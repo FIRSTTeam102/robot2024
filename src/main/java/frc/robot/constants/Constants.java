@@ -9,6 +9,9 @@ public final class Constants {
 		Active, Replay;
 	}
 
+	/** publishes many constants to NT for hot editing */
+	public static final boolean tuningMode = false;
+
 	public static class OperatorConstants {
 		public static final int driverControllerPort = 0;
 

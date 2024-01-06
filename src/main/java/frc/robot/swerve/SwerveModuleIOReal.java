@@ -129,8 +129,8 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	}
 
 	@Override
-	public void setDriveMotorPercentage(double percentage) {
-		driveMotor.set(percentage);
+	public void setDriveMotorVoltage(double voltage) {
+		driveMotor.setVoltage(voltage);
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 	@Override
 	public void setAngleVoltage(double voltage) {
-		angleSparkPidController.setReference(voltage, CANSparkMax.ControlType.kVoltage);
+		angleMotor.setVoltage(voltage);
 	}
 
 	@Override

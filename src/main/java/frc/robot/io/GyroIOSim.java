@@ -17,9 +17,9 @@ public class GyroIOSim implements GyroIO {
 			return;
 
 		inputs.connected = true;
-		inputs.yaw_dps = Math
+		double yaw_dps = Math
 			.toDegrees(swerve.kinematics.toChassisSpeeds(swerve.moduleStates).omegaRadiansPerSecond);
-		inputs.yaw_deg += inputs.yaw_dps * Constants.loopPeriod_s;
+		inputs.yaw_deg += yaw_dps * Constants.loopPeriod_s;
 		// todo: sim other rotations if needed
 	}
 

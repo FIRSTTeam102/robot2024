@@ -27,7 +27,7 @@ public interface SwerveModuleIO {
 	public default void updateInputs(SwerveModuleIOInputs inputs) {}
 
 	/** runs the drive motor at the specified percentage of full power */
-	public default void setDriveMotorPercentage(double percentage) {}
+	public default void setDriveMotorVoltage(double voltage) {}
 
 	/** runs the drive motor at the specified velocity */
 	public default void setDriveVelocity(double velocity) {}

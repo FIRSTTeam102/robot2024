@@ -34,7 +34,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	private PIDController driveController = new PIDController(simDriveKp, simDriveKi, simDriveKd);
 
 	private PIDController angleController = new PIDController(simAngleKp, simDriveKi, simDriveKd);
-	private boolean anglePositionEnabled = true;
+	private boolean isAngleOpenLoop = true;
 
 	public SwerveModuleIOSim() {
 		angleController.enableContinuousInput(0, Conversions.twoPi);
@@ -42,7 +42,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 
 	@Override
 	public void updateInputs(SwerveModuleIOInputs inputs) {
-		if (anglePositionEnabled) {
+		if (!isAngleOpenLoop) {
 			angleWheelSim.setInputVoltage(angleController.calculate(inputs.angleAbsolutePosition_rad));
 		}
 
@@ -84,10 +84,10 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	}
 
 	@Override
-	public void setDriveMotorPercentage(double percentage) {
+	public void setDriveMotorVoltage(double voltage) {
 		isDriveOpenLoop = true;
 		driveController.reset();
-		driveAppliedVolts = MathUtil.clamp(percentage * 12.0, -12.0, 12.0);
+		driveAppliedVolts = MathUtil.clamp(voltage, -12.0, 12.0);
 		driveWheelSim.setInputVoltage(driveAppliedVolts);
 	}
 
@@ -99,15 +99,16 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 
 	@Override
 	public void setAngleVoltage(double voltage) {
+		isAngleOpenLoop = true;
+		angleController.reset();
 		angleAppliedVolts = MathUtil.clamp(voltage, -12.0, 12.0);
 		angleWheelSim.setInputVoltage(angleAppliedVolts);
-		this.anglePositionEnabled = false;
 	}
 
 	@Override
 	public void setAnglePosition(Rotation2d angle) {
+		isAngleOpenLoop = false;
 		angleController.setSetpoint(angle.getRadians());
-		this.anglePositionEnabled = true;
 	}
 
 	@Override

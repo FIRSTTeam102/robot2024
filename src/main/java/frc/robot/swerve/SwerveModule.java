@@ -53,9 +53,9 @@ public class SwerveModule {
 	 *
 	 * @param voltage specified voltage for the drive motor
 	 */
-	public void runCharacterization(double voltage) {
+	public void runDriveCharacterization(double voltage) {
 		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0.0)), true, true);
-		io.setDriveMotorPercentage(voltage / 12.0);
+		io.setDriveMotorVoltage(voltage);
 	}
 
 	public SwerveModuleState getState() {
@@ -97,7 +97,7 @@ public class SwerveModule {
 		// run drive
 		if (isOpenLoop) {
 			double percentOutput = optimizedState.speedMetersPerSecond / maxVelocity_mps;
-			io.setDriveMotorPercentage(percentOutput);
+			io.setDriveMotorVoltage(percentOutput * 12);
 		} else {
 			io.setDriveVelocity(optimizedState.speedMetersPerSecond);
 		}

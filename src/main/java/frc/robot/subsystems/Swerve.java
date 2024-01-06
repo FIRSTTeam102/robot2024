@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static frc.robot.constants.AutoConstants.*;
 import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.Robot;
@@ -18,7 +19,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import org.littletonrobotics.junction.Logger;
@@ -55,20 +56,13 @@ public class Swerve extends SubsystemBase {
 
 	// used for pose estimation
 	private Timer timer = new Timer();
-	public double disabledTimeStart = 0.0;
-
-	private boolean brakeMode = true;
 
 	public GyroIO gyroIO;
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
-	private double gyroOffset_deg = 0.0;
-
-	public double translationY;
-	public double translationX;
 
 	// private Vision vision;
-
-	public boolean autoAprilTag = true;
+	private double translationY;
+	private double translationX;
 
 	public Swerve(GyroIO gyroIO/* , Vision vision */) {
 		modules = new SwerveModule[moduleConstants.length];
@@ -95,7 +89,11 @@ public class Swerve extends SubsystemBase {
 			() -> kinematics.toChassisSpeeds(getStates()),
 			this::setChasisSpeeds,
 			new HolonomicPathFollowerConfig(
-				maxVelocity_mps, Math.hypot(trackWidth_m / 2.0, trackWidth_m / 2.0), new ReplanningConfig()),
+				new PIDConstants(autoDriveKp, autoDriveKi, autoDriveKd),
+				new PIDConstants(autoAngleKp, autoAngleKi, autoAngleKd),
+				maxVelocity_mps,
+				Math.hypot(trackWidth_m / 2.0, trackWidth_m / 2.0),
+				new ReplanningConfig()),
 			this);
 		Pathfinding.setPathfinder(new LocalADStarAK());
 
@@ -154,7 +152,11 @@ public class Swerve extends SubsystemBase {
 
 	/** @return gyro yaw including code offset */
 	public Rotation2d getYaw() {
-		return Rotation2d.fromDegrees(gyroInputs.yaw_deg + gyroOffset_deg);
+		return Rotation2d.fromDegrees(gyroInputs.yaw_deg);
+	}
+
+	public void zeroYaw() {
+		gyroIO.setYaw(0);
 	}
 
 	public double getTilt_rad() {
@@ -162,42 +164,9 @@ public class Swerve extends SubsystemBase {
 		return (gyroInputs.pitch_rad * Math.sin(yaw)) + (gyroInputs.roll_rad * -Math.cos(yaw));
 	}
 
-	/** sets the rotation of the robot to the specified value by changing code gyro offset */
-	public void setGyroOffset_deg(double expectedYaw_deg) {
-		gyroOffset_deg = expectedYaw_deg - gyroInputs.yaw_deg;
-	}
-
-	public void zeroYaw() {
-		gyroIO.setYaw(0);
-	}
-
-	/** turn off brake mode if we're disabled for long enough and not moving */
-	// todo:
-	private void updateBrakeMode() {
-		if (DriverStation.isEnabled() && !brakeMode) {
-			setBrakeMode(true);
-		} else {
-			boolean stillMoving = false;
-
-			// update if we're still moving for braking
-			for (var mod : moduleStates)
-				if (mod.speedMetersPerSecond > maxCoastVelocity_mps) {
-					stillMoving = true;
-					break;
-				}
-
-			if (brakeMode && !stillMoving
-			// wait for scores to be finalized during a match
-				&& (!DriverStation.isFMSAttached() || (Timer.getFPGATimestamp() - disabledTimeStart) < 4.0))
-				setBrakeMode(false);
-		}
-	}
-
-	private void setBrakeMode(boolean enable) {
-		brakeMode = enable;
-		for (SwerveModule mod : modules) {
+	public void setBrakeMode(boolean enable) {
+		for (SwerveModule mod : modules)
 			mod.setDriveBrakeMode(enable);
-		}
 	}
 
 	public void setCenterRotation(double x, double y) {
@@ -237,19 +206,6 @@ public class Swerve extends SubsystemBase {
 		setModuleStates(states);
 	}
 
-	public void runCharacterization(double voltage) {
-		for (var mod : modules)
-			mod.runCharacterization(voltage);
-	}
-
-	// radps
-	public double getCharacterizationVelocity() {
-		double driveVelocityAverage = 0.0;
-		for (var module : modules)
-			driveVelocityAverage += module.io.getCharacterizationVelocity_radps();
-		return driveVelocityAverage / modules.length;
-	}
-
 	public SwerveModuleState[] getXStanceStates() {
 		var states = kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0), new Translation2d(0, 0));
 		states[0].angle = new Rotation2d(3 * Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
@@ -283,8 +239,7 @@ public class Swerve extends SubsystemBase {
 		// todo: estimate without using gyro?
 
 		// // Every 0.02s, updating pose2d
-		// if ((autoAprilTag || !DriverStation.isAutonomous())
-		// && vision.inputs.pipeline == pipeline.AprilTag.value && vision.isPipelineReady()
+		// if (vision.inputs.pipeline == pipeline.AprilTag.value && vision.isPipelineReady()
 		// && vision.inputs.target == true) {
 		// visionSeenCount++;
 		// if (visionSeenCount > 2) { // fixme: temporary
@@ -316,5 +271,18 @@ public class Swerve extends SubsystemBase {
 		}
 		fieldSim.setRobotPose(pose);
 		fieldSim.getObject("Swerve Modules").setPoses(modulePoses);
+	}
+
+	public void runDriveCharacterization(double voltage) {
+		for (var mod : modules)
+			mod.runDriveCharacterization(voltage);
+	}
+
+	// radps
+	public double getDriveCharacterizationVelocity() {
+		double driveVelocityAverage = 0.0;
+		for (var module : modules)
+			driveVelocityAverage += module.io.getCharacterizationVelocity_radps();
+		return driveVelocityAverage / modules.length;
 	}
 }
