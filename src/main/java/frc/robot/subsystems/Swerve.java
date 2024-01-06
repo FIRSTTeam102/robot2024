@@ -5,6 +5,7 @@ import static frc.robot.constants.SwerveConstants.*;
 import frc.robot.Robot;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
+import frc.robot.swerve.LocalADStarAK;
 import frc.robot.swerve.SwerveModule;
 import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
@@ -23,7 +24,10 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import com.pathplanner.lib.path.PathPlannerTrajectory;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.ReplanningConfig;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -84,6 +88,17 @@ public class Swerve extends SubsystemBase {
 
 		SmartDashboard.putData("Field", fieldSim);
 
+		// configure pathplanner
+		AutoBuilder.configureHolonomic(
+			this::getPose,
+			this::resetOdometry,
+			() -> kinematics.toChassisSpeeds(getStates()),
+			this::setChasisSpeeds,
+			new HolonomicPathFollowerConfig(
+				maxVelocity_mps, Math.hypot(trackWidth_m / 2.0, trackWidth_m / 2.0), new ReplanningConfig()),
+			this);
+		Pathfinding.setPathfinder(new LocalADStarAK());
+
 		// this.vision = vision;
 	}
 
@@ -128,11 +143,8 @@ public class Swerve extends SubsystemBase {
 	 * this should only be done when the rotation of the robot is known
 	 * (like at the start of an autonomous path)
 	 */
-	public void resetOdometry(PathPlannerTrajectory.State state) {
-		// estimatedPoseWithoutGyro = new Pose2d(state.poseMeters.getTranslation(), state.holonomicRotation);
-		poseEstimator.resetPosition(
-			getYaw(), getPositions(),
-			new Pose2d(state.positionMeters, state.targetHolonomicRotation));
+	public void resetOdometry(Pose2d pose) {
+		poseEstimator.resetPosition(getYaw(), getPositions(), pose);
 	}
 
 	public void resetModuleOffsets() {

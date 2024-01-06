@@ -8,6 +8,7 @@ import frc.robot.util.Conversions;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -32,8 +33,19 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(simDriveKs, simDriveKv);
 	private PIDController driveController = new PIDController(simDriveKp, simDriveKi, simDriveKd);
 
+	private PIDController angleController = new PIDController(simAngleKp, simDriveKi, simDriveKd);
+	private boolean anglePositionEnabled = true;
+
+	public SwerveModuleIOSim() {
+		angleController.enableContinuousInput(0, Conversions.twoPi);
+	}
+
 	@Override
 	public void updateInputs(SwerveModuleIOInputs inputs) {
+		if (anglePositionEnabled) {
+			angleWheelSim.setInputVoltage(angleController.calculate(inputs.angleAbsolutePosition_rad));
+		}
+
 		// update the models
 		driveWheelSim.update(loopPeriod_s);
 		angleWheelSim.update(loopPeriod_s);
@@ -89,6 +101,13 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	public void setAngleVoltage(double voltage) {
 		angleAppliedVolts = MathUtil.clamp(voltage, -12.0, 12.0);
 		angleWheelSim.setInputVoltage(angleAppliedVolts);
+		this.anglePositionEnabled = false;
+	}
+
+	@Override
+	public void setAnglePosition(Rotation2d angle) {
+		angleController.setSetpoint(angle.getRadians());
+		this.anglePositionEnabled = true;
 	}
 
 	@Override

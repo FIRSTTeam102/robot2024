@@ -1,14 +1,12 @@
 package frc.robot.swerve;
 
-import static frc.robot.constants.SwerveConstants.*;
+import static frc.robot.constants.SwerveConstants.maxVelocity_mps;
 
 import frc.robot.util.Conversions;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -17,25 +15,14 @@ public class SwerveModule {
 	private Rotation2d lastAngle;
 	public final SwerveModuleIO io;
 	private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
-	private PIDController anglePIDController;
 
 	public SwerveModule(int moduleNumber, SwerveModuleIO io) {
 		this.moduleNumber = moduleNumber;
 		this.io = io;
 
 		var isReal = io.getClass() == SwerveModuleIOReal.class;
-		anglePIDController = new PIDController(
-			isReal ? angleKp : simAngleKp,
-			isReal ? angleKi : simAngleKi,
-			isReal ? angleKd : simAngleKd);
-		// new TrapezoidProfile.Constraints(
-		// maxAngularVelocity_radps,
-		// maxAngularVelocity_radps));
-		anglePIDController.enableContinuousInput(0, Conversions.twoPi);
 
 		lastAngle = getState().angle;
-
-		SmartDashboard.putData("SwerveModule " + moduleNumber, anglePIDController);
 	}
 
 	private SwerveModuleState optimizedState = new SwerveModuleState();
@@ -100,12 +87,10 @@ public class SwerveModule {
 
 		// run turn
 		io.setAnglePosition(angle);
-		// io.setAngleVoltage(
-		// anglePIDController.calculate(inputs.angleAbsolutePosition_rad,
-		// Conversions.angleModulus2pi(angle.getRadians())));
 
 		// update velocity based on angle error
-		optimizedState.speedMetersPerSecond *= Math.cos(anglePIDController.getPositionError());
+		optimizedState.speedMetersPerSecond *= Math.cos(Math.abs(
+			optimizedState.angle.getRadians() - inputs.angleAbsolutePosition_rad));
 
 		Logger.recordOutput("SwerveModule " + moduleNumber + "/targetSpeed_mps", optimizedState.speedMetersPerSecond);
 

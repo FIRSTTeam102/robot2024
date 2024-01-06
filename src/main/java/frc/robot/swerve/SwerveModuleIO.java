@@ -35,6 +35,7 @@ public interface SwerveModuleIO {
 	/** runs the angle motor at the specified voltage */
 	public default void setAngleVoltage(double voltage) {}
 
+	/** runs the angle motor to the specified position */
 	public default void setAnglePosition(Rotation2d angle) {}
 
 	/** enable or disable brake mode on the drive motor */

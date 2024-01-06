@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.constants.Constants.OperatorConstants.driverControllerPort;
 
 import frc.robot.constants.Constants;
+import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
@@ -10,6 +11,9 @@ import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
+
+import frc.robot.commands.swerve.TeleopSwerve;
+import frc.robot.commands.swerve.XStance;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -80,7 +84,25 @@ public class RobotContainer {
 	 * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
 	 * joysticks}.
 	 */
-	private void configureBindings() {}
+	private void configureBindings() {
+		var teleopSwerve = new TeleopSwerve(
+			() -> -driverController.getLeftY(),
+			() -> -driverController.getLeftX(),
+			() -> -driverController.getRightX(),
+			driverController.getHID()::getLeftBumper, // override speed
+			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // preceise mode
+			swerve);
+		swerve.setDefaultCommand(teleopSwerve);
+
+		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
+			.whileTrue(teleopSwerve.holdToggleFieldRelative());
+		driverController.rightBumper()
+			.whileTrue(teleopSwerve.holdRotateAroundPiece());
+
+		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
+		driverController.x().whileTrue(new XStance(swerve));
+		driverController.y().onTrue(teleopSwerve.zeroYaw());
+	}
 
 	/**
 	 * Use this to pass the autonomous command to the main {@link Robot} class.
