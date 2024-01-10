@@ -19,6 +19,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -94,6 +95,10 @@ public class Swerve extends SubsystemBase {
 				maxVelocity_mps,
 				Math.hypot(trackWidth_m / 2.0, trackWidth_m / 2.0),
 				new ReplanningConfig()),
+			() -> {
+				var alliance = DriverStation.getAlliance();
+				return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+			},
 			this);
 		Pathfinding.setPathfinder(new LocalADStarAK());
 
@@ -210,8 +215,8 @@ public class Swerve extends SubsystemBase {
 		var states = kinematics.toSwerveModuleStates(new ChassisSpeeds(0, 0, 0), new Translation2d(0, 0));
 		states[0].angle = new Rotation2d(3 * Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
 		states[1].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
-		states[3].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
-		states[2].angle = new Rotation2d(Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
+		states[2].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
+		states[3].angle = new Rotation2d(Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
 		return states;
 	}
 
@@ -226,10 +231,8 @@ public class Swerve extends SubsystemBase {
 
 			modulePositions[mod.moduleNumber] = mod.getPosition();
 			moduleStates[mod.moduleNumber] = mod.getState();
-
-			// log outputs
-			Logger.recordOutput("Swerve/State " + mod.moduleNumber, moduleStates[mod.moduleNumber]);
 		}
+		Logger.recordOutput("Swerve/States", moduleStates);
 
 		// update odometry
 		poseEstimator.updateWithTime(timer.get(), getYaw(), modulePositions);

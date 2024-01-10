@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 public final class SwerveConstants {
-	// FL, FR, BR, BL
+	// FL, FR, BL, BR (matches AdvantageScope convention)
 	public static final SwerveModuleConstants moduleConstants[] = {
 		new SwerveModuleConstants(21, 22, 23, 0),
 		new SwerveModuleConstants(24, 25, 26, 0),
@@ -25,8 +25,8 @@ public final class SwerveConstants {
 	public static final Translation2d[] moduleTranslations = {
 		new Translation2d(wheelBase_m / 2.0, trackWidth_m / 2.0),
 		new Translation2d(wheelBase_m / 2.0, -trackWidth_m / 2.0),
-		new Translation2d(-wheelBase_m / 2.0, -trackWidth_m / 2.0),
 		new Translation2d(-wheelBase_m / 2.0, trackWidth_m / 2.0),
+		new Translation2d(-wheelBase_m / 2.0, -trackWidth_m / 2.0),
 	};
 
 	/**
@@ -60,12 +60,12 @@ public final class SwerveConstants {
 	public static final double robotfence = 0.35; // from botpose to the bumper
 
 	/* drive motor PID values */
-	public static final double driveKp = 0.1; // fixme:
+	public static final double driveKp = 0.1; // todo: tune for real
 	public static final double driveKi = 0.0;
 	public static final double driveKd = 0.0;
 	public static final double driveKf = 0.0;
 	/* sim drive motor PID values */
-	public static final double simDriveKp = 0.8;
+	public static final double simDriveKp = 0.003; // fixme: overshoots
 	public static final double simDriveKi = 0.0;
 	public static final double simDriveKd = 0.0;
 	public static final double simDriveKf = 0.0;
@@ -73,7 +73,7 @@ public final class SwerveConstants {
 	public static final double driveEncoderPositionFactor_m = wheelCircumference_m * driveGearRatio;
 
 	/* angle motor PID values */
-	public static final double angleKp = 5.7;
+	public static final double angleKp = 5.7; // todo: tune for real
 	public static final double angleKi = 0.0;
 	public static final double angleKd = 0.05;
 	public static final double angleKf = 0.0;

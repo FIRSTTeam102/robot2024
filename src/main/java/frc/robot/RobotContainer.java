@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -63,6 +64,10 @@ public class RobotContainer {
 
 		configureBindings();
 
+		// named commands must be registered before any paths are created
+		NamedCommands.registerCommand("XStance", new XStance(swerve));
+
+		// create paths
 		autoChooser.addOption("nothing", Commands.none());
 		autoChooser.addDefaultOption("example", new PathPlannerAuto("Example Auto"));
 

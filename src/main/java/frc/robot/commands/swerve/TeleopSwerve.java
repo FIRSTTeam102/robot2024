@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 
+import org.littletonrobotics.junction.Logger;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -100,7 +102,7 @@ public class TeleopSwerve extends Command {
 	private SlewRateLimiter driveLimiter = new SlewRateLimiter(accelerationLimit_mps2);
 	private SlewRateLimiter strafeLimiter = new SlewRateLimiter(accelerationLimit_mps2);
 
-	private static final double normalMaxPercent = 0.75;
+	private static final double normalMaxPercent = 1.0; // todo: depending on driver
 
 	@Override
 	public void execute() {
@@ -123,14 +125,14 @@ public class TeleopSwerve extends Command {
 			driveLimiter.calculate(driveMax * modifyAxis(driveSupplier.getAsDouble())),
 			strafeLimiter.calculate(driveMax * modifyAxis(strafeSupplier.getAsDouble())));
 
-		// Logger.getInstance().recordOutput("TeleopSwerve/translationX_mps", translation.getX());
-		// Logger.getInstance().recordOutput("TeleopSwerve/translationY_mps", translation.getY());
+		Logger.recordOutput("TeleopSwerve/translationX_mps", translation.getX());
+		Logger.recordOutput("TeleopSwerve/translationY_mps", translation.getY());
 
 		rotation = modifyAxis(turnSupplier.getAsDouble())
 			* SwerveConstants.maxAngularVelocity_radps
 			* turnMaxPercent;
 
-		// Logger.getInstance().recordOutput("TeleopSwerve/rotation_radps", rotation);
+		Logger.recordOutput("TeleopSwerve/rotation_radps", rotation);
 
 		swerve.drive(translation, rotation, fieldRelative);
 	}
