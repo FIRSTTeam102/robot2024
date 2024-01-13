@@ -27,7 +27,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 	private CANSparkMax angleMotor;
 	private SparkPIDController angleSparkPidController;
-	// private RelativeEncoder angleRelativeEncoder;
+	private RelativeEncoder angleRelativeEncoder;
 	private SparkAnalogSensor angleAbsoluteEncoder;
 	private double angleOffset_rad;
 	// private SimpleMotorFeedforward angleFeedforward = new SimpleMotorFeedforward(angleKs, angleKv, angleKa);
@@ -49,43 +49,6 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		tunableDriveKd = new TunableNumber(key + "driveKd", driveKd);
 		tunableAngleKp = new TunableNumber(key + "angleKp", angleKp);
 		tunableAngleKd = new TunableNumber(key + "angleKd", angleKd);
-
-		angleMotor = new CANSparkMax(moduleConstants.angleMotorId(), CANSparkMax.MotorType.kBrushless);
-		angleMotor.restoreFactoryDefaults();
-		angleSparkPidController = angleMotor.getPIDController();
-		angleSparkPidController.setP(angleKp);
-		angleSparkPidController.setI(angleKi);
-		angleSparkPidController.setD(angleKd);
-		angleSparkPidController.setFF(angleKf);
-		// angleSparkPidController.setOutputRange(-angleMaxPercentOutput, angleMaxPercentOutput);
-		angleMotor.setSmartCurrentLimit(angleCurrentLimit_amp);
-		angleMotor.setInverted(angleInverted);
-		angleMotor.setIdleMode(angleIdleMode);
-		// angleMotor.setClosedLoopRampRate(angleRampTime_s);
-		angleMotor.enableVoltageCompensation(12);
-
-		// angleRelativeEncoder = angleMotor.getEncoder();
-
-		angleAbsoluteEncoder = angleMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
-		angleAbsoluteEncoder.setPositionConversionFactor(Conversions.twoPi / 3.3 /* V */); // rad
-		angleAbsoluteEncoder.setVelocityConversionFactor(Conversions.twoPi / 3.3 /* V */); // radps
-		angleSparkPidController.setFeedbackDevice(angleAbsoluteEncoder);
-
-		// wrap betwee 0 and 2pi radians
-		angleSparkPidController.setPositionPIDWrappingEnabled(true);
-		angleSparkPidController.setPositionPIDWrappingMinInput(0);
-		angleSparkPidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
-
-		// turn down frequency as we only log them, not needed for calculations
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 40); // percent output
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 40); // velocity, current
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500); // position
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500); // analog sensor
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500); // alternate encoder
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500); // duty cycle position
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500); // duty cycle velocity
-
-		angleMotor.burnFlash();
 
 		driveMotor = new CANSparkMax(moduleConstants.driveMotorId(), CANSparkMax.MotorType.kBrushless);
 		driveMotor.restoreFactoryDefaults();
@@ -115,26 +78,64 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		// driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500); // duty cycle velocity
 
 		driveMotor.burnFlash();
-	}
 
-	private double getAbsoluteEncoder_rad() {
-		return Conversions.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad);
+		angleMotor = new CANSparkMax(moduleConstants.angleMotorId(), CANSparkMax.MotorType.kBrushless);
+		angleMotor.restoreFactoryDefaults();
+		angleSparkPidController = angleMotor.getPIDController();
+		angleSparkPidController.setP(angleKp);
+		angleSparkPidController.setI(angleKi);
+		angleSparkPidController.setD(angleKd);
+		angleSparkPidController.setFF(angleKf);
+		// angleSparkPidController.setOutputRange(-angleMaxPercentOutput, angleMaxPercentOutput);
+		angleMotor.setSmartCurrentLimit(angleCurrentLimit_amp);
+		angleMotor.setInverted(angleInverted);
+		angleMotor.setIdleMode(angleIdleMode);
+		// angleMotor.setClosedLoopRampRate(angleRampTime_s);
+		angleMotor.enableVoltageCompensation(12);
+
+		angleRelativeEncoder = angleMotor.getEncoder();
+		angleRelativeEncoder.setPositionConversionFactor(Conversions.twoPi / angleGearRatio); // rad
+		angleRelativeEncoder.setVelocityConversionFactor(Conversions.twoPi / angleGearRatio / 60.0); // radps
+
+		driveRelativeEncoder.setPositionConversionFactor(wheelCircumference_m / driveGearRatio); // m
+		driveRelativeEncoder.setVelocityConversionFactor(wheelCircumference_m / driveGearRatio / 60.0); // mps
+
+		angleAbsoluteEncoder = angleMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
+		angleAbsoluteEncoder.setPositionConversionFactor(Conversions.twoPi / 3.3 /* V */); // rad
+		// absolute encoder velocity reading is meaningless (jumps around), using relative encoder's instead
+		// angleAbsoluteEncoder.setVelocityConversionFactor(Conversions.twoPi / 3.3 /* V */); // radps
+		angleSparkPidController.setFeedbackDevice(angleAbsoluteEncoder);
+
+		// wrap betwee 0 and 2pi radians
+		angleSparkPidController.setPositionPIDWrappingEnabled(true);
+		angleSparkPidController.setPositionPIDWrappingMinInput(0);
+		angleSparkPidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
+
+		// turn down frequency as we only log them, not needed for calculations
+		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 40); // percent output
+		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 40); // velocity, current
+		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500); // position
+		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500); // analog sensor
+		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500); // alternate encoder
+		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500); // duty cycle position
+		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500); // duty cycle velocity
+
+		angleMotor.burnFlash();
 	}
 
 	@Override
 	public void updateInputs(SwerveModuleIOInputs inputs) {
-		inputs.angleAbsolutePosition_rad = getAbsoluteEncoder_rad();
-
 		inputs.driveDistance_m = driveRelativeEncoder.getPosition();
 		inputs.driveVelocity_mps = driveRelativeEncoder.getVelocity();
-		inputs.driveAppliedPercentage = driveMotor.getAppliedOutput();
 		inputs.driveVoltage_V = driveMotor.getBusVoltage() * driveMotor.getAppliedOutput();
 		inputs.driveCurrent_A = driveMotor.getOutputCurrent();
 		inputs.driveTemperature_C = driveMotor.getMotorTemperature();
 
-		inputs.angleAbsolutePosition_rad = angleAbsoluteEncoder.getPosition();
-		inputs.angleVelocity_radps = angleAbsoluteEncoder.getVelocity();
-		inputs.angleAppliedPercentage = angleMotor.getAppliedOutput();
+		inputs.anglePosition_rad = angleRelativeEncoder.getPosition();
+		inputs.angleAbsolutePosition_rad = Conversions
+			.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad); // ensure offset is properly wrapped
+		// inputs.angleVelocity_radps = angleAbsoluteEncoder.getVelocity(); // gives garbage data
+		inputs.angleVelocity_radps = angleRelativeEncoder.getVelocity();
 		inputs.angleVoltage_V = angleMotor.getBusVoltage() * angleMotor.getAppliedOutput();
 		inputs.angleCurrent_A = angleMotor.getOutputCurrent();
 		inputs.angleTemperature_C = angleMotor.getMotorTemperature();

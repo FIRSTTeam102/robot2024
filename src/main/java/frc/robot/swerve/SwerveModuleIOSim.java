@@ -25,12 +25,12 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	private FlywheelSim angleWheelSim = new FlywheelSim(DCMotor.getNEO(1), angleGearRatio, 0.004);
 
 	private double angleAbsolutePosition_rad = 0.0; // Math.random() * Conversions.twoPi;
-	private double driveAppliedVolts = 0.0;
-	private double angleAppliedVolts = 0.0;
+	private double driveApplied_V = 0.0;
+	private double angleApplied_V = 0.0;
 	private boolean isDriveOpenLoop = true;
 	private double driveSetpoint_mps = 0.0;
 
-	private SimpleMotorFeedforward feedForward = new SimpleMotorFeedforward(simDriveKs, simDriveKv);
+	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(simDriveKs, simDriveKv, simDriveKa);
 	private PIDController driveController = new PIDController(simDriveKp, simDriveKi, simDriveKd);
 
 	private PIDController angleController = new PIDController(simAngleKp, simDriveKi, simDriveKd);
@@ -51,31 +51,29 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 		angleWheelSim.update(loopPeriod_s);
 
 		// update the inputs that will be logged
-		double angleDiffRad = angleWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s;
-		// inputs.anglePosition_rad += angleDiffRad;
-		// using member so we start at a random location
-		angleAbsolutePosition_rad += angleDiffRad;
-		angleAbsolutePosition_rad = Conversions.angleModulus2pi(angleAbsolutePosition_rad + angleDiffRad);
+		double angleDiff_rad = angleWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s;
+		inputs.anglePosition_rad += angleDiff_rad;
+		// angleAbsolutePosition_rad += angleDiff_rad;
+		angleAbsolutePosition_rad = Conversions.angleModulus2pi(angleAbsolutePosition_rad + angleDiff_rad);
 		inputs.angleAbsolutePosition_rad = angleAbsolutePosition_rad;
 
 		// inputs.drivePosition_rad = inputs.drivePosition_rad
 		// + driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s;
-		inputs.driveDistance_m = inputs.driveDistance_m
-			+ (driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s * wheelRadius_m);
+		inputs.driveDistance_m += (driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s * wheelRadius_m);
 		inputs.driveVelocity_mps = driveWheelSim.getAngularVelocityRadPerSec() * wheelRadius_m;
-		inputs.driveAppliedPercentage = driveAppliedVolts / 12.0;
+		inputs.driveVoltage_V = driveApplied_V;
 		inputs.driveCurrent_A = Math.abs(driveWheelSim.getCurrentDrawAmps());
 
 		inputs.angleVelocity_radps = angleWheelSim.getAngularVelocityRadPerSec();
-		inputs.angleAppliedPercentage = angleAppliedVolts / 12.0;
+		inputs.angleVoltage_V = angleApplied_V;
 		inputs.angleCurrent_A = Math.abs(angleWheelSim.getCurrentDrawAmps());
 
 		if (!isDriveOpenLoop) {
-			double velocityRadPerSec = driveSetpoint_mps / wheelRadius_m;
-			driveAppliedVolts = feedForward.calculate(velocityRadPerSec)
-				+ driveController.calculate(inputs.driveVelocity_mps, velocityRadPerSec);
-			driveAppliedVolts = MathUtil.clamp(driveAppliedVolts, -12.0, 12.0);
-			driveWheelSim.setInputVoltage(driveAppliedVolts);
+			double velocity_radps = driveSetpoint_mps / wheelRadius_m;
+			driveApplied_V = driveFeedforward.calculate(velocity_radps)
+				+ driveController.calculate(inputs.driveVelocity_mps, velocity_radps);
+			driveApplied_V = MathUtil.clamp(driveApplied_V, -12.0, 12.0);
+			driveWheelSim.setInputVoltage(driveApplied_V);
 		}
 
 		RoboRioSim.setVInVoltage(
@@ -87,8 +85,8 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	public void setDriveVoltage(double voltage) {
 		isDriveOpenLoop = true;
 		driveController.reset();
-		driveAppliedVolts = MathUtil.clamp(voltage, -12.0, 12.0);
-		driveWheelSim.setInputVoltage(driveAppliedVolts);
+		driveApplied_V = MathUtil.clamp(voltage, -12.0, 12.0);
+		driveWheelSim.setInputVoltage(driveApplied_V);
 	}
 
 	@Override
@@ -101,8 +99,8 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	public void setAngleVoltage(double voltage) {
 		isAngleOpenLoop = true;
 		angleController.reset();
-		angleAppliedVolts = MathUtil.clamp(voltage, -12.0, 12.0);
-		angleWheelSim.setInputVoltage(angleAppliedVolts);
+		angleApplied_V = MathUtil.clamp(voltage, -12.0, 12.0);
+		angleWheelSim.setInputVoltage(angleApplied_V);
 	}
 
 	@Override

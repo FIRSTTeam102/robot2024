@@ -278,6 +278,8 @@ public class Swerve extends SubsystemBase {
 		fieldSim.getObject("Swerve Modules").setPoses(modulePoses);
 	}
 
+	// until advantagescope wpilog imports are fixed, use built in data log to gather data
+
 	// public final SysIdRoutine driveSysIdRoutine = new SysIdRoutine(
 	// new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
 	// new SysIdRoutine.Mechanism(

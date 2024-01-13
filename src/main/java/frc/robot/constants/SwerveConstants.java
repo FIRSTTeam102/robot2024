@@ -60,10 +60,20 @@ public final class SwerveConstants {
 	public static final double driveKd = 0.0;
 	public static final double driveKf = 0.0; // 1 / maxVelocity_mps;
 	/* sim drive motor PID values */
-	public static final double simDriveKp = 0.003; // fixme: overshoots
+	// public static final double simDriveKp = 0.003; // fixme: overshoots
+	public static final double simDriveKp = 0.002;
 	public static final double simDriveKi = 0.0;
 	public static final double simDriveKd = 0.0;
 	public static final double simDriveKf = 0.0;
+
+	/* drive motor characterization (feed forward) */
+	public static final double driveKs = 0.097269;
+	public static final double driveKv = 2.7132;
+	public static final double driveKa = 0.33493;
+	/* sim drive motor characterization */
+	public static final double simDriveKs = -0.0088814;
+	public static final double simDriveKv = 2.4012;
+	public static final double simDriveKa = 0.18761;
 
 	/* angle motor PID values */
 	public static final double angleKp = 5.7; // todo: tune for real
@@ -71,18 +81,10 @@ public final class SwerveConstants {
 	public static final double angleKd = 0.05;
 	public static final double angleKf = 0.0;
 	/* sim angle motor PID values */
-	public static final double simAngleKp = 8.0;
+	public static final double simAngleKp = 10; // todo: replace with linear system of real mech?
 	public static final double simAngleKi = 0.0;
 	public static final double simAngleKd = 0.0;
 	public static final double simAngleKf = 0.0;
-
-	/* drive motor characterization (feed forward) */
-	public static final double driveKs = 0.097269;
-	public static final double driveKv = 2.7132;
-	public static final double driveKa = 0.33493;
-	/* sim drive motor characterization */
-	public static final double simDriveKs = 0.117;
-	public static final double simDriveKv = 0.133;
 
 	// /* angle motor characterization (feed forward) */
 	// public static final double angleKs = 0;

@@ -88,23 +88,8 @@ public class RobotContainer {
 		if (Constants.tuningMode) {
 			Logger.recordOutput("SysIdTestState", SysIdRoutineLog.State.kNone.toString()); // populate default
 
-			autoChooser.addOption("sysid swerve drive", Commands.sequence(
-				swerve.driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward),
-				Commands.waitSeconds(2),
-				swerve.driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
-				Commands.waitSeconds(2),
-				swerve.driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward),
-				Commands.waitSeconds(2),
-				swerve.driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)));
-
-			autoChooser.addOption("sysid swerve angle", Commands.sequence(
-				swerve.angleSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward),
-				Commands.waitSeconds(2),
-				swerve.angleSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
-				Commands.waitSeconds(2),
-				swerve.angleSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward),
-				Commands.waitSeconds(2),
-				swerve.angleSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)));
+			autoChooser.addOption("sysid swerve drive", sysIdTestSet(swerve.driveSysIdRoutine));
+			autoChooser.addOption("sysid swerve angle", sysIdTestSet(swerve.angleSysIdRoutine));
 		}
 	}
 
@@ -145,6 +130,17 @@ public class RobotContainer {
 	public Command getAutonomousCommand() {
 		// An example command will be run in autonomous
 		return autoChooser.get();
+	}
+
+	private Command sysIdTestSet(SysIdRoutine routine) {
+		return Commands.sequence(
+			routine.quasistatic(SysIdRoutine.Direction.kForward),
+			Commands.waitSeconds(2),
+			routine.quasistatic(SysIdRoutine.Direction.kReverse),
+			Commands.waitSeconds(2),
+			routine.dynamic(SysIdRoutine.Direction.kForward),
+			Commands.waitSeconds(2),
+			routine.dynamic(SysIdRoutine.Direction.kReverse));
 	}
 
 	Alert driverControllerAlert = new Alert("driver controller not connected properly", AlertType.Error);
