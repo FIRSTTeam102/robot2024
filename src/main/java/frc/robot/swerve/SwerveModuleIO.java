@@ -8,7 +8,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface SwerveModuleIO {
 	@AutoLog
 	public static class SwerveModuleIOInputs {
-		double drivePosition_rad = 0.0;
+		// double drivePosition_rad = 0.0;
 		double driveDistance_m = 0.0;
 		double driveVelocity_mps = 0.0;
 		double driveAppliedPercentage = 0.0;
@@ -27,7 +27,7 @@ public interface SwerveModuleIO {
 	public default void updateInputs(SwerveModuleIOInputs inputs) {}
 
 	/** runs the drive motor at the specified percentage of full power */
-	public default void setDriveMotorVoltage(double voltage) {}
+	public default void setDriveVoltage(double voltage) {}
 
 	/** runs the drive motor at the specified velocity */
 	public default void setDriveVelocity(double velocity) {}
@@ -41,10 +41,13 @@ public interface SwerveModuleIO {
 	/** enable or disable brake mode on the drive motor */
 	public default void setDriveBrakeMode(boolean enable) {}
 
-	public default double getCharacterizationVelocity_radps() {
+	/** set the offset (zero/forwards) of the angle position */
+	public default void setOffset(double offset_rad) {}
+
+	public default double getDriveCharacterizationVelocity_radps() {
 		return 0.0;
 	}
 
-	/** set the offset (zero/forwards) of the angle position */
-	public default void setOffset(double offset_rad) {}
+	/** called during testing to update motor pid config */
+	public default void tunablePeriodic() {}
 }

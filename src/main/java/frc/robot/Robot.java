@@ -24,6 +24,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.littletonrobotics.urcl.URCL;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -64,7 +65,7 @@ public class Robot extends LoggedRobot {
 				Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
 			}
 			case Active -> {
-				Logger.addDataReceiver(new WPILOGWriter()); // log to a usb stick
+				Logger.addDataReceiver(new WPILOGWriter("/media/sda1/logs/")); // log to a usb stick
 				Logger.addDataReceiver(new NT4Publisher()); // publish data to NetworkTables
 				if (isReal()) {
 					new PowerDistribution(pdhId, ModuleType.kRev); // enables power distribution logging
@@ -81,6 +82,8 @@ public class Robot extends LoggedRobot {
 
 		// disable LiveWindow telemetry in favor of AdvantageKit to reduce processing each tick
 		LiveWindow.disableAllTelemetry();
+
+		Logger.registerURCL(URCL.startExternal());
 
 		Logger.start();
 

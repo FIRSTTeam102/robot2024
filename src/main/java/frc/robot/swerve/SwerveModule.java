@@ -2,6 +2,7 @@ package frc.robot.swerve;
 
 import static frc.robot.constants.SwerveConstants.maxVelocity_mps;
 
+import frc.robot.constants.Constants;
 import frc.robot.util.Conversions;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,8 +20,6 @@ public class SwerveModule {
 	public SwerveModule(int moduleNumber, SwerveModuleIO io) {
 		this.moduleNumber = moduleNumber;
 		this.io = io;
-
-		var isReal = io.getClass() == SwerveModuleIOReal.class;
 
 		lastAngle = getState().angle;
 	}
@@ -46,16 +45,26 @@ public class SwerveModule {
 		this.forceAngle = forceAngle;
 	}
 
-	/**
-	 * Set the drive motor to the specified voltage and angle position to 0.
-	 * 
-	 * This is used for characterization by the FeedForwardCharacterization command.
-	 *
-	 * @param voltage specified voltage for the drive motor
-	 */
+	private boolean driveCharacterizationRunning = false;
+
+	/** set the drive motor to the specified voltage, called repeatedly by SysId */
 	public void runDriveCharacterization(double voltage) {
 		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0.0)), true, true);
-		io.setDriveMotorVoltage(voltage);
+		io.setDriveVoltage(voltage);
+		driveCharacterizationRunning = true;
+
+		Logger.recordOutput("SysId/Swerve/Drive" + moduleNumber + "Target_V", voltage);
+		Logger.recordOutput("SysId/Swerve/Drive" + moduleNumber + "Position_m", inputs.driveDistance_m);
+		Logger.recordOutput("SysId/Swerve/Drive" + moduleNumber + "Velocity_mps", inputs.driveVelocity_mps);
+	}
+
+	private boolean angleCharacterizationRunning = false;
+
+	/** set the angle motor to the specified voltage, called repeatedly by SysId */
+	public void runAngleCharacterization(double voltage) {
+		setDesiredState(new SwerveModuleState(0.0, new Rotation2d(0.0)), true, true);
+		io.setAngleVoltage(voltage);
+		angleCharacterizationRunning = true;
 	}
 
 	public SwerveModuleState getState() {
@@ -86,7 +95,8 @@ public class SwerveModule {
 			: optimizedState.angle;
 
 		// run turn
-		io.setAnglePosition(angle);
+		if (!angleCharacterizationRunning)
+			io.setAnglePosition(angle);
 
 		// update velocity based on angle error
 		optimizedState.speedMetersPerSecond *= Math.cos(Math.abs(
@@ -95,9 +105,11 @@ public class SwerveModule {
 		Logger.recordOutput("SwerveModule " + moduleNumber + "/targetSpeed_mps", optimizedState.speedMetersPerSecond);
 
 		// run drive
-		if (isOpenLoop) {
+		if (driveCharacterizationRunning) {
+			// don't try to change the state
+		} else if (isOpenLoop) {
 			double percentOutput = optimizedState.speedMetersPerSecond / maxVelocity_mps;
-			io.setDriveMotorVoltage(percentOutput * 12);
+			io.setDriveVoltage(percentOutput * 12);
 		} else {
 			io.setDriveVelocity(optimizedState.speedMetersPerSecond);
 		}
@@ -105,6 +117,9 @@ public class SwerveModule {
 		lastAngle = angle;
 		Logger.recordOutput("SwerveModule " + moduleNumber + "/targetAngle_rad",
 			Conversions.angleModulus2pi(angle.getRadians()));
+
+		if (Constants.tuningMode)
+			io.tunablePeriodic();
 	}
 
 	public void setDriveBrakeMode(boolean enable) {

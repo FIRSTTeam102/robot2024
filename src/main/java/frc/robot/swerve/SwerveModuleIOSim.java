@@ -58,8 +58,8 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 		angleAbsolutePosition_rad = Conversions.angleModulus2pi(angleAbsolutePosition_rad + angleDiffRad);
 		inputs.angleAbsolutePosition_rad = angleAbsolutePosition_rad;
 
-		inputs.drivePosition_rad = inputs.drivePosition_rad
-			+ driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s;
+		// inputs.drivePosition_rad = inputs.drivePosition_rad
+		// + driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s;
 		inputs.driveDistance_m = inputs.driveDistance_m
 			+ (driveWheelSim.getAngularVelocityRadPerSec() * loopPeriod_s * wheelRadius_m);
 		inputs.driveVelocity_mps = driveWheelSim.getAngularVelocityRadPerSec() * wheelRadius_m;
@@ -84,7 +84,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	}
 
 	@Override
-	public void setDriveMotorVoltage(double voltage) {
+	public void setDriveVoltage(double voltage) {
 		isDriveOpenLoop = true;
 		driveController.reset();
 		driveAppliedVolts = MathUtil.clamp(voltage, -12.0, 12.0);
@@ -112,7 +112,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	}
 
 	@Override
-	public double getCharacterizationVelocity_radps() {
+	public double getDriveCharacterizationVelocity_radps() {
 		return driveWheelSim.getAngularVelocityRadPerSec();
 	}
 }

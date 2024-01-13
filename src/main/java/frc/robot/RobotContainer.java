@@ -19,14 +19,17 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.util.Map;
@@ -81,6 +84,37 @@ public class RobotContainer {
 			.withWidget(BuiltInWidgets.kCameraStream)
 			.withSize(11, 5)
 			.withPosition(0, 0);
+
+		if (Constants.tuningMode) {
+			Logger.recordOutput("SysIdTestState", SysIdRoutineLog.State.kNone.toString()); // populate default
+
+			autoChooser.addOption("sysid swerve drive", Commands.sequence(
+				swerve.driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+				Commands.waitSeconds(2),
+				swerve.driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+				Commands.waitSeconds(2),
+				swerve.driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward),
+				Commands.waitSeconds(2),
+				swerve.driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)));
+
+			autoChooser.addOption("sysid swerve drive quasistatic forward",
+				swerve.driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
+			autoChooser.addOption("sysid swerve drive quasistatic reverse",
+				swerve.driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
+			autoChooser.addOption("sysid swerve drive dynamic forward",
+				swerve.driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
+			autoChooser.addOption("sysid swerve drive dynamic reverse",
+				swerve.driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+
+			autoChooser.addOption("sysid swerve angle quasistatic forward",
+				swerve.angleSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
+			autoChooser.addOption("sysid swerve angle quasistatic reverse",
+				swerve.angleSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
+			autoChooser.addOption("sysid swerve angle dynamic forward",
+				swerve.angleSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
+			autoChooser.addOption("sysid swerve angle dynamic reverse",
+				swerve.angleSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+		}
 	}
 
 	/**

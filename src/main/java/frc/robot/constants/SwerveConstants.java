@@ -1,7 +1,6 @@
 package frc.robot.constants;
 
 import frc.robot.swerve.SwerveModuleConstants;
-import frc.robot.util.Conversions;
 
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -10,10 +9,10 @@ import com.revrobotics.CANSparkBase.IdleMode;
 public final class SwerveConstants {
 	// FL, FR, BL, BR (matches AdvantageScope convention)
 	public static final SwerveModuleConstants moduleConstants[] = {
-		new SwerveModuleConstants(21, 22, 23, 0),
-		new SwerveModuleConstants(24, 25, 26, 0),
-		new SwerveModuleConstants(27, 28, 29, 0),
-		new SwerveModuleConstants(30, 31, 32, 0)
+		new SwerveModuleConstants(21, 22, 0),
+		new SwerveModuleConstants(23, 24, 0),
+		new SwerveModuleConstants(25, 26, 0),
+		new SwerveModuleConstants(27, 28, 0)
 	};
 
 	// the left-to-right distance between the drivetrain wheels, should be measured from center to center
@@ -44,33 +43,27 @@ public final class SwerveConstants {
 	public static final double angleGearRatio = 1 / ((14.0 / 50.0) * (10.0 / 60.0));
 	public static final boolean angleInverted = true;
 	public static final IdleMode angleIdleMode = IdleMode.kCoast;
-	// public static final double angleMaxPercentOutput = 0.5;
 	public static final double angleRampTime_s = 0.5;
 	public static final boolean angleEncoderInverted = false;
-	// public static final double angleSparkEncoderPositionFactor_rad = (2 * Math.PI);
-	// public static final double angleSparkEncoderVelocityFactor_radps = (2 * Math.PI) / 60.0;
 
 	public static final double maxVelocity_mps = 5676 /* NEO max RPM */
 		/ 60.0 / driveGearRatio * wheelCircumference_m;
 	public static final double maxAngularVelocity_radps = 5676 /* NEO max RPM */
 		/ 60.0 / angleGearRatio / Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
-	public static final double maxCoastVelocity_mps = 0.05;
 
 	/* robot dimensions */
 	public static final double robotfence = 0.35; // from botpose to the bumper
 
 	/* drive motor PID values */
-	public static final double driveKp = 0.1; // todo: tune for real
+	public static final double driveKp = 0.04; // todo: tune for real
 	public static final double driveKi = 0.0;
 	public static final double driveKd = 0.0;
-	public static final double driveKf = 0.0;
+	public static final double driveKf = 1 / maxVelocity_mps; // https://github.com/OysterRiverOverdrive/Crescendo2024-Roomba/blob/main/src/main/java/frc/robot/Constants.java#L138
 	/* sim drive motor PID values */
 	public static final double simDriveKp = 0.003; // fixme: overshoots
 	public static final double simDriveKi = 0.0;
 	public static final double simDriveKd = 0.0;
 	public static final double simDriveKf = 0.0;
-	/* drive motor PID conversion factors */
-	public static final double driveEncoderPositionFactor_m = wheelCircumference_m * driveGearRatio;
 
 	/* angle motor PID values */
 	public static final double angleKp = 5.7; // todo: tune for real
@@ -82,9 +75,6 @@ public final class SwerveConstants {
 	public static final double simAngleKi = 0.0;
 	public static final double simAngleKd = 0.0;
 	public static final double simAngleKf = 0.0;
-	/* angle motor PID conversion factors */
-	// fixme: probably wrong
-	public static final double angleEncoderPositionFactor_rad = (Conversions.twoPi) / 1200; /* rad per ticks */
 
 	/* drive motor characterization (feed forward) */
 	public static final double driveKs = 0.0092198;
@@ -99,6 +89,6 @@ public final class SwerveConstants {
 	// public static final double angleKa = 0;
 
 	/* current limiting */
-	public static final int driveCurrentLimit_amp = 35;
+	public static final int driveCurrentLimit_amp = 50;
 	public static final int angleCurrentLimit_amp = 25;
 };

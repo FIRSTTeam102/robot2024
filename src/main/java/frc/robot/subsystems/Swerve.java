@@ -19,11 +19,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
@@ -276,16 +278,32 @@ public class Swerve extends SubsystemBase {
 		fieldSim.getObject("Swerve Modules").setPoses(modulePoses);
 	}
 
-	public void runDriveCharacterization(double voltage) {
-		for (var mod : modules)
-			mod.runDriveCharacterization(voltage);
-	}
+	public final SysIdRoutine driveSysIdRoutine = new SysIdRoutine(
+		new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
+		new SysIdRoutine.Mechanism(
+			(voltage) -> {
+				var volts = voltage.in(Units.Volts);
+				for (var mod : modules)
+					mod.runDriveCharacterization(volts);
+			},
+			null,
+			this));
 
-	// radps
-	public double getDriveCharacterizationVelocity() {
-		double driveVelocityAverage = 0.0;
-		for (var module : modules)
-			driveVelocityAverage += module.io.getCharacterizationVelocity_radps();
-		return driveVelocityAverage / modules.length;
-	}
+	public final SysIdRoutine angleSysIdRoutine = new SysIdRoutine(
+		new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
+		new SysIdRoutine.Mechanism(
+			(voltage) -> {
+				var volts = voltage.in(Units.Volts);
+				for (var mod : modules)
+					mod.runAngleCharacterization(volts);
+			},
+			null,
+			this));
+
+	// public double getDriveCharacterizationVelocity_radps() {
+	// double driveVelocityAverage = 0.0;
+	// for (var module : modules)
+	// driveVelocityAverage += module.io.getCharacterizationVelocity_radps();
+	// return driveVelocityAverage / modules.length;
+	// }
 }
