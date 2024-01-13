@@ -97,23 +97,14 @@ public class RobotContainer {
 				Commands.waitSeconds(2),
 				swerve.driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)));
 
-			autoChooser.addOption("sysid swerve drive quasistatic forward",
-				swerve.driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
-			autoChooser.addOption("sysid swerve drive quasistatic reverse",
-				swerve.driveSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
-			autoChooser.addOption("sysid swerve drive dynamic forward",
-				swerve.driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
-			autoChooser.addOption("sysid swerve drive dynamic reverse",
-				swerve.driveSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
-
-			autoChooser.addOption("sysid swerve angle quasistatic forward",
-				swerve.angleSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward));
-			autoChooser.addOption("sysid swerve angle quasistatic reverse",
-				swerve.angleSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse));
-			autoChooser.addOption("sysid swerve angle dynamic forward",
-				swerve.angleSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward));
-			autoChooser.addOption("sysid swerve angle dynamic reverse",
-				swerve.angleSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse));
+			autoChooser.addOption("sysid swerve angle", Commands.sequence(
+				swerve.angleSysIdRoutine.quasistatic(SysIdRoutine.Direction.kForward),
+				Commands.waitSeconds(2),
+				swerve.angleSysIdRoutine.quasistatic(SysIdRoutine.Direction.kReverse),
+				Commands.waitSeconds(2),
+				swerve.angleSysIdRoutine.dynamic(SysIdRoutine.Direction.kForward),
+				Commands.waitSeconds(2),
+				swerve.angleSysIdRoutine.dynamic(SysIdRoutine.Direction.kReverse)));
 		}
 	}
 

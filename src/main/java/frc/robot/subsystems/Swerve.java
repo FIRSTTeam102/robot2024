@@ -297,28 +297,38 @@ public class Swerve extends SubsystemBase {
 					mod.runDriveCharacterization(volts);
 			},
 			log -> {
-				log.motor("one")
-					.voltage(Units.Volts.of(modules[0].inputs.driveVoltage_V))
-					.linearPosition(Units.Meters.of(modules[0].inputs.driveDistance_m))
-					.linearVelocity(Units.MetersPerSecond.of(modules[0].inputs.driveVelocity_mps));
+				for (int i = 0; i < modules.length; i++)
+					log.motor("drive" + i)
+						.voltage(Units.Volts.of(modules[i].inputs.driveVoltage_V))
+						.linearPosition(Units.Meters.of(modules[i].inputs.driveDistance_m))
+						.linearVelocity(Units.MetersPerSecond.of(modules[i].inputs.driveVelocity_mps));
 			},
 			this));
 
+	// public final SysIdRoutine angleSysIdRoutine = new SysIdRoutine(
+	// new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
+	// new SysIdRoutine.Mechanism(
+	// (voltage) -> {
+	// var volts = voltage.in(Units.Volts);
+	// for (var mod : modules)
+	// mod.runAngleCharacterization(volts);
+	// },
+	// null,
+	// this));
 	public final SysIdRoutine angleSysIdRoutine = new SysIdRoutine(
-		new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
+		new SysIdRoutine.Config(),
 		new SysIdRoutine.Mechanism(
 			(voltage) -> {
 				var volts = voltage.in(Units.Volts);
 				for (var mod : modules)
 					mod.runAngleCharacterization(volts);
 			},
-			null,
+			log -> {
+				for (int i = 0; i < modules.length; i++)
+					log.motor("angle" + i)
+						.voltage(Units.Volts.of(modules[i].inputs.angleVoltage_V))
+						.linearPosition(Units.Meters.of(modules[i].inputs.angleAbsolutePosition_rad))
+						.linearVelocity(Units.MetersPerSecond.of(modules[i].inputs.angleVelocity_radps));
+			},
 			this));
-
-	// public double getDriveCharacterizationVelocity_radps() {
-	// double driveVelocityAverage = 0.0;
-	// for (var module : modules)
-	// driveVelocityAverage += module.io.getCharacterizationVelocity_radps();
-	// return driveVelocityAverage / modules.length;
-	// }
 }

@@ -84,7 +84,7 @@ public final class SwerveConstants {
 	public static final double simDriveKs = 0.117;
 	public static final double simDriveKv = 0.133;
 
-	/* angle motor characterization */
+	// /* angle motor characterization (feed forward) */
 	// public static final double angleKs = 0;
 	// public static final double angleKv = 0;
 	// public static final double angleKa = 0;

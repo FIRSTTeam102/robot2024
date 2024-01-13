@@ -12,7 +12,7 @@ import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.SparkAbsoluteEncoder;
+import com.revrobotics.SparkAnalogSensor;
 import com.revrobotics.SparkPIDController;
 
 /**
@@ -23,13 +23,14 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	private CANSparkMax driveMotor;
 	private SparkPIDController driveSparkPidController;
 	private RelativeEncoder driveRelativeEncoder;
+	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
+
 	private CANSparkMax angleMotor;
 	private SparkPIDController angleSparkPidController;
-	private RelativeEncoder angleRelativeEncoder;
-	private SparkAbsoluteEncoder angleAbsoluteEncoder;
+	// private RelativeEncoder angleRelativeEncoder;
+	private SparkAnalogSensor angleAbsoluteEncoder;
 	private double angleOffset_rad;
-	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
-	// private SimpleMotorFeedforward angleFeedforward = new SimpleMotorFeedforward(angleKs, angleKv);
+	// private SimpleMotorFeedforward angleFeedforward = new SimpleMotorFeedforward(angleKs, angleKv, angleKa);
 
 	private TunableNumber tunableDriveKp;
 	private TunableNumber tunableDriveKd;
@@ -63,12 +64,11 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		// angleMotor.setClosedLoopRampRate(angleRampTime_s);
 		angleMotor.enableVoltageCompensation(12);
 
-		angleRelativeEncoder = angleMotor.getEncoder();
+		// angleRelativeEncoder = angleMotor.getEncoder();
 
-		angleAbsoluteEncoder = angleMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
-		angleAbsoluteEncoder.setPositionConversionFactor(Conversions.twoPi); // rad
-		angleAbsoluteEncoder.setVelocityConversionFactor(Conversions.twoPi / 60.0); // radps
-		// angleAbsoluteEncoder.setZeroOffset(Conversions.twoPi);
+		angleAbsoluteEncoder = angleMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
+		angleAbsoluteEncoder.setPositionConversionFactor(Conversions.twoPi / 3.3 /* V */); // rad
+		angleAbsoluteEncoder.setVelocityConversionFactor(Conversions.twoPi / 3.3 /* V */); // radps
 		angleSparkPidController.setFeedbackDevice(angleAbsoluteEncoder);
 
 		// wrap betwee 0 and 2pi radians
@@ -157,7 +157,9 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 	@Override
 	public void setAnglePosition(Rotation2d angle) {
-		angleSparkPidController.setReference(Conversions.angleModulus2pi(angle.getRadians()), ControlType.kPosition);
+		final double targetAngle_rad = Conversions.angleModulus2pi(angle.getRadians());
+		angleSparkPidController.setReference(targetAngle_rad, ControlType.kPosition);
+		// 0, angleFeedforward.calculate(targetAngle_rad));
 	}
 
 	@Override
