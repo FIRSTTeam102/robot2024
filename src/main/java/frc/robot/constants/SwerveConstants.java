@@ -35,12 +35,12 @@ public final class SwerveConstants {
 	public static final double wheelDiameter_m = 0.10033;
 	public static final double wheelRadius_m = wheelDiameter_m / 2;
 	public static final double wheelCircumference_m = wheelDiameter_m * Math.PI;
-	public static final double driveGearRatio = 1 / ((14.0 / 50.0) * (27.0 / 17.0) * (15.0 / 45.0));
+	public static final double driveGearRatio = (50.0 / 14.0) * (17.0 / 27.0) * (45.0 / 15.0);
 	public static final boolean driveInverted = true;
 	public static final IdleMode driveIdleMode = IdleMode.kBrake;
 	public static final double driveRampTime_s = 0.25;
 
-	public static final double angleGearRatio = 1 / ((14.0 / 50.0) * (10.0 / 60.0));
+	public static final double angleGearRatio = (50.0 / 14.0) * (60.0 / 10.0);
 	public static final boolean angleInverted = true;
 	public static final IdleMode angleIdleMode = IdleMode.kCoast;
 	public static final double angleRampTime_s = 0.5;
@@ -55,10 +55,10 @@ public final class SwerveConstants {
 	public static final double robotfence = 0.35; // from botpose to the bumper
 
 	/* drive motor PID values */
-	public static final double driveKp = 0.04; // todo: tune for real
+	public static final double driveKp = 0.15138; // todo: tune for real
 	public static final double driveKi = 0.0;
 	public static final double driveKd = 0.0;
-	public static final double driveKf = 1 / maxVelocity_mps; // https://github.com/OysterRiverOverdrive/Crescendo2024-Roomba/blob/main/src/main/java/frc/robot/Constants.java#L138
+	public static final double driveKf = 0.0; // 1 / maxVelocity_mps;
 	/* sim drive motor PID values */
 	public static final double simDriveKp = 0.003; // fixme: overshoots
 	public static final double simDriveKi = 0.0;
@@ -77,8 +77,9 @@ public final class SwerveConstants {
 	public static final double simAngleKf = 0.0;
 
 	/* drive motor characterization (feed forward) */
-	public static final double driveKs = 0.0092198;
-	public static final double driveKv = 0.23218;
+	public static final double driveKs = 0.097269;
+	public static final double driveKv = 2.7132;
+	public static final double driveKa = 0.33493;
 	/* sim drive motor characterization */
 	public static final double simDriveKs = 0.117;
 	public static final double simDriveKv = 0.133;

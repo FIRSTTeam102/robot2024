@@ -9,18 +9,19 @@ public interface SwerveModuleIO {
 	@AutoLog
 	public static class SwerveModuleIOInputs {
 		// double drivePosition_rad = 0.0;
-		double driveDistance_m = 0.0;
-		double driveVelocity_mps = 0.0;
-		double driveAppliedPercentage = 0.0;
-		double driveCurrent_A = 0.0;
-		double driveTemperature_C = 0.0;
-		double driveVoltage_V = 0.0;
+		public double driveDistance_m = 0.0;
+		public double driveVelocity_mps = 0.0;
+		public double driveAppliedPercentage = 0.0;
+		public double driveVoltage_V = 0.0;
+		public double driveCurrent_A = 0.0;
+		public double driveTemperature_C = 0.0;
 
-		double angleAbsolutePosition_rad = 0.0;
-		double angleVelocity_radps = 0.0;
-		double angleAppliedPercentage = 0.0;
-		double angleCurrent_A = 0.0;
-		double angleTemperature_C = 0.0;
+		public double angleAbsolutePosition_rad = 0.0;
+		public double angleVelocity_radps = 0.0;
+		public double angleAppliedPercentage = 0.0;
+		public double angleVoltage_V = 0.0;
+		public double angleCurrent_A = 0.0;
+		public double angleTemperature_C = 0.0;
 	}
 
 	/** updates the set of inputs */

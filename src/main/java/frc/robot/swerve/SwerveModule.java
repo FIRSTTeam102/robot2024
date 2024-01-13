@@ -15,7 +15,7 @@ public class SwerveModule {
 	public int moduleNumber;
 	private Rotation2d lastAngle;
 	public final SwerveModuleIO io;
-	private final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
+	public final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
 
 	public SwerveModule(int moduleNumber, SwerveModuleIO io) {
 		this.moduleNumber = moduleNumber;

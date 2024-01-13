@@ -25,9 +25,10 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	private RelativeEncoder driveRelativeEncoder;
 	private CANSparkMax angleMotor;
 	private SparkPIDController angleSparkPidController;
+	private RelativeEncoder angleRelativeEncoder;
 	private SparkAbsoluteEncoder angleAbsoluteEncoder;
 	private double angleOffset_rad;
-	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv);
+	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
 	// private SimpleMotorFeedforward angleFeedforward = new SimpleMotorFeedforward(angleKs, angleKv);
 
 	private TunableNumber tunableDriveKp;
@@ -62,10 +63,12 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		// angleMotor.setClosedLoopRampRate(angleRampTime_s);
 		angleMotor.enableVoltageCompensation(12);
 
+		angleRelativeEncoder = angleMotor.getEncoder();
+
 		angleAbsoluteEncoder = angleMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
 		angleAbsoluteEncoder.setPositionConversionFactor(Conversions.twoPi); // rad
 		angleAbsoluteEncoder.setVelocityConversionFactor(Conversions.twoPi / 60.0); // radps
-		angleAbsoluteEncoder.setZeroOffset(Conversions.twoPi);
+		// angleAbsoluteEncoder.setZeroOffset(Conversions.twoPi);
 		angleSparkPidController.setFeedbackDevice(angleAbsoluteEncoder);
 
 		// wrap betwee 0 and 2pi radians
@@ -99,8 +102,8 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		driveMotor.enableVoltageCompensation(12);
 
 		driveRelativeEncoder = driveMotor.getEncoder();
-		driveRelativeEncoder.setPositionConversionFactor(wheelCircumference_m * driveGearRatio); // m
-		driveRelativeEncoder.setVelocityConversionFactor(wheelCircumference_m * driveGearRatio / 60.0); // mps
+		driveRelativeEncoder.setPositionConversionFactor(wheelCircumference_m / driveGearRatio); // m
+		driveRelativeEncoder.setVelocityConversionFactor(wheelCircumference_m / driveGearRatio / 60.0); // mps
 
 		// turn down frequency as we only log them, not needed for calculations
 		// driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 40); // percent output
@@ -125,12 +128,14 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		inputs.driveDistance_m = driveRelativeEncoder.getPosition();
 		inputs.driveVelocity_mps = driveRelativeEncoder.getVelocity();
 		inputs.driveAppliedPercentage = driveMotor.getAppliedOutput();
+		inputs.driveVoltage_V = driveMotor.getBusVoltage() * driveMotor.getAppliedOutput();
 		inputs.driveCurrent_A = driveMotor.getOutputCurrent();
 		inputs.driveTemperature_C = driveMotor.getMotorTemperature();
 
 		inputs.angleAbsolutePosition_rad = angleAbsoluteEncoder.getPosition();
 		inputs.angleVelocity_radps = angleAbsoluteEncoder.getVelocity();
 		inputs.angleAppliedPercentage = angleMotor.getAppliedOutput();
+		inputs.angleVoltage_V = angleMotor.getBusVoltage() * angleMotor.getAppliedOutput();
 		inputs.angleCurrent_A = angleMotor.getOutputCurrent();
 		inputs.angleTemperature_C = angleMotor.getMotorTemperature();
 	}

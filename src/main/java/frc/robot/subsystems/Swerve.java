@@ -278,15 +278,30 @@ public class Swerve extends SubsystemBase {
 		fieldSim.getObject("Swerve Modules").setPoses(modulePoses);
 	}
 
+	// public final SysIdRoutine driveSysIdRoutine = new SysIdRoutine(
+	// new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
+	// new SysIdRoutine.Mechanism(
+	// (voltage) -> {
+	// var volts = voltage.in(Units.Volts);
+	// for (var mod : modules)
+	// mod.runDriveCharacterization(volts);
+	// },
+	// null,
+	// this));
 	public final SysIdRoutine driveSysIdRoutine = new SysIdRoutine(
-		new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
+		new SysIdRoutine.Config(),
 		new SysIdRoutine.Mechanism(
 			(voltage) -> {
 				var volts = voltage.in(Units.Volts);
 				for (var mod : modules)
 					mod.runDriveCharacterization(volts);
 			},
-			null,
+			log -> {
+				log.motor("one")
+					.voltage(Units.Volts.of(modules[0].inputs.driveVoltage_V))
+					.linearPosition(Units.Meters.of(modules[0].inputs.driveDistance_m))
+					.linearVelocity(Units.MetersPerSecond.of(modules[0].inputs.driveVelocity_mps));
+			},
 			this));
 
 	public final SysIdRoutine angleSysIdRoutine = new SysIdRoutine(
