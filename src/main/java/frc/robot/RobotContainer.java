@@ -8,6 +8,7 @@ import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
@@ -60,6 +61,7 @@ public class RobotContainer {
 	/* subsystems */
 	// public final Vision vision = new Vision();
 	public final Swerve swerve = new Swerve(gyro/* , vision */);
+	public final Shooter shooter = new Shooter();
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
@@ -86,10 +88,12 @@ public class RobotContainer {
 			.withPosition(0, 0);
 
 		if (Constants.tuningMode) {
-			Logger.recordOutput("SysIdTestState", SysIdRoutineLog.State.kNone.toString()); // populate default
+			tuningModeAlert.set(true);
+			Logger.recordOutput("SysId/testState", SysIdRoutineLog.State.kNone.toString()); // populate default
 
 			autoChooser.addOption("sysid swerve drive", sysIdTestSet(swerve.driveSysIdRoutine));
 			autoChooser.addOption("sysid swerve angle", sysIdTestSet(swerve.angleSysIdRoutine));
+			autoChooser.addOption("sysid shooter", sysIdTestSet(shooter.sysIdRoutine));
 		}
 	}
 
@@ -143,6 +147,7 @@ public class RobotContainer {
 			routine.dynamic(SysIdRoutine.Direction.kReverse));
 	}
 
+	Alert tuningModeAlert = new Alert("tuning mode enabled", AlertType.Info);
 	Alert driverControllerAlert = new Alert("driver controller not connected properly", AlertType.Error);
 
 	public void updateOIAlert() {

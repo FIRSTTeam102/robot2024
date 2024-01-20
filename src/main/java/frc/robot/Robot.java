@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.constants.Constants.*;
 
 import frc.robot.constants.BuildConstants;
+import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -106,6 +107,9 @@ public class Robot extends LoggedRobot {
 		 * block in order for anything in the Command-based framework to work.
 		 */
 		CommandScheduler.getInstance().run();
+
+		if (tuningMode)
+			AutoSetterTunableNumberManager.periodic();
 	}
 
 	/** This function is called once each time the robot enters Disabled mode. */

@@ -17,7 +17,8 @@ public class TunableNumber {
 
 	private String key;
 	private double defaultValue;
-	private double lastHasChangedValue = defaultValue;
+	// holds the value when the last hasChanged() was called
+	protected double lastHasChangedValue = defaultValue;
 
 	/**
 	 * Create a new TunableNumber
