@@ -21,7 +21,7 @@ public class Arm extends SubsystemBase {
 	private SparkPIDController pidController = motor.getPIDController();
 	private RelativeEncoder encoder = motor.getEncoder();
 
-	private ArmFeedforward feedForwardController = new ArmFeedforward(kS, kG, kV, kA);
+	private ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
 
 	@Getter
 	private double targetPosition_rad = 0;
@@ -51,7 +51,7 @@ public class Arm extends SubsystemBase {
 	@AutoLog
 	public static class ArmIOInputs {
 		public double current_A = 0.0;
-		public double appliedVoltage_V = 0.0;
+		public double voltage_V = 0.0;
 		public double temperature_C = 0.0;
 		public double position_rad = 0.0;
 		public double velocity_radps = 0.0;
@@ -61,7 +61,7 @@ public class Arm extends SubsystemBase {
 
 	private void updateInputs(ArmIOInputs inputs) {
 		inputs.current_A = motor.getOutputCurrent();
-		inputs.appliedVoltage_V = motor.getBusVoltage();
+		inputs.voltage_V = motor.getBusVoltage();
 		inputs.temperature_C = motor.getMotorTemperature();
 		inputs.position_rad = encoder.getPosition();
 		inputs.velocity_radps = encoder.getVelocity();
