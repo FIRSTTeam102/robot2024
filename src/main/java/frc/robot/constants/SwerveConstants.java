@@ -76,9 +76,9 @@ public final class SwerveConstants {
 	public static final double simDriveKa = 0.18761;
 
 	/* angle motor PID values */
-	public static final double angleKp = 5.7; // todo: tune for real
+	public static final double angleKp = 0.57874; // todo: tune for real
 	public static final double angleKi = 0.0;
-	public static final double angleKd = 0.05;
+	public static final double angleKd = 0.060653;
 	public static final double angleKf = 0.0;
 	/* sim angle motor PID values */
 	public static final double simAngleKp = 10; // todo: replace with linear system of real mech?
