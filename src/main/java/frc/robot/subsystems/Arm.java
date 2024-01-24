@@ -46,8 +46,6 @@ public class Arm extends SubsystemBase {
 		updateInputs(inputs);
 		Logger.processInputs(getName(), inputs);
 		Logger.recordOutput("Elevator/targetPosition_rad", targetPosition_rad);
-		pidController.setReference(targetPosition_rad, ControlType.kPosition, 0,
-			feedforwardController.calculate(targetPosition_rad, 0));
 	}
 
 	@AutoLog
@@ -71,5 +69,7 @@ public class Arm extends SubsystemBase {
 
 	void setPosition(double position_rad) {
 		targetPosition_rad = position_rad;
+		pidController.setReference(targetPosition_rad, ControlType.kPosition, 0,
+			feedforwardController.calculate(targetPosition_rad, 0));
 	}
 }
