@@ -1,4 +1,4 @@
-package frc.robot.swerve;
+package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 
@@ -47,7 +47,4 @@ public interface SwerveModuleIO {
 	public default double getDriveCharacterizationVelocity_radps() {
 		return 0.0;
 	}
-
-	/** called during testing to update motor pid config */
-	public default void tunablePeriodic() {}
 }

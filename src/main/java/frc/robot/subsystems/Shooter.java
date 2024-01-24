@@ -16,6 +16,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
 	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushless);
@@ -24,14 +25,12 @@ public class Shooter extends SubsystemBase {
 	private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(kS, kV, kA);
 
 	public Shooter() {
-		new AutoSetterTunableNumber("Shooter/kP", kP,
-			(double value) -> pidController.setP(value));
-		new AutoSetterTunableNumber("Shooter/kD", kD,
-			(double value) -> pidController.setD(value));
+		if (tuningMode) {
+			new AutoSetterTunableNumber("Shooter/kP", kP, (double value) -> pidController.setP(value));
+			new AutoSetterTunableNumber("Shooter/kD", kD, (double value) -> pidController.setD(value));
 
-		if (tuningMode)
-			new AutoSetterTunableNumber("Shooter/setpoint", 0,
-				(double value) -> setVelocity(value));
+			new AutoSetterTunableNumber("Shooter/setpoint", 0, (double value) -> setVelocity(value));
+		}
 
 		pidController.setP(kP);
 		pidController.setI(0);
@@ -45,6 +44,7 @@ public class Shooter extends SubsystemBase {
 	@Override
 	public void periodic() {
 		updateInputs(inputs);
+		Logger.processInputs(getName(), inputs);
 	}
 
 	@AutoLog

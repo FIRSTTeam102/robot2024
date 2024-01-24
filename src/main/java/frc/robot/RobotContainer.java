@@ -118,8 +118,8 @@ public class RobotContainer {
 
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
-		driverController.rightBumper()
-			.whileTrue(teleopSwerve.holdRotateAroundPiece());
+		// driverController.rightBumper()
+		// .whileTrue(teleopSwerve.holdRotateAroundPiece());
 
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		driverController.x().whileTrue(new XStance(swerve));

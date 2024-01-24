@@ -1,4 +1,4 @@
-package frc.robot.swerve;
+package frc.robot.subsystems.swerve;
 
 import static frc.robot.constants.Constants.loopPeriod_s;
 import static frc.robot.constants.SwerveConstants.*;
@@ -20,7 +20,7 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
  * The swerve module is simulated as a flywheel connected to the drive motor and another flywheel
  * connected to the angle motor.
  */
-public class SwerveModuleIOSim implements SwerveModuleIO {
+public class SwerveModuleIOSimOld implements SwerveModuleIO {
 	private FlywheelSim driveWheelSim = new FlywheelSim(DCMotor.getFalcon500(1), driveGearRatio, 0.025);
 	private FlywheelSim angleWheelSim = new FlywheelSim(DCMotor.getNEO(1), angleGearRatio, 0.004);
 
@@ -30,13 +30,13 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	private boolean isDriveOpenLoop = true;
 	private double driveSetpoint_mps = 0.0;
 
-	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(simDriveKs, simDriveKv, simDriveKa);
-	private PIDController driveController = new PIDController(simDriveKp, simDriveKi, simDriveKd);
+	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(-0.0088814, 2.4012, 0.18761);
+	private PIDController driveController = new PIDController(0.002, 0.0, 0.0);
 
-	private PIDController angleController = new PIDController(simAngleKp, simDriveKi, simDriveKd);
+	private PIDController angleController = new PIDController(10.0, 0.0, 0.0);
 	private boolean isAngleOpenLoop = true;
 
-	public SwerveModuleIOSim() {
+	public SwerveModuleIOSimOld() {
 		angleController.enableContinuousInput(0, Conversions.twoPi);
 	}
 

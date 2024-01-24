@@ -1,9 +1,10 @@
-package frc.robot.swerve;
+package frc.robot.subsystems.swerve;
 
+import static frc.robot.constants.Constants.tuningMode;
 import static frc.robot.constants.SwerveConstants.*;
 
+import frc.robot.util.AutoSetterTunableNumber;
 import frc.robot.util.Conversions;
-import frc.robot.util.TunableNumber;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -21,21 +22,16 @@ import com.revrobotics.SparkPIDController;
  */
 public class SwerveModuleIOReal implements SwerveModuleIO {
 	private CANSparkMax driveMotor;
-	private SparkPIDController driveSparkPidController;
+	private SparkPIDController drivePidController;
 	private RelativeEncoder driveRelativeEncoder;
 	private SimpleMotorFeedforward driveFeedforward = new SimpleMotorFeedforward(driveKs, driveKv, driveKa);
 
 	private CANSparkMax angleMotor;
-	private SparkPIDController angleSparkPidController;
-	private RelativeEncoder angleRelativeEncoder;
+	private SparkPIDController anglePidController;
 	private SparkAnalogSensor angleAbsoluteEncoder;
+	private RelativeEncoder angleRelativeEncoder;
 	private double angleOffset_rad;
 	// private SimpleMotorFeedforward angleFeedforward = new SimpleMotorFeedforward(angleKs, angleKv, angleKa);
-
-	private TunableNumber tunableDriveKp;
-	private TunableNumber tunableDriveKd;
-	private TunableNumber tunableAngleKp;
-	private TunableNumber tunableAngleKd;
 
 	/**
 	 * @param moduleConstants module config
@@ -44,23 +40,25 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	public SwerveModuleIOReal(SwerveModuleConstants moduleConstants, int moduleNumber) {
 		this.angleOffset_rad = moduleConstants.angleOffset_rad();
 
-		final String key = "SwerveModuleIO" + moduleNumber + "/";
-		tunableDriveKp = new TunableNumber(key + "driveKp", driveKp);
-		tunableDriveKd = new TunableNumber(key + "driveKd", driveKd);
-		tunableAngleKp = new TunableNumber(key + "angleKp", angleKp);
-		tunableAngleKd = new TunableNumber(key + "angleKd", angleKd);
+		if (tuningMode) {
+			final String key = "SwerveModuleIO" + moduleNumber + "/";
+			new AutoSetterTunableNumber(key + "driveKp", driveKp, (double value) -> drivePidController.setP(value));
+			new AutoSetterTunableNumber(key + "driveKd", driveKd, (double value) -> drivePidController.setD(value));
+			new AutoSetterTunableNumber(key + "angleKp", angleKp, (double value) -> anglePidController.setP(value));
+			new AutoSetterTunableNumber(key + "angleKd", angleKd, (double value) -> anglePidController.setD(value));
+		}
 
 		driveMotor = new CANSparkMax(moduleConstants.driveMotorId(), CANSparkMax.MotorType.kBrushless);
 		driveMotor.restoreFactoryDefaults();
-		driveSparkPidController = driveMotor.getPIDController();
-		driveSparkPidController.setP(driveKp);
-		driveSparkPidController.setI(driveKi);
-		driveSparkPidController.setD(driveKd);
-		driveSparkPidController.setFF(driveKf);
+		drivePidController = driveMotor.getPIDController();
+		drivePidController.setP(driveKp);
+		drivePidController.setI(driveKi);
+		drivePidController.setD(driveKd);
+		drivePidController.setFF(driveKf);
 		// driveSparkPidController.setOutputRange(-driveMaxPercentOutput, driveMaxPercentOutput);
 		driveMotor.setSmartCurrentLimit(driveCurrentLimit_amp);
 		driveMotor.setInverted(driveInverted);
-		driveMotor.setIdleMode(driveIdleMode);
+		driveMotor.setIdleMode(IdleMode.kBrake);
 		driveMotor.setClosedLoopRampRate(driveRampTime_s);
 		driveMotor.enableVoltageCompensation(12);
 
@@ -81,35 +79,35 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 		angleMotor = new CANSparkMax(moduleConstants.angleMotorId(), CANSparkMax.MotorType.kBrushless);
 		angleMotor.restoreFactoryDefaults();
-		angleSparkPidController = angleMotor.getPIDController();
-		angleSparkPidController.setP(angleKp);
-		angleSparkPidController.setI(angleKi);
-		angleSparkPidController.setD(angleKd);
-		angleSparkPidController.setFF(angleKf);
+		anglePidController = angleMotor.getPIDController();
+		anglePidController.setP(angleKp);
+		anglePidController.setI(angleKi);
+		anglePidController.setD(angleKd);
+		anglePidController.setFF(angleKf);
 		// angleSparkPidController.setOutputRange(-angleMaxPercentOutput, angleMaxPercentOutput);
 		angleMotor.setSmartCurrentLimit(angleCurrentLimit_amp);
 		angleMotor.setInverted(angleInverted);
-		angleMotor.setIdleMode(angleIdleMode);
+		angleMotor.setIdleMode(IdleMode.kCoast);
 		// angleMotor.setClosedLoopRampRate(angleRampTime_s);
 		angleMotor.enableVoltageCompensation(12);
-
-		angleRelativeEncoder = angleMotor.getEncoder();
-		angleRelativeEncoder.setPositionConversionFactor(Conversions.twoPi / angleGearRatio); // rad
-		angleRelativeEncoder.setVelocityConversionFactor(Conversions.twoPi / angleGearRatio / 60.0); // radps
-
-		driveRelativeEncoder.setPositionConversionFactor(wheelCircumference_m / driveGearRatio); // m
-		driveRelativeEncoder.setVelocityConversionFactor(wheelCircumference_m / driveGearRatio / 60.0); // mps
 
 		angleAbsoluteEncoder = angleMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
 		angleAbsoluteEncoder.setPositionConversionFactor(Conversions.twoPi / 3.3 /* V */); // rad
 		// absolute encoder velocity reading is meaningless (jumps around), using relative encoder's instead
 		// angleAbsoluteEncoder.setVelocityConversionFactor(Conversions.twoPi / 3.3 /* V */); // radps
-		angleSparkPidController.setFeedbackDevice(angleAbsoluteEncoder);
+		anglePidController.setFeedbackDevice(angleAbsoluteEncoder);
+
+		angleRelativeEncoder = angleMotor.getEncoder();
+		angleRelativeEncoder.setPositionConversionFactor(Conversions.twoPi / angleGearRatio); // rad
+		angleRelativeEncoder.setVelocityConversionFactor(Conversions.twoPi / angleGearRatio / 60.0); // radps
+
+		// on first cycle, reset relative encoder to absolute
+		angleRelativeEncoder.setPosition(Conversions.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad));
 
 		// wrap betwee 0 and 2pi radians
-		angleSparkPidController.setPositionPIDWrappingEnabled(true);
-		angleSparkPidController.setPositionPIDWrappingMinInput(0);
-		angleSparkPidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
+		anglePidController.setPositionPIDWrappingEnabled(true);
+		anglePidController.setPositionPIDWrappingMinInput(0);
+		anglePidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
 
 		// turn down frequency as we only log them, not needed for calculations
 		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 40); // percent output
@@ -148,7 +146,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 	@Override
 	public void setDriveVelocity(double velocity) {
-		driveSparkPidController.setReference(velocity, ControlType.kVelocity, 0, driveFeedforward.calculate(velocity));
+		drivePidController.setReference(velocity, ControlType.kVelocity, 0, driveFeedforward.calculate(velocity));
 	}
 
 	@Override
@@ -159,7 +157,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	@Override
 	public void setAnglePosition(Rotation2d angle) {
 		final double targetAngle_rad = Conversions.angleModulus2pi(angle.getRadians());
-		angleSparkPidController.setReference(targetAngle_rad, ControlType.kPosition);
+		anglePidController.setReference(targetAngle_rad, ControlType.kPosition);
 		// 0, angleFeedforward.calculate(targetAngle_rad));
 	}
 
@@ -176,17 +174,5 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	@Override
 	public double getDriveCharacterizationVelocity_radps() {
 		return Conversions.twoPi * (driveRelativeEncoder.getVelocity() / wheelCircumference_m); // undo unit conversion
-	}
-
-	@Override
-	public void tunablePeriodic() {
-		if (tunableDriveKp.hasChanged())
-			driveSparkPidController.setP(tunableDriveKp.get());
-		if (tunableDriveKd.hasChanged())
-			driveSparkPidController.setD(tunableDriveKd.get());
-		if (tunableAngleKp.hasChanged())
-			angleSparkPidController.setP(tunableAngleKp.get());
-		if (tunableAngleKd.hasChanged())
-			angleSparkPidController.setD(tunableAngleKd.get());
 	}
 }
