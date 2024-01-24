@@ -5,6 +5,7 @@ import static frc.robot.constants.ArmConstants.*;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
@@ -44,8 +45,9 @@ public class Arm extends SubsystemBase {
 	public void periodic() {
 		updateInputs(inputs);
 		Logger.processInputs(getName(), inputs);
-
 		Logger.recordOutput("Elevator/targetPosition_rad", targetPosition_rad);
+		pidController.setReference(targetPosition_rad, ControlType.kPosition, 0,
+			feedforwardController.calculate(targetPosition_rad, 0));
 	}
 
 	@AutoLog
@@ -65,5 +67,9 @@ public class Arm extends SubsystemBase {
 		inputs.temperature_C = motor.getMotorTemperature();
 		inputs.position_rad = encoder.getPosition();
 		inputs.velocity_radps = encoder.getVelocity();
+	}
+
+	void setPosition(double position_rad) {
+		targetPosition_rad = position_rad;
 	}
 }
