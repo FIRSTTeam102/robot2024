@@ -4,6 +4,7 @@ import static frc.robot.constants.Constants.tuningMode;
 import static frc.robot.constants.ShooterConstants.*;
 
 import frc.robot.util.AutoSetterTunableNumber;
+import frc.robot.util.SparkUtil;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Units;
@@ -19,9 +20,10 @@ import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
-	private CANSparkMax motor = new CANSparkMax(motorId, CANSparkMax.MotorType.kBrushless);
-	private SparkPIDController pidController = motor.getPIDController();
-	private RelativeEncoder encoder = motor.getEncoder();
+	private CANSparkMax leadMotor = new CANSparkMax(leadMotorId, CANSparkMax.MotorType.kBrushless);
+	private CANSparkMax followerMotor = new CANSparkMax(followerMotorId, CANSparkMax.MotorType.kBrushless);
+	private SparkPIDController pidController = leadMotor.getPIDController();
+	private RelativeEncoder encoder = leadMotor.getEncoder();
 	private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(kS, kV, kA);
 
 	public Shooter() {
@@ -35,6 +37,12 @@ public class Shooter extends SubsystemBase {
 		pidController.setP(kP);
 		pidController.setI(0);
 		pidController.setD(kD);
+
+		followerMotor.follow(leadMotor);
+
+		// only fetch position when tuning
+		SparkUtil.setPeriodicFrames(leadMotor, true, true, tuningMode, false, false, false, false);
+		SparkUtil.setPeriodicFrames(followerMotor, false, false, false, false, false, false, false);
 	}
 
 	public void setVelocity(double velocity_rpm) {
@@ -49,21 +57,30 @@ public class Shooter extends SubsystemBase {
 
 	@AutoLog
 	public static class ShooterIOInputs {
-		public double position_rot = 0.0;
-		public double velocity_rpm = 0.0;
-		public double voltage_V = 0.0;
-		public double current_A = 0.0;
-		public double temperature_C = 0.0;
+		// public double leadPosition_rot = 0.0;
+		public double leadVelocity_rpm = 0.0;
+		public double leadVoltage_V = 0.0;
+		public double leadCurrent_A = 0.0;
+		public double leadTemperature_C = 0.0;
+
+		public double followerVoltage_V = 0.0;
+		public double followerCurrent_A = 0.0;
+		public double followerTemperature_C = 0.0;
 	}
 
 	public ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
 
 	private void updateInputs(ShooterIOInputs inputs) {
-		inputs.position_rot = encoder.getPosition();
-		inputs.velocity_rpm = encoder.getVelocity();
-		inputs.voltage_V = motor.getBusVoltage() * motor.getAppliedOutput();
-		inputs.current_A = motor.getOutputCurrent();
-		inputs.temperature_C = motor.getMotorTemperature();
+		// inputs.leadPosition_rot = encoder.getPosition();
+		inputs.leadVelocity_rpm = encoder.getVelocity();
+		inputs.leadVoltage_V = leadMotor.getBusVoltage() * leadMotor.getAppliedOutput();
+		inputs.leadCurrent_A = leadMotor.getOutputCurrent();
+		inputs.leadTemperature_C = leadMotor.getMotorTemperature();
+
+		// important to log to ensure proper functionality
+		inputs.followerVoltage_V = followerMotor.getBusVoltage() * followerMotor.getAppliedOutput();
+		inputs.followerCurrent_A = followerMotor.getOutputCurrent();
+		inputs.followerTemperature_C = followerMotor.getMotorTemperature();
 	}
 
 	public final SysIdRoutine sysIdRoutine = new SysIdRoutine(
@@ -73,10 +90,10 @@ public class Shooter extends SubsystemBase {
 				pidController.setReference(voltage.in(Units.Volts), ControlType.kVoltage);
 			},
 			log -> {
-				log.motor("shooter")
-					.voltage(Units.Volts.of(inputs.voltage_V))
-					.angularPosition(Units.Rotations.of(inputs.position_rot))
-					.angularVelocity(Units.RPM.of(inputs.velocity_rpm));
+				log.motor("shooter-lead")
+					.voltage(Units.Volts.of(inputs.leadVoltage_V))
+					.angularPosition(Units.Rotations.of(encoder.getPosition()))
+					.angularVelocity(Units.RPM.of(inputs.leadVelocity_rpm));
 			},
 			this));
 }

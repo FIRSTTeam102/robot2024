@@ -5,6 +5,7 @@ import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.util.AutoSetterTunableNumber;
 import frc.robot.util.Conversions;
+import frc.robot.util.SparkUtil;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -66,14 +67,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		driveRelativeEncoder.setPositionConversionFactor(wheelCircumference_m / driveGearRatio); // m
 		driveRelativeEncoder.setVelocityConversionFactor(wheelCircumference_m / driveGearRatio / 60.0); // mps
 
-		// turn down frequency as we only log them, not needed for calculations
-		// driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 40); // percent output
-		// driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 40); // velocity, current
-		// driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 40); // position
-		// driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500); // analog sensor
-		// driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500); // alternate encoder
-		// driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500); // duty cycle position
-		// driveMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500); // duty cycle velocity
+		SparkUtil.setPeriodicFrames(driveMotor, false, true, true, false, false, false, false);
 
 		driveMotor.burnFlash();
 
@@ -109,14 +103,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		anglePidController.setPositionPIDWrappingMinInput(0);
 		anglePidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
 
-		// turn down frequency as we only log them, not needed for calculations
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus0, 40); // percent output
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus1, 40); // velocity, current
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus2, 500); // position
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus3, 500); // analog sensor
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus4, 500); // alternate encoder
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus5, 500); // duty cycle position
-		// angleMotor.setPeriodicFramePeriod(PeriodicFrame.kStatus6, 500); // duty cycle velocity
+		SparkUtil.setPeriodicFrames(angleMotor, false, true, true, true, false, false, false);
 
 		angleMotor.burnFlash();
 	}
