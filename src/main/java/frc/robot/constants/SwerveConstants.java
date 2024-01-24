@@ -48,6 +48,12 @@ public final class SwerveConstants {
 	public static final double maxAngularVelocity_radps = 5676 /* NEO max RPM */
 		/ 60.0 / angleGearRatio / Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
 
+	// calculated with choreo, todo: see if empirical can match these
+	public static final double theoreticalMaxVelocity_mps = 4.420;
+	public static final double theoreticalMaxAcceleration_mps2 = 27.971;
+	public static final double theoreticalMaxAngularVelocity_radps = 10.817;
+	public static final double theoreticalMaxAngularAcceleration_radps2 = 95.242;
+
 	/* drive motor PID values */
 	public static final double driveKp = 0.15138;
 	public static final double driveKi = 0.0;
@@ -71,6 +77,6 @@ public final class SwerveConstants {
 	// public static final double angleKa = 0.027348;
 
 	/* current limiting */
-	public static final int driveCurrentLimit_amp = 45;
+	public static final int driveCurrentLimit_amp = 50;
 	public static final int angleCurrentLimit_amp = 30;
 };

@@ -1,11 +1,12 @@
 package frc.robot.util;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleConsumer;
 
 public class AutoSetterTunableNumber extends TunableNumber {
 	public static class AutoSetterTunableNumberManager {
-		private static List<AutoSetterTunableNumber> instances;
+		private static List<AutoSetterTunableNumber> instances = new ArrayList<AutoSetterTunableNumber>();
 
 		public static void addInstance(AutoSetterTunableNumber instance) {
 			instances.add(instance);

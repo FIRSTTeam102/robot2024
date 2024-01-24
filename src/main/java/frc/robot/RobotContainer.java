@@ -27,12 +27,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,10 +73,25 @@ public class RobotContainer {
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("XStance", new XStance(swerve));
+		NamedCommands.registerCommand("AimAndShoot",
+			Commands.print("aiming and shooting").andThen(Commands.waitSeconds(5)));
+		NamedCommands.registerCommand("Intake", Commands.print("arm to intaking position & rollers running"));
+		NamedCommands.registerCommand("WaitIntake",
+			Commands.print("wait for intake note sensor").andThen(Commands.waitSeconds(1)));
+		NamedCommands.registerCommand("SafeArm", Commands.print("move arm to safe position inside frame"));
 
 		// create paths
 		autoChooser.addOption("nothing", Commands.none());
-		autoChooser.addDefaultOption("example", new PathPlannerAuto("Example Auto"));
+		final List<String> autoNames = AutoBuilder.getAllAutoNames();
+		for (final String autoName : autoNames) {
+			Command auto = new PathPlannerAuto(autoName);
+			// fixme: investigate stopping swerve when auto is finished, here of somewhere else
+			// .finallyDo(() -> {
+			// System.out.println("stopping swerve");
+			// swerve.stop();
+			// });
+			autoChooser.addOption(autoName, auto);
+		}
 
 		var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
