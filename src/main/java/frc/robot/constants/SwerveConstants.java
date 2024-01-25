@@ -3,7 +3,6 @@ package frc.robot.constants;
 import frc.robot.subsystems.swerve.SwerveModuleConstants;
 
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.util.Units;
 
 public final class SwerveConstants {
 	// FL, FR, BL, BR (matches AdvantageScope convention)
@@ -15,7 +14,7 @@ public final class SwerveConstants {
 	};
 
 	// the left-to-right distance between the drivetrain wheels, should be measured from center to center
-	public static final double trackWidth_m = Units.inchesToMeters(22.75); // 28in frame
+	public static final double trackWidth_m = 0.57785; // 22.75in c-c, 28in frame
 	// the front-to-back distance between the drivetrain wheels, should be measured from center to center
 	public static final double wheelBase_m = trackWidth_m;
 

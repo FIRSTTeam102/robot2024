@@ -76,7 +76,7 @@ public class RobotContainer {
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("XStance", new XStance(swerve));
 		NamedCommands.registerCommand("AimAndShoot",
-			Commands.print("aiming and shooting").andThen(Commands.waitSeconds(5)));
+			Commands.print("aiming and shooting").andThen(Commands.waitSeconds(1)));
 		NamedCommands.registerCommand("Intake", Commands.print("arm to intaking position & rollers running"));
 		NamedCommands.registerCommand("WaitIntake",
 			Commands.print("wait for intake note sensor").andThen(Commands.waitSeconds(1)));

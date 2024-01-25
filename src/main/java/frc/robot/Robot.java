@@ -5,16 +5,15 @@ import static frc.robot.constants.Constants.*;
 import frc.robot.constants.BuildConstants;
 import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
 
-import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import com.revrobotics.REVPhysicsSim;
@@ -42,8 +41,8 @@ public class Robot extends LoggedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		if (Robot.isSimulation())
-			DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+		// if (Robot.isSimulation())
+		// DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
 
 		Logger.recordMetadata("RuntimeType", getRuntimeType().toString());
 		Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -89,6 +88,9 @@ public class Robot extends LoggedRobot {
 
 		// disable LiveWindow telemetry in favor of AdvantageKit to reduce processing each tick
 		LiveWindow.disableAllTelemetry();
+
+		if (!tuningMode)
+			PPLibTelemetry.enableCompetitionMode();
 	}
 
 	/**
