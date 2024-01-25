@@ -7,7 +7,7 @@ public class SparkUtil {
 	public static final int framePeriodDisabled = 65535;
 	public static final int framePeriodSlow = 500;
 	public static final int framePeriodMid = 40;
-	public static final int framePeriodDefault = 20;
+	public static final int framePeriodDefault = 15;
 	public static final int framePeriodFast = 15;
 
 	// https://docs.revrobotics.com/sparkmax/operating-modes/control-interfaces#periodic-status-frames

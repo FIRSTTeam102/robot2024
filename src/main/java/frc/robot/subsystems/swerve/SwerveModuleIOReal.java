@@ -143,7 +143,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 	@Override
 	public void setAnglePosition(Rotation2d angle) {
-		final double targetAngle_rad = Conversions.angleModulus2pi(angle.getRadians());
+		final double targetAngle_rad = Conversions.angleModulus2pi(angle.getRadians() + angleOffset_rad);
 		anglePidController.setReference(targetAngle_rad, ControlType.kPosition);
 		// 0, angleFeedforward.calculate(targetAngle_rad));
 	}

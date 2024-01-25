@@ -103,8 +103,10 @@ public class SwerveModule {
 		 * as the wheel turns towards the setpoint, its velocity should increase.
 		 * this is achieved by taking the component of the velocity in the direction of the setpoint.
 		 */
-		optimizedState.speedMetersPerSecond *= Math
-			.cos(optimizedState.angle.getRadians() - inputs.angleAbsolutePosition_rad);
+		final double angleErrorMultiplier = Math.cos(optimizedState.angle.getRadians() - inputs.angleAbsolutePosition_rad);
+		if (angleErrorMultiplier > 0)
+			optimizedState.speedMetersPerSecond *= angleErrorMultiplier;
+		// Logger.recordOutput("SwerveModule " + moduleNumber + "/angleErrorMultiplier", angleErrorMultiplier);
 
 		Logger.recordOutput("SwerveModule " + moduleNumber + "/targetSpeed_mps", optimizedState.speedMetersPerSecond);
 

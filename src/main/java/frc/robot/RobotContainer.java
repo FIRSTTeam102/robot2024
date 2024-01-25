@@ -13,6 +13,7 @@ import frc.robot.subsystems.Swerve;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 
@@ -20,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -112,6 +114,10 @@ public class RobotContainer {
 			autoChooser.addOption("sysid swerve angle", sysIdTestSet(swerve.angleSysIdRoutine));
 			autoChooser.addOption("sysid shooter", sysIdTestSet(shooter.sysIdRoutine));
 		}
+
+		// shouldn't require tuningMode as we might run it randomly in comp
+		// needs to run when disabled so motors don't run
+		SmartDashboard.putData("swerve angle calibration", new SwerveAngleOffsetCalibration(swerve));
 	}
 
 	/**
