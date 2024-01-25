@@ -4,12 +4,15 @@ import static frc.robot.constants.Constants.*;
 
 import frc.robot.constants.BuildConstants;
 import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
+import frc.robot.util.VirtualSubsystem;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -41,8 +44,8 @@ public class Robot extends LoggedRobot {
 	 */
 	@Override
 	public void robotInit() {
-		// if (Robot.isSimulation())
-		// DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+		if (Robot.isSimulation())
+			DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
 
 		Logger.recordMetadata("RuntimeType", getRuntimeType().toString());
 		Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
@@ -102,6 +105,11 @@ public class Robot extends LoggedRobot {
 	 */
 	@Override
 	public void robotPeriodic() {
+		if (tuningMode)
+			AutoSetterTunableNumberManager.periodic();
+
+		VirtualSubsystem.periodicAll();
+
 		/*
 		 * Runs the Scheduler. This is responsible for polling buttons, adding newly-scheduled
 		 * commands, running already-scheduled commands, removing finished or interrupted commands,
@@ -109,9 +117,6 @@ public class Robot extends LoggedRobot {
 		 * block in order for anything in the Command-based framework to work.
 		 */
 		CommandScheduler.getInstance().run();
-
-		if (tuningMode)
-			AutoSetterTunableNumberManager.periodic();
 	}
 
 	/** This function is called once each time the robot enters Disabled mode. */

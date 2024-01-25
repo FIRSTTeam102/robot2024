@@ -10,6 +10,7 @@ import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.SystemAlerter;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
@@ -71,6 +72,8 @@ public class RobotContainer {
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
+		new SystemAlerter();
+
 		configureBindings();
 
 		// named commands must be registered before any paths are created
@@ -86,20 +89,15 @@ public class RobotContainer {
 		autoChooser.addOption("nothing", Commands.none());
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();
 		for (final String autoName : autoNames) {
-			Command auto = new PathPlannerAuto(autoName);
-			// fixme: investigate stopping swerve when auto is finished, here of somewhere else
-			// .finallyDo(() -> {
-			// System.out.println("stopping swerve");
-			// swerve.stop();
-			// });
+			final Command auto = new PathPlannerAuto(autoName);
 			autoChooser.addOption(autoName, auto);
 		}
 
-		var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
+		final var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
 			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
-			.withSize(5, 4).withPosition(4, 5);
+			.withSize(5, 4).withPosition(4, 5).withWidget(Alert.widgetName);
 		driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.11:5800/stream.mjpg"))
 			.withProperties(Map.of("show crosshair", false, "show controls", false))
 			.withWidget(BuiltInWidgets.kCameraStream)
@@ -170,7 +168,7 @@ public class RobotContainer {
 			routine.dynamic(SysIdRoutine.Direction.kReverse));
 	}
 
-	Alert tuningModeAlert = new Alert("tuning mode enabled", AlertType.Info);
+	Alert tuningModeAlert = new Alert("tuning mode enabled, expect decreased performance", AlertType.Info);
 	Alert driverControllerAlert = new Alert("driver controller not connected properly", AlertType.Error);
 
 	public void updateOIAlert() {

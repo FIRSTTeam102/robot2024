@@ -6,7 +6,7 @@ import java.util.function.DoubleConsumer;
 
 public class AutoSetterTunableNumber extends TunableNumber {
 	public static class AutoSetterTunableNumberManager {
-		private static List<AutoSetterTunableNumber> instances = new ArrayList<AutoSetterTunableNumber>();
+		private static List<AutoSetterTunableNumber> instances = new ArrayList<>();
 
 		public static void addInstance(AutoSetterTunableNumber instance) {
 			instances.add(instance);
