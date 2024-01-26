@@ -16,4 +16,6 @@ public final class ArmConstants {
 	public static final double kG = 0;
 	public static final double kV = 0;
 	public static final double kA = 0;
+
+	public static final double verticalArmPos_Rad = 1.5708;
 }

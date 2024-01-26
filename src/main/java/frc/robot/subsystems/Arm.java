@@ -67,9 +67,14 @@ public class Arm extends SubsystemBase {
 		inputs.velocity_radps = encoder.getVelocity();
 	}
 
-	void setPosition(double position_rad) {
+	public void setPosition(double position_rad) {
 		targetPosition_rad = position_rad;
 		pidController.setReference(targetPosition_rad, ControlType.kPosition, 0,
 			feedforwardController.calculate(targetPosition_rad, 0));
+	}
+
+	public void stopArm() {
+		pidController.setReference(0, ControlType.kDutyCycle, 0, feedforwardController.calculate(inputs.position_rad, 0));
+		// Set
 	}
 }
