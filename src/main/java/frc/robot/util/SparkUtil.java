@@ -32,4 +32,17 @@ public class SparkUtil {
 		spark.setPeriodicFramePeriod(PeriodicFrame.kStatus6,
 			dutyCycleAbsoluteVelocity ? framePeriodDefault : framePeriodDisabled);
 	}
+
+	// https://github.com/Mechanical-Advantage/RobotCode2023/blob/main/src/main/java/org/littletonrobotics/frc2023/util/CleanSparkMaxValue.java
+	public static double cleanValue(double lastValue, double value) {
+		if (Double.isNaN(value)
+			|| Double.isInfinite(value)) {
+			// || (Math.abs(value) < 1.0e-4 && Math.abs(lastValue) > 60.0)) {
+			return lastValue;
+		} else
+
+		{
+			return value;
+		}
+	}
 }

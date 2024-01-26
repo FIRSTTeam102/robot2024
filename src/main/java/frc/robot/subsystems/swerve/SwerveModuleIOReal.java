@@ -110,17 +110,18 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 	@Override
 	public void updateInputs(SwerveModuleIOInputs inputs) {
-		inputs.driveDistance_m = driveRelativeEncoder.getPosition();
-		inputs.driveVelocity_mps = driveRelativeEncoder.getVelocity();
+		inputs.driveDistance_m = SparkUtil.cleanValue(inputs.driveDistance_m, driveRelativeEncoder.getPosition());
+		inputs.driveVelocity_mps = SparkUtil.cleanValue(inputs.driveVelocity_mps, driveRelativeEncoder.getVelocity());
 		inputs.driveVoltage_V = driveMotor.getBusVoltage() * driveMotor.getAppliedOutput();
 		inputs.driveCurrent_A = driveMotor.getOutputCurrent();
 		inputs.driveTemperature_C = driveMotor.getMotorTemperature();
 
-		inputs.anglePosition_rad = angleRelativeEncoder.getPosition();
-		inputs.angleAbsolutePosition_rad = Conversions
-			.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad); // ensure offset is properly wrapped
+		inputs.anglePosition_rad = SparkUtil.cleanValue(inputs.anglePosition_rad, angleRelativeEncoder.getPosition());
+		inputs.angleAbsolutePosition_rad = SparkUtil.cleanValue(inputs.angleAbsolutePosition_rad,
+			// ensure offset is properly wrapped
+			Conversions.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad));
 		// inputs.angleVelocity_radps = angleAbsoluteEncoder.getVelocity(); // gives garbage data
-		inputs.angleVelocity_radps = angleRelativeEncoder.getVelocity();
+		inputs.angleVelocity_radps = SparkUtil.cleanValue(inputs.angleVelocity_radps, angleRelativeEncoder.getVelocity());
 		inputs.angleVoltage_V = angleMotor.getBusVoltage() * angleMotor.getAppliedOutput();
 		inputs.angleCurrent_A = angleMotor.getOutputCurrent();
 		inputs.angleTemperature_C = angleMotor.getMotorTemperature();
