@@ -4,8 +4,6 @@
 
 package frc.robot.commands.arm;
 
-import static frc.robot.constants.ArmConstants.verticalArmPos_Rad;
-
 import frc.robot.subsystems.Arm;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -22,22 +20,21 @@ public class setArmPosition extends Command {
 	}
 
 	@Override
-	public void initialize() {}
-
-	@Override
-	public void execute() {
+	public void initialize() {
 		arm.setPosition(targetPosition_rad);
 	}
 
 	@Override
+	public void execute() {}
+
+	@Override
 	public void end(boolean interrupted) {
-		arm.setPosition(verticalArmPos_Rad);
 		arm.stopArm();
 	}
 
 	// Returns true when the command should end.
 	@Override
 	public boolean isFinished() {
-		return false;
+		return (arm.closeEnough());
 	}
 }

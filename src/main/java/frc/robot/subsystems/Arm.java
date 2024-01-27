@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.ArmConstants.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -37,10 +38,11 @@ public class Arm extends SubsystemBase {
 		motor.setSmartCurrentLimit(50);
 		motor.setSecondaryCurrentLimit(65);
 
-		encoder.setPositionConversionFactor((1 / 10) * 2 * Math.PI); // motor revolutions * arm rev / motor rev * arm
-																																	// radians / arm rev = arm radians
-		encoder.setVelocityConversionFactor((1 / 10) * (2 * Math.PI) * (1 / 60)); // RPM * arm rev / motor rev * radians /
-																																							// revolution * min / sec = rad/s
+		encoder.setPositionConversionFactor((1 / gearRatio) * 2 * Math.PI); // motor revolutions * arm rev / motor rev * arm
+		// radians / arm rev = arm radians
+		encoder.setVelocityConversionFactor((1 / gearRatio) * (2 * Math.PI) * (1 / 60)); // RPM * arm rev / motor rev *
+																																											// radians /
+		// revolution * min / sec = rad/s
 	}
 
 	@Override
@@ -78,5 +80,13 @@ public class Arm extends SubsystemBase {
 	public void stopArm() {
 		pidController.setReference(0, ControlType.kDutyCycle, 0, feedforwardController.calculate(inputs.position_rad, 0));
 		// Set
+	}
+
+	public boolean closeEnough() {
+		if (MathUtil.isNear(targetPosition_rad, inputs.position_rad, 0.1)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
