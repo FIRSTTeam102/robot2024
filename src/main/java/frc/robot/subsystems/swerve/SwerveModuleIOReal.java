@@ -86,7 +86,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleMotor.enableVoltageCompensation(12);
 
 		angleAbsoluteEncoder = angleMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
-		angleAbsoluteEncoder.setPositionConversionFactor(Conversions.twoPi / 3.3 /* V */); // rad
+		angleAbsoluteEncoder.setPositionConversionFactor(Conversions.truncate(Conversions.twoPi / 3.3 /* V */, 3)); // rad
 		// absolute encoder velocity reading is meaningless (jumps around), using relative encoder's instead
 		// angleAbsoluteEncoder.setVelocityConversionFactor(Conversions.twoPi / 3.3 /* V */); // radps
 		anglePidController.setFeedbackDevice(angleAbsoluteEncoder);
