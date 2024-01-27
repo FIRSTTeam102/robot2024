@@ -37,8 +37,10 @@ public class Arm extends SubsystemBase {
 		motor.setSmartCurrentLimit(50);
 		motor.setSecondaryCurrentLimit(65);
 
-		encoder.setPositionConversionFactor(2 * Math.PI); // revolutions * radians / revolution = radians
-		encoder.setVelocityConversionFactor(2 * Math.PI * (1 / 60)); // RPM * radians / revolution * min / sec = rad/s
+		encoder.setPositionConversionFactor((1 / 10) * 2 * Math.PI); // motor revolutions * arm rev / motor rev * arm
+																																	// radians / arm rev = arm radians
+		encoder.setVelocityConversionFactor((1 / 10) * (2 * Math.PI) * (1 / 60)); // RPM * arm rev / motor rev * radians /
+																																							// revolution * min / sec = rad/s
 	}
 
 	@Override
