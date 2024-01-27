@@ -1,9 +1,0 @@
-# this file defines who is required to approve code requests for certain areas of the code
-# https://help.github.com/articles/about-codeowners/
-
-# programming leads default owners for everything
-*	@caburum @shinthebinn
-
-# swerve
-Swerve.java				@caburum
-**/subsystems/swerve	@caburum
