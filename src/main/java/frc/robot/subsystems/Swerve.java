@@ -4,6 +4,7 @@ import static frc.robot.constants.AutoConstants.*;
 import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.io.FieldVisionIO;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
 import frc.robot.swerve.LocalADStarAK;
@@ -11,6 +12,7 @@ import frc.robot.swerve.SwerveModule;
 import frc.robot.swerve.SwerveModuleIOReal;
 import frc.robot.swerve.SwerveModuleIOSim;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -244,22 +246,22 @@ public class Swerve extends SubsystemBase {
 		// todo: estimate without using gyro?
 
 		// // Every 0.02s, updating pose2d
-		// if (vision.inputs.pipeline == pipeline.AprilTag.value && vision.isPipelineReady()
-		// && vision.inputs.target == true) {
-		// visionSeenCount++;
-		// if (visionSeenCount > 2) { // fixme: temporary
-		// var visionPose = new Pose2d(vision.inputs.botpose_fieldspaceTranslationX_m,
-		// vision.inputs.botpose_fieldspaceTranslationY_m,
-		// new Rotation2d(vision.inputs.botpose_fieldspaceRotationZ_rad));
-		// Logger.recordOutput("Odometry/VisionPose", visionPose);
-		// // var distance = Math.hypot(
-		// // Math.abs(translationX - vision.inputs.botpose_fieldspaceTranslationX_m),
-		// // Math.abs(translationY - vision.inputs.botpose_fieldspaceTranslationY_m));
-		// poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.inputs.botpose_latency_s);
-		// // VecBuilder.fill(distance / 2, distance / 2, 100));
-		// }
-		// } else
-		// visionSeenCount = 0;
+		if (FieldVisionIO.FieldVisionIOInputs.inputs.targetAprilTag == pipeline.AprilTag.value && FieldVisionIO.isPipelineReady()
+		 && FieldVisionIO.inputs.target == true) {  //If the seen apriltag is equal to the desired apriltag value(?) and if the pipeline is ready for use
+		 visionSeenCount++;
+		 if (visionSeenCount > 2) { // fixme: temporary
+		 var visionPose = new Pose2d(FieldVisionIO.inputs.fieldspaceTranslationX_m, //inputs.fieldspaceTranslationX_m
+		 FieldVisionIO.inputs.fieldspaceTranslationY_m,
+		 new Rotation2d(FieldVisionIO.inputs.fieldspaceRotationZ_rad));
+		 Logger.recordOutput("Odometry/VisionPose", visionPose);
+		 var distance = Math.hypot(
+		 Math.abs(translationX - FieldVisionIO.inputs.fieldspaceTranslationX_m),
+		 Math.abs(translationY - FieldVisionIO.inputs.fieldspaceTranslationY_m));
+		 poseEstimator.addVisionMeasurement(visionPose, timer.get() - FieldVisionIO.FieldVisionIOInputs.inputs.fieldspaceTotalLatency_s);
+		 VecBuilder.fill(distance / 2, distance / 2, 100));
+		 }
+		 } else
+		 visionSeenCount = 0;
 
 		Logger.recordOutput("Odometry/Robot", pose);
 
