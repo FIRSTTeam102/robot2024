@@ -1,9 +1,10 @@
 package frc.robot.subsystems.swerve;
 
-import static frc.robot.constants.SwerveConstants.maxVelocity_mps;
+import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.util.Conversions;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -15,6 +16,8 @@ public class SwerveModule {
 	private Rotation2d lastAngle;
 	public final SwerveModuleIO io;
 	public final SwerveModuleIOInputsAutoLogged inputs = new SwerveModuleIOInputsAutoLogged();
+
+	private PIDController anglePidController = new PIDController(angleKp, angleKi, angleKd);
 
 	public SwerveModule(int moduleNumber, SwerveModuleIO io) {
 		this.moduleNumber = moduleNumber;
@@ -94,7 +97,8 @@ public class SwerveModule {
 			// don't try to change the state, clear flag before next loop
 			angleCharacterizationRunning = false;
 		} else {
-			io.setAnglePosition(angle);
+			io.setAngleVoltage(anglePidController.calculate(inputs.angleAbsolutePosition_rad,
+				Conversions.angleModulus2pi(angle.getRadians())));
 		}
 
 		/*
