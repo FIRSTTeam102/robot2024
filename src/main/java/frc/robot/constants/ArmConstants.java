@@ -20,5 +20,5 @@ public final class ArmConstants {
 	public static final double verticalArmPos_Rad = 1.5708;
 
 	// Conversion
-	public static final int gearRatio = 0; // PLACEHOLDER
+	public static final int gearRatio = 1; // 1 IS PLACEHOLDER
 }
