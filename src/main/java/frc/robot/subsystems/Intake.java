@@ -46,11 +46,8 @@ public class Intake extends SubsystemBase {
 	}
 
 	public boolean detectNote() {
-		if (inputs.noteSensor == true) {
-			return true;
-		} else {
-			return false;
-		}
+		return inputs.noteSensor 
+		
 	}
 
 	public void stopMotor() {

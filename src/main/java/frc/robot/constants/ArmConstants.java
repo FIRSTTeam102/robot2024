@@ -21,4 +21,7 @@ public final class ArmConstants {
 
 	// Conversion
 	public static final int gearRatio = 1; // 1 IS PLACEHOLDER
+
+	// closeEnough 
+	public static final double closeVar = 0.1; 
 }

@@ -83,7 +83,7 @@ public class Arm extends SubsystemBase {
 	}
 
 	public boolean closeEnough() {
-		if (MathUtil.isNear(targetPosition_rad, inputs.position_rad, 0.1)) {
+		if (MathUtil.isNear(targetPosition_rad, inputs.position_rad, closeVar)) {
 			return true;
 		} else {
 			return false;
