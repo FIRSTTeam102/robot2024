@@ -9,12 +9,15 @@ import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.SystemAlerter;
 import frc.robot.subsystems.Intake;
 import frc.robot.commands.intakeCommands; 
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 
@@ -22,6 +25,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -29,12 +33,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -62,27 +68,40 @@ public class RobotContainer {
 
 	/* subsystems */
 	// public final Vision vision = new Vision();
-	public final Swerve swerve = new Swerve(gyro/* , vision */);
 	public final Arm arm = new Arm();
-
+	public final Swerve swerve = new Swerve(gyro/* , vision */);
+	public final Shooter shooter = new Shooter();
+  
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
+
+		new SystemAlerter();
 
 		configureBindings();
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("XStance", new XStance(swerve));
+		NamedCommands.registerCommand("AimAndShoot",
+			Commands.print("aiming and shooting").andThen(Commands.waitSeconds(1)));
+		NamedCommands.registerCommand("Intake", Commands.print("arm to intaking position & rollers running"));
+		NamedCommands.registerCommand("WaitIntake",
+			Commands.print("wait for intake note sensor").andThen(Commands.waitSeconds(1)));
+		NamedCommands.registerCommand("SafeArm", Commands.print("move arm to safe position inside frame"));
 
 		// create paths
 		autoChooser.addOption("nothing", Commands.none());
-		autoChooser.addDefaultOption("example", new PathPlannerAuto("Example Auto"));
+		final List<String> autoNames = AutoBuilder.getAllAutoNames();
+		for (final String autoName : autoNames) {
+			final Command auto = new PathPlannerAuto(autoName);
+			autoChooser.addOption(autoName, auto);
+		}
 
-		var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
+		final var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
 			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
-			.withSize(5, 4).withPosition(4, 5);
+			.withSize(5, 4).withPosition(4, 5).withWidget(Alert.widgetName);
 		driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.11:5800/stream.mjpg"))
 			.withProperties(Map.of("show crosshair", false, "show controls", false))
 			.withWidget(BuiltInWidgets.kCameraStream)
@@ -90,11 +109,17 @@ public class RobotContainer {
 			.withPosition(0, 0);
 
 		if (Constants.tuningMode) {
-			Logger.recordOutput("SysIdTestState", SysIdRoutineLog.State.kNone.toString()); // populate default
+			tuningModeAlert.set(true);
+			Logger.recordOutput("SysId/testState", SysIdRoutineLog.State.kNone.toString()); // populate default
 
 			autoChooser.addOption("sysid swerve drive", sysIdTestSet(swerve.driveSysIdRoutine));
 			autoChooser.addOption("sysid swerve angle", sysIdTestSet(swerve.angleSysIdRoutine));
+			autoChooser.addOption("sysid shooter", sysIdTestSet(shooter.sysIdRoutine));
 		}
+
+		// shouldn't require tuningMode as we might run it randomly in comp
+		// needs to run when disabled so motors don't run
+		SmartDashboard.putData("swerve angle calibration", new SwerveAngleOffsetCalibration(swerve));
 	}
 
 	/**
@@ -118,8 +143,8 @@ public class RobotContainer {
 
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
-		driverController.rightBumper()
-			.whileTrue(teleopSwerve.holdRotateAroundPiece());
+		// driverController.rightBumper()
+		// .whileTrue(teleopSwerve.holdRotateAroundPiece());
 
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		driverController.x().whileTrue(new XStance(swerve));
@@ -147,6 +172,7 @@ public class RobotContainer {
 			routine.dynamic(SysIdRoutine.Direction.kReverse));
 	}
 
+	Alert tuningModeAlert = new Alert("tuning mode enabled, expect decreased performance", AlertType.Info);
 	Alert driverControllerAlert = new Alert("driver controller not connected properly", AlertType.Error);
 
 	public void updateOIAlert() {

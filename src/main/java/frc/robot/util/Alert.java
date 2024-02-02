@@ -130,6 +130,8 @@ public class Alert {
 		}
 	}
 
+	public static final String widgetName = "Alerts";
+
 	/** Represents an alert's level of urgency. */
 	public static enum AlertType {
 		/**

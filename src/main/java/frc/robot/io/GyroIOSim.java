@@ -7,6 +7,10 @@ import frc.robot.subsystems.Swerve;
 public class GyroIOSim implements GyroIO {
 	public GyroIOSim() {}
 
+	// flag to set custom yaw on next loop
+	private boolean setYawTriggered = false;
+	private double setYaw_deg = 0;
+
 	Swerve swerve;
 
 	@Override
@@ -15,6 +19,11 @@ public class GyroIOSim implements GyroIO {
 			swerve = RobotContainer.getInstance().swerve;
 		if (swerve == null)
 			return;
+
+		if (setYawTriggered) {
+			inputs.yaw_deg = setYaw_deg;
+			setYawTriggered = false;
+		}
 
 		inputs.connected = true;
 		double yaw_dps = Math
@@ -25,6 +34,7 @@ public class GyroIOSim implements GyroIO {
 
 	@Override
 	public void setYaw(double yaw_deg) {
-		// todo:
+		setYawTriggered = true;
+		setYaw_deg = yaw_deg;
 	}
 }

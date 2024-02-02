@@ -6,10 +6,10 @@ import static frc.robot.constants.SwerveConstants.*;
 import frc.robot.Robot;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
-import frc.robot.swerve.LocalADStarAK;
-import frc.robot.swerve.SwerveModule;
-import frc.robot.swerve.SwerveModuleIOReal;
-import frc.robot.swerve.SwerveModuleIOSim;
+import frc.robot.subsystems.swerve.SwerveModule;
+import frc.robot.subsystems.swerve.SwerveModuleIOReal;
+import frc.robot.subsystems.swerve.SwerveModuleIOSim;
+import frc.robot.util.LocalADStarAK;
 
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -305,7 +305,7 @@ public class Swerve extends SubsystemBase {
 						.linearPosition(Units.Meters.of(modules[i].inputs.driveDistance_m))
 						.linearVelocity(Units.MetersPerSecond.of(modules[i].inputs.driveVelocity_mps));
 			},
-			this));
+			this, "swerve-drive"));
 
 	// public final SysIdRoutine angleSysIdRoutine = new SysIdRoutine(
 	// new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
@@ -332,5 +332,5 @@ public class Swerve extends SubsystemBase {
 						.linearPosition(Units.Meters.of(modules[i].inputs.angleAbsolutePosition_rad))
 						.linearVelocity(Units.MetersPerSecond.of(modules[i].inputs.angleVelocity_radps));
 			},
-			this));
+			this, "swerve-angle"));
 }

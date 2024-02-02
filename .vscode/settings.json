@@ -47,6 +47,8 @@
 		"text": "@fieldcal",
 		"backgroundColor": "#f47100",
 		"color": "#fff"
-	}],
+	}
+],
+"java.debug.settings.onBuildFailureProceed": true,
 
 }
