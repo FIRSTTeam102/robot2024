@@ -10,6 +10,8 @@ import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Swerve;
+import frc.robot.subsystems.Intake;
+import frc.robot.commands.intakeCommands; 
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
