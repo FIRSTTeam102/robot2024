@@ -8,6 +8,7 @@ import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.SystemAlerter;
@@ -65,6 +66,7 @@ public class RobotContainer {
 
 	/* subsystems */
 	// public final Vision vision = new Vision();
+	public final Arm arm = new Arm();
 	public final Swerve swerve = new Swerve(gyro/* , vision */);
 	public final Shooter shooter = new Shooter();
 
