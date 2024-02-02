@@ -2,22 +2,40 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands;
+package frc.robot.commands.intake;
 
+import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class intake extends Command {
-	private int maxMotorSpeed = frc.robot.constants.IntakeConstants.maxMotorSpeed;
+public class SetIntakeSpeed extends Command {
+	private double speed;
 	private Intake intake;
 
-	public intake() {}
+	/**
+	 * Create a command that sets the intake to a specified speed
+	 * @param intake Intake Subsystem
+	 * @param speed Speed to set the motor to, for -1 <= speed <= 1
+	 */
+	public SetIntakeSpeed(Intake intake, double speed) {
+		this.speed = speed;
+		this.intake = intake;
+	}
+
+	/**
+	 * Set an intake to a standard speed given by IntakeConstants.maxMotorSpeed
+	 * @param intake Intake Subsystem
+	 */
+	public SetIntakeSpeed(Intake intake) {
+		this.intake = intake;
+		this.speed = IntakeConstants.maxMotorSpeed;
+	}
 
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		intake.setMotorSpeed(maxMotorSpeed);
+		intake.setMotorSpeed(speed);
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
