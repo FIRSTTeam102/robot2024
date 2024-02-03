@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class startShooter extends Command {
 	private Shooter shooterM;
-	private double targetVelocity = 0;
+	private double targetVelocity = 10;
 
 	public startShooter(Shooter shooter, double velocity_rpm) {
 		shooterM = shooter;

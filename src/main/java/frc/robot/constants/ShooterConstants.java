@@ -10,6 +10,5 @@ public final class ShooterConstants {
 	public static final double kS = 0;
 	public static final double kV = 0;
 	public static final double kA = 0;
-
-	public static final double shooterVelocity = 1166; // PLACEHOLDER VALUE
+	public static final double shooterVelocity = 1166;
 }
