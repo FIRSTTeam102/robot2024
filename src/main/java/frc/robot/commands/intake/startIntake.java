@@ -21,6 +21,7 @@ public class startIntake extends Command {
 	public startIntake(Intake intake, double speed) {
 		this.speed = speed;
 		this.intake = intake;
+		addRequirements(intake);
 	}
 
 	/**
