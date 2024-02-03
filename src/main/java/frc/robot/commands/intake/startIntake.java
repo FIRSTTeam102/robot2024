@@ -9,7 +9,7 @@ import frc.robot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class SetIntakeSpeed extends Command {
+public class startIntake extends Command {
 	private double speed;
 	private Intake intake;
 
@@ -18,7 +18,7 @@ public class SetIntakeSpeed extends Command {
 	 * @param intake Intake Subsystem
 	 * @param speed Speed to set the motor to, for -1 <= speed <= 1
 	 */
-	public SetIntakeSpeed(Intake intake, double speed) {
+	public startIntake(Intake intake, double speed) {
 		this.speed = speed;
 		this.intake = intake;
 	}
@@ -27,7 +27,7 @@ public class SetIntakeSpeed extends Command {
 	 * Set an intake to a standard speed given by IntakeConstants.maxMotorSpeed
 	 * @param intake Intake Subsystem
 	 */
-	public SetIntakeSpeed(Intake intake) {
+	public startIntake(Intake intake) {
 		this.intake = intake;
 		this.speed = IntakeConstants.maxMotorSpeed;
 	}
