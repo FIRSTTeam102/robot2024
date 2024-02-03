@@ -16,6 +16,7 @@ import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
 import frc.robot.commands.Shooter.startShooter;
+import frc.robot.commands.Shooter.stopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -149,6 +150,7 @@ public class RobotContainer {
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 		operaterController.y().whileTrue(new startShooter(shooter, shooterVelocity));
+		operaterController.a().whileTrue(new stopShooter(shooter, 0));
 
 	}
 
