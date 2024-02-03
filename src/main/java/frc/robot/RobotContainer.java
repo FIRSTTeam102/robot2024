@@ -1,6 +1,7 @@
 package frc.robot;
 
-import static frc.robot.constants.Constants.OperatorConstants.driverControllerPort;
+import static frc.robot.constants.Constants.OperatorConstants.*;
+import static frc.robot.constants.ShooterConstants.shooterVelocity;
 
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
@@ -14,6 +15,7 @@ import frc.robot.subsystems.SystemAlerter;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.Shooter.startShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -56,6 +58,7 @@ public class RobotContainer {
 	}
 
 	private final CommandXboxController driverController = new CommandXboxController(driverControllerPort);
+	private final CommandXboxController operaterController = new CommandXboxController(operaterControllerPort);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
 
@@ -145,6 +148,8 @@ public class RobotContainer {
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
+		operaterController.y().whileTrue(new startShooter(shooter, shooterVelocity));
+
 	}
 
 	/**
