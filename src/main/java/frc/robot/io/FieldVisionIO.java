@@ -10,7 +10,6 @@ import org.littletonrobotics.junction.AutoLog;
 public class FieldVisionIO {
 	@AutoLog
 	public static class FieldVisionIOInputs {
-		public static Object inputs;
 		public int pipeline = 0;
 		public boolean hasTarget = false;
 		public int targetAprilTag = 0;
