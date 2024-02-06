@@ -15,8 +15,8 @@ import frc.robot.subsystems.SystemAlerter;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
-import frc.robot.commands.Shooter.startShooter;
-import frc.robot.commands.Shooter.stopShooter;
+import frc.robot.commands.Shooter.SetShooterVelocity;
+import frc.robot.commands.Shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -59,7 +60,7 @@ public class RobotContainer {
 	}
 
 	private final CommandXboxController driverController = new CommandXboxController(driverControllerPort);
-	private final CommandXboxController operaterController = new CommandXboxController(operaterControllerPort);
+	private final CommandXboxController operatorController = new CommandXboxController(operaterControllerPort);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
 
@@ -149,8 +150,10 @@ public class RobotContainer {
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
-		operaterController.y().whileTrue(new startShooter(shooter, shooterVelocity));
-		operaterController.a().whileTrue(new stopShooter(shooter, 0));
+
+		operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
+		operatorController.x().onTrue(new StopShooter(shooter));
+		operatorController.b().onTrue(new InstantCommand(() -> shooter.setPercentOutput(.85), shooter));
 
 	}
 

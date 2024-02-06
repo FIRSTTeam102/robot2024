@@ -4,20 +4,18 @@ import frc.robot.subsystems.Shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class stopShooter extends Command {
-	private Shooter shooterM;
-	private double targetVelocity = 0;
+public class StopShooter extends Command {
+	private Shooter shooter;
 
-	public stopShooter(Shooter shooter, double velocity_rpm) {
-		shooterM = shooter;
-		targetVelocity = velocity_rpm;
+	public StopShooter(Shooter shooter) {
+		this.shooter = shooter;
 		addRequirements(shooter);
 
 	}
 
 	@Override
 	public void initialize() {
-		shooterM.setVelocity(0);
+		shooter.stop();
 
 	}
 
