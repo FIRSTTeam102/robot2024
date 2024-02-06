@@ -25,7 +25,7 @@ public class SetIntakeSpeed extends Command {
 	}
 
 	/**
-	 * Set an intake to a standard speed given by IntakeConstants.maxMotorSpeed
+	 * Set an intake to a standard speed given by {@link IntakeConstants#maxMotorSpeed IntakeConstants.maxMotorSpeed}
 	 * @param intake Intake Subsystem
 	 */
 	public SetIntakeSpeed(Intake intake) {
