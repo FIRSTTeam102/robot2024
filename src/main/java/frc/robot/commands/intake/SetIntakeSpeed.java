@@ -21,6 +21,7 @@ public class SetIntakeSpeed extends Command {
 	public SetIntakeSpeed(Intake intake, double speed) {
 		this.speed = speed;
 		this.intake = intake;
+		addRequirements(intake);
 	}
 
 	/**
@@ -28,8 +29,7 @@ public class SetIntakeSpeed extends Command {
 	 * @param intake Intake Subsystem
 	 */
 	public SetIntakeSpeed(Intake intake) {
-		this.intake = intake;
-		this.speed = IntakeConstants.maxMotorSpeed;
+		this(intake, IntakeConstants.maxMotorSpeed);
 	}
 
 	// Called when the command is initially scheduled.

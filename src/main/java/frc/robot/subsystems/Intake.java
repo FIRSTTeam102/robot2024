@@ -5,6 +5,7 @@ import static frc.robot.constants.IntakeConstants.*;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
@@ -16,7 +17,9 @@ public class Intake extends SubsystemBase {
 
 	private final DigitalInput noteSensor = new DigitalInput(sensorId);
 
-	public Intake() {}
+	public Intake() {
+		motor.setIdleMode(IdleMode.kBrake);
+	}
 
 	@Override
 	public void periodic() {
@@ -51,7 +54,7 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void stopMotor() {
-		motor.set(0);
+		motor.stopMotor();
 	}
 
 }
