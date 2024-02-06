@@ -1,6 +1,6 @@
 package frc.robot;
 
-import static frc.robot.constants.Constants.OperatorConstants.driverControllerPort;
+import static frc.robot.constants.Constants.OperatorConstants.*;
 
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
@@ -9,12 +9,14 @@ import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.SystemAlerter;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -57,6 +59,7 @@ public class RobotContainer {
 	}
 
 	private final CommandXboxController driverController = new CommandXboxController(driverControllerPort);
+	private final CommandXboxController operatorController = new CommandXboxController(operaterControllerPort);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
 
@@ -67,6 +70,7 @@ public class RobotContainer {
 	/* subsystems */
 	// public final Vision vision = new Vision();
 	public final Arm arm = new Arm();
+	public final Intake intake = new Intake();
 	public final Swerve swerve = new Swerve(gyro/* , vision */);
 	public final Shooter shooter = new Shooter();
 
@@ -147,6 +151,8 @@ public class RobotContainer {
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
+
+		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake));
 	}
 
 	/**
