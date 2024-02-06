@@ -1,8 +1,3 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-// DON'T LOOK AT THIS
 package frc.robot.subsystems;
 
 import frc.robot.io.FieldVisionIO;
@@ -24,3 +19,8 @@ public class Vision extends SubsystemBase {
 		Logger.processInputs(getName() + "/field", fieldInputs);
 	}
 }
+
+/*
+ * The point of this subsystem is to take all the inputs from VisionIO and log them.
+ * From there we can take values from here and apply them elsewhere
+ */
