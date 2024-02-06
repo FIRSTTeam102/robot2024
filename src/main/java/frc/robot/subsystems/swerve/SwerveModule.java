@@ -99,7 +99,7 @@ public class SwerveModule {
 
 		/*
 		 * scale velocity based on angle error
-		 * when the error is 90°, the velocity setpoint should be 0.
+		 * when the error is 90 deg, the velocity setpoint should be 0.
 		 * as the wheel turns towards the setpoint, its velocity should increase.
 		 * this is achieved by taking the component of the velocity in the direction of the setpoint.
 		 */

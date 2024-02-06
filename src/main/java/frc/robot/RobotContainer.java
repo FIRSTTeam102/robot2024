@@ -1,20 +1,24 @@
 package frc.robot;
 
 import static frc.robot.constants.Constants.OperatorConstants.*;
-import static frc.robot.constants.ShooterConstants.shooterVelocity;
 
+import static frc.robot.constants.ShooterConstants.shooterVelocity;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.SystemAlerter;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+
+import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.Shooter.SetShooterVelocity;
 import frc.robot.commands.Shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
@@ -70,6 +74,8 @@ public class RobotContainer {
 
 	/* subsystems */
 	// public final Vision vision = new Vision();
+	public final Arm arm = new Arm();
+	public final Intake intake = new Intake();
 	public final Swerve swerve = new Swerve(gyro/* , vision */);
 	public final Shooter shooter = new Shooter();
 
@@ -151,10 +157,11 @@ public class RobotContainer {
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 
-		operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
+
+    operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
 		operatorController.x().onTrue(new StopShooter(shooter));
 		operatorController.b().onTrue(new InstantCommand(() -> shooter.setPercentOutput(.85), shooter));
-
+    operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake));
 	}
 
 	/**
