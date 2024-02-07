@@ -49,6 +49,14 @@ public class Shooter extends SubsystemBase {
 		pidController.setReference(velocity_rpm, ControlType.kVelocity, 0, feedforward.calculate(velocity_rpm));
 	}
 
+	public void setPercentOutput(double speed) {
+		pidController.setReference(speed, ControlType.kDutyCycle);
+	}
+
+	public void stop() {
+		pidController.setReference(0, ControlType.kDutyCycle);
+	}
+
 	@Override
 	public void periodic() {
 		updateInputs(inputs);

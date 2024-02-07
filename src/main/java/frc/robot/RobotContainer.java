@@ -1,6 +1,7 @@
 package frc.robot;
 
 import static frc.robot.constants.Constants.OperatorConstants.*;
+import static frc.robot.constants.ShooterConstants.shooterVelocity;
 
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
@@ -17,6 +18,8 @@ import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
 import frc.robot.commands.intake.SetIntakeSpeed;
+import frc.robot.commands.shooter.SetShooterVelocity;
+import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
@@ -29,6 +32,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -152,6 +156,9 @@ public class RobotContainer {
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 
+		operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
+		operatorController.x().onTrue(new StopShooter(shooter));
+		operatorController.b().onTrue(new InstantCommand(() -> shooter.setPercentOutput(.85), shooter));
 		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake));
 	}
 
