@@ -1,21 +1,23 @@
-package frc.robot.commands.Shooter;
+package frc.robot.commands.shooter;
 
 import frc.robot.subsystems.Shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class StopShooter extends Command {
+public class SetShooterVelocity extends Command {
 	private Shooter shooter;
+	private double targetVelocity = 10;
 
-	public StopShooter(Shooter shooter) {
+	public SetShooterVelocity(Shooter shooter, double velocity_rpm) {
 		this.shooter = shooter;
+		targetVelocity = velocity_rpm;
 		addRequirements(shooter);
 
 	}
 
 	@Override
 	public void initialize() {
-		shooter.stop();
+		shooter.setVelocity(targetVelocity);
 
 	}
 
