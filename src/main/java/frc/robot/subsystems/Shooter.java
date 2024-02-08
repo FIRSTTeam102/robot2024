@@ -12,12 +12,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 import com.revrobotics.CANSparkBase.ControlType;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import lombok.Getter;
 
 public class Shooter extends SubsystemBase {
 	private CANSparkMax leadMotor = new CANSparkMax(leadMotorId, CANSparkMax.MotorType.kBrushless);
@@ -25,6 +29,10 @@ public class Shooter extends SubsystemBase {
 	private SparkPIDController pidController = leadMotor.getPIDController();
 	private RelativeEncoder encoder = leadMotor.getEncoder();
 	private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(kS, kV, kA);
+
+	@Getter
+	@AutoLogOutput
+	private double targetVelocity_rpm = 0.0;
 
 	public Shooter() {
 		if (tuningMode) {
@@ -38,6 +46,9 @@ public class Shooter extends SubsystemBase {
 		pidController.setI(0);
 		pidController.setD(kD);
 
+		leadMotor.setIdleMode(IdleMode.kCoast);
+
+		followerMotor.setIdleMode(IdleMode.kCoast);
 		followerMotor.follow(leadMotor);
 
 		// only fetch position when tuning
@@ -46,6 +57,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setVelocity(double velocity_rpm) {
+		targetVelocity_rpm = velocity_rpm;
 		pidController.setReference(velocity_rpm, ControlType.kVelocity, 0, feedforward.calculate(velocity_rpm));
 	}
 

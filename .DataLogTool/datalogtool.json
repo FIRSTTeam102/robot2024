@@ -1,0 +1,9 @@
+{
+  "download": {
+    "deleteAfter": false,
+    "serverTeam": "10.1.2.2"
+  },
+  "output": {
+    "outputFolder": "C:\\Users\\24smaizel_team102\\Downloads"
+  }
+}

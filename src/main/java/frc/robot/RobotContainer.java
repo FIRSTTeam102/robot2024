@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -147,6 +148,12 @@ public class RobotContainer {
 			swerve);
 		swerve.setDefaultCommand(teleopSwerve);
 
+		var intakeSpeedEntry = Shuffleboard.getTab("Drive").add("Intake Speed", 0).withWidget(BuiltInWidgets.kNumberSlider)
+			.withProperties(Map.of("min", -1, "max", 1)).getEntry();
+		var shooterSpeedEntry = Shuffleboard.getTab("Drive").add("Shooter Speed", 0)
+			.withWidget(BuiltInWidgets.kNumberSlider)
+			.withProperties(Map.of("min", -1, "max", 1)).getEntry();
+
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
 		// driverController.rightBumper()
@@ -159,7 +166,12 @@ public class RobotContainer {
 		operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
 		operatorController.x().onTrue(new StopShooter(shooter));
 		operatorController.b().onTrue(new InstantCommand(() -> shooter.setPercentOutput(.85), shooter));
+		operatorController.a()
+			.onTrue(new InstantCommand(() -> shooter.setPercentOutput(shooterSpeedEntry.getDouble(0)), shooter));
 		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake));
+		operatorController.leftBumper().whileTrue(
+			new StartEndCommand(() -> intake.setMotorVoltage(intakeSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(),
+				intake));
 	}
 
 	/**

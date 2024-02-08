@@ -1,7 +1,7 @@
 package frc.robot.constants;
 
 public final class ArmConstants {
-	public static final int motorId = 26; // placeholder
+	public static final int motorId = 2; // placeholder
 
 	// pid
 	public static final double kP = 0;
@@ -22,6 +22,6 @@ public final class ArmConstants {
 	// Conversion
 	public static final int gearRatio = 1; // 1 IS PLACEHOLDER
 
-	// closeEnough 
-	public static final double closeVar = 0.1; 
+	// closeEnough
+	public static final double closeVar = 0.1;
 }
