@@ -62,7 +62,7 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setPercentOutput(double speed) {
-		pidController.setReference(speed, ControlType.kDutyCycle);
+		pidController.setReference(speed, ControlType.kDutyCycle, 0, 0);
 	}
 
 	public void stop() {
@@ -115,7 +115,7 @@ public class Shooter extends SubsystemBase {
 			},
 			log -> {
 				log.motor("shooter-lead")
-					.voltage(Units.Volts.of(inputs.leadVoltage_V))
+					.voltage(Units.Volts.of(inputs.leadVoltage_V * inputs.leadPercentOutput))
 					.angularPosition(Units.Rotations.of(encoder.getPosition()))
 					.angularVelocity(Units.RPM.of(inputs.leadVelocity_rpm));
 			},

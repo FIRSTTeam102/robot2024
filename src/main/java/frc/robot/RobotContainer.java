@@ -1,7 +1,6 @@
 package frc.robot;
 
 import static frc.robot.constants.Constants.OperatorConstants.*;
-import static frc.robot.constants.ShooterConstants.shooterVelocity;
 
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
@@ -18,7 +17,6 @@ import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
 import frc.robot.commands.intake.SetIntakeSpeed;
-import frc.robot.commands.shooter.SetShooterVelocity;
 import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
@@ -153,6 +151,7 @@ public class RobotContainer {
 		var shooterSpeedEntry = Shuffleboard.getTab("Drive").add("Shooter Speed", 0)
 			.withWidget(BuiltInWidgets.kNumberSlider)
 			.withProperties(Map.of("min", -1, "max", 1)).getEntry();
+		var shooterVelocityEntry = Shuffleboard.getTab("Drive").add("Shooter Velocity", 0).getEntry();
 
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
@@ -163,9 +162,10 @@ public class RobotContainer {
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 
-		operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
+		// operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
 		operatorController.x().onTrue(new StopShooter(shooter));
-		operatorController.b().onTrue(new InstantCommand(() -> shooter.setPercentOutput(.85), shooter));
+		operatorController.b()
+			.onTrue(new InstantCommand(() -> shooter.setVelocity(shooterVelocityEntry.getDouble(0)), shooter));
 		operatorController.a()
 			.onTrue(new InstantCommand(() -> shooter.setPercentOutput(shooterSpeedEntry.getDouble(0)), shooter));
 		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake));
