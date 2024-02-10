@@ -82,10 +82,12 @@ public class Shooter extends SubsystemBase {
 		public double leadVoltage_V = 0.0;
 		public double leadCurrent_A = 0.0;
 		public double leadTemperature_C = 0.0;
+		public double leadPercentOutput = 0.0;
 
 		public double followerVoltage_V = 0.0;
 		public double followerCurrent_A = 0.0;
 		public double followerTemperature_C = 0.0;
+		public double followerPercentOutput = 0.0;
 	}
 
 	public ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
@@ -93,14 +95,16 @@ public class Shooter extends SubsystemBase {
 	private void updateInputs(ShooterIOInputs inputs) {
 		// inputs.leadPosition_rot = encoder.getPosition();
 		inputs.leadVelocity_rpm = encoder.getVelocity();
-		inputs.leadVoltage_V = leadMotor.getBusVoltage() * leadMotor.getAppliedOutput();
+		inputs.leadVoltage_V = leadMotor.getBusVoltage();
 		inputs.leadCurrent_A = leadMotor.getOutputCurrent();
 		inputs.leadTemperature_C = leadMotor.getMotorTemperature();
+		inputs.leadPercentOutput = leadMotor.getAppliedOutput();
 
 		// important to log to ensure proper functionality
-		inputs.followerVoltage_V = followerMotor.getBusVoltage() * followerMotor.getAppliedOutput();
+		inputs.followerVoltage_V = followerMotor.getBusVoltage();
 		inputs.followerCurrent_A = followerMotor.getOutputCurrent();
 		inputs.followerTemperature_C = followerMotor.getMotorTemperature();
+		inputs.followerPercentOutput = followerMotor.getAppliedOutput();
 	}
 
 	public final SysIdRoutine sysIdRoutine = new SysIdRoutine(

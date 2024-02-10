@@ -41,6 +41,7 @@ public class Intake extends SubsystemBase {
 		public double current_A = 0.0;
 		public double voltage_V = 0.0;
 		public double tempature_C = 0.0;
+		public double percentOutput = 0.0;
 		public boolean noteSensor = false;
 	}
 
@@ -48,8 +49,9 @@ public class Intake extends SubsystemBase {
 
 	public void updateInputs(IntakeIOInputs inputs) {
 		inputs.current_A = motor.getOutputCurrent();
-		inputs.voltage_V = motor.getBusVoltage() * motor.getAppliedOutput();
+		inputs.voltage_V = motor.getBusVoltage();
 		inputs.tempature_C = motor.getMotorTemperature();
+		inputs.percentOutput = motor.getAppliedOutput();
 		inputs.noteSensor = !noteSensor.get();
 	}
 
