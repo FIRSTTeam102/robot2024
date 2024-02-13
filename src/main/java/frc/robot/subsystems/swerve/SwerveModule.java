@@ -1,7 +1,9 @@
 package frc.robot.subsystems.swerve;
 
+import static frc.robot.constants.Constants.tuningMode;
 import static frc.robot.constants.SwerveConstants.maxVelocity_mps;
 
+import frc.robot.util.AutoSetterTunableNumber;
 import frc.robot.util.Conversions;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,6 +21,9 @@ public class SwerveModule {
 	public SwerveModule(int moduleNumber, SwerveModuleIO io) {
 		this.moduleNumber = moduleNumber;
 		this.io = io;
+		if (tuningMode)
+			new AutoSetterTunableNumber(moduleNumber + "setAngle", 0.0,
+				(double value) -> setDesiredState(new SwerveModuleState(0.0, new Rotation2d(value)), false, true));
 
 		lastAngle = getState().angle;
 	}
