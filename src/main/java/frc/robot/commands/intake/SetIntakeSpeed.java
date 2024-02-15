@@ -35,7 +35,8 @@ public class SetIntakeSpeed extends Command {
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		intake.setMotorSpeed(speed);
+		if (!intake.detectNote())
+			intake.setMotorSpeed(speed);
 		System.out.println("Command has started");
 	}
 
