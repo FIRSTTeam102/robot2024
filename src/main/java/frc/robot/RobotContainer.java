@@ -144,7 +144,7 @@ public class RobotContainer {
 			driverController.getHID()::getLeftBumper, // override speed
 			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // preceise mode
 			swerve);
-		// swerve.setDefaultCommand(teleopSwerve);
+		swerve.setDefaultCommand(teleopSwerve);
 
 		var intakeSpeedEntry = Shuffleboard.getTab("Drive").add("Intake Speed", 0).withWidget(BuiltInWidgets.kNumberSlider)
 			.withProperties(Map.of("min", -1, "max", 1)).getEntry();
