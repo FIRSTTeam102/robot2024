@@ -185,3 +185,5 @@ src/main/java/frc/robot/constants/BuildConstants.java
 
 # for testing
 src/main/deploy/pathplanner/New*
+.DataLogTool/
+.SysId/

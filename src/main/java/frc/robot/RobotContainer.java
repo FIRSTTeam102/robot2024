@@ -1,7 +1,7 @@
 package frc.robot;
 
+import static frc.robot.constants.Constants.tuningMode;
 import static frc.robot.constants.Constants.OperatorConstants.*;
-import static frc.robot.constants.ShooterConstants.shooterVelocity;
 
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
@@ -18,7 +18,6 @@ import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
 import frc.robot.commands.intake.SetIntakeSpeed;
-import frc.robot.commands.shooter.SetShooterVelocity;
 import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
@@ -33,6 +32,7 @@ import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -64,6 +64,7 @@ public class RobotContainer {
 
 	private final CommandXboxController driverController = new CommandXboxController(driverControllerPort);
 	private final CommandXboxController operatorController = new CommandXboxController(operaterControllerPort);
+	private final CommandXboxController testController = new CommandXboxController(testControllerPort);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
 
@@ -156,10 +157,38 @@ public class RobotContainer {
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 
-		operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
+		// operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
 		operatorController.x().onTrue(new StopShooter(shooter));
-		operatorController.b().onTrue(new InstantCommand(() -> shooter.setPercentOutput(.85), shooter));
-		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake));
+		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake, false));
+		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
+
+		// When in tuning mode, create multiple testing options on shuffleboard as well as bind commands to a unique
+		// 'testing' controller
+		if (tuningMode) {
+			var indexSpeedEntry = Shuffleboard.getTab("Test").add("Index Speed", 0)
+				.withWidget(BuiltInWidgets.kNumberSlider)
+				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
+			var intakeSpeedEntry = Shuffleboard.getTab("Test").add("Intake Speed", 0)
+				.withWidget(BuiltInWidgets.kNumberSlider)
+				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
+			var shooterSpeedEntry = Shuffleboard.getTab("Test").add("Shooter Speed", 0)
+				.withWidget(BuiltInWidgets.kNumberSlider)
+				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
+			var shooterVelocityEntry = Shuffleboard.getTab("Test").add("Shooter Velocity", 0).getEntry();
+
+			testController.x().onTrue(new StopShooter(shooter));
+			testController.b()
+				.onTrue(new InstantCommand(() -> shooter.setVelocity(shooterVelocityEntry.getDouble(0)), shooter));
+			testController.a()
+				.onTrue(new InstantCommand(() -> shooter.setPercentOutput(shooterSpeedEntry.getDouble(0)), shooter));
+			testController.rightBumper()
+				.whileTrue(Commands
+					.runEnd(() -> intake.setMotorVoltage(intakeSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(), intake)
+					.until(() -> intake.inputs.noteSensor).unless(() -> intake.inputs.noteSensor));
+			testController.leftBumper().whileTrue(
+				new StartEndCommand(() -> intake.setMotorVoltage(indexSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(),
+					intake));
+		}
 	}
 
 	/**

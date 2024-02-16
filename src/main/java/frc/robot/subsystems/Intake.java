@@ -31,11 +31,16 @@ public class Intake extends SubsystemBase {
 		motor.set(speed);
 	}
 
+	public void setMotorVoltage(double voltage_V) {
+		motor.setVoltage(voltage_V);
+	}
+
 	@AutoLog
 	public static class IntakeIOInputs {
 		public double current_A = 0.0;
 		public double voltage_V = 0.0;
 		public double tempature_C = 0.0;
+		public double percentOutput = 0.0;
 		public boolean noteSensor = false;
 	}
 
@@ -45,7 +50,8 @@ public class Intake extends SubsystemBase {
 		inputs.current_A = motor.getOutputCurrent();
 		inputs.voltage_V = motor.getBusVoltage();
 		inputs.tempature_C = motor.getMotorTemperature();
-		inputs.noteSensor = noteSensor.get();
+		inputs.percentOutput = motor.getAppliedOutput();
+		inputs.noteSensor = !noteSensor.get();
 	}
 
 	public boolean detectNote() {

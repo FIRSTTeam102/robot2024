@@ -86,7 +86,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		angleMotor.enableVoltageCompensation(12);
 
 		angleAbsoluteEncoder = angleMotor.getAnalog(SparkAnalogSensor.Mode.kAbsolute);
-		angleAbsoluteEncoder.setPositionConversionFactor(Conversions.truncate(Conversions.twoPi / 3.325 /* V */, 2)); // rad
+		angleAbsoluteEncoder.setPositionConversionFactor(1.88); // 2pi rad / 3.325 V
 		// absolute encoder velocity reading is meaningless (jumps around), using relative encoder's instead
 		// angleAbsoluteEncoder.setVelocityConversionFactor(Conversions.twoPi / 3.3 /* V */); // radps
 		anglePidController.setFeedbackDevice(angleAbsoluteEncoder);
@@ -119,7 +119,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		inputs.anglePosition_rad = SparkUtil.cleanValue(inputs.anglePosition_rad, angleRelativeEncoder.getPosition());
 		inputs.angleAbsolutePosition_rad = SparkUtil.cleanValue(inputs.angleAbsolutePosition_rad,
 			// ensure offset is properly wrapped
-			Conversions.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad));
+			Conversions.truncate(Conversions.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad), 3));
 		// inputs.angleVelocity_radps = angleAbsoluteEncoder.getVelocity(); // gives garbage data
 		// inputs.angleAbsolutePosition_rad = angleAbsoluteEncoder.getPosition() - angleOffset_rad;s
 		inputs.angleVelocity_radps = SparkUtil.cleanValue(inputs.angleVelocity_radps, angleRelativeEncoder.getVelocity());

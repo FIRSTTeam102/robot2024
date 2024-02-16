@@ -14,6 +14,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import lombok.Getter;
@@ -26,6 +27,7 @@ public class Arm extends SubsystemBase {
 	private ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
 
 	@Getter
+	@AutoLogOutput
 	private double targetPosition_rad = 0;
 
 	public Arm() {
@@ -49,7 +51,6 @@ public class Arm extends SubsystemBase {
 	public void periodic() {
 		updateInputs(inputs);
 		Logger.processInputs(getName(), inputs);
-		Logger.recordOutput("Elevator/targetPosition_rad", targetPosition_rad);
 	}
 
 	@AutoLog
