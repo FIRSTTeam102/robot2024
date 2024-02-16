@@ -112,6 +112,10 @@ public class Arm extends SubsystemBase {
 			feedforwardController.calculate(targetPosition_deg, 0));
 	}
 
+	public void setMotorVoltage(double voltage_V) {
+		pidController.setReference(voltage_V, ControlType.kVoltage, 0, 0);
+	}
+
 	public void stopArm() {
 		pidController.setReference(0, ControlType.kDutyCycle, 0,
 			feedforwardController.calculate(inputs.shaftPosition_deg, 0));
