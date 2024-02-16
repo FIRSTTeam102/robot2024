@@ -1,6 +1,9 @@
 package frc.robot.subsystems;
 
 import static frc.robot.constants.ArmConstants.*;
+import static frc.robot.constants.Constants.tuningMode;
+
+import frc.robot.util.AutoSetterTunableNumber;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -12,6 +15,7 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.SparkPIDController.AccelStrategy;
 
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -28,23 +32,30 @@ public class Arm extends SubsystemBase {
 
 	@Getter
 	@AutoLogOutput
-	private double targetPosition_rad = 0;
+	private double targetPosition_deg = 0;
 
 	public Arm() {
 		motor.setIdleMode(IdleMode.kBrake);
 
 		pidController.setP(kP);
 		pidController.setD(kD);
-		pidController.setI(kI);
 
-		motor.setSmartCurrentLimit(50);
+		pidController.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, 0);
+		pidController.setSmartMotionMaxAccel(maxAccel_rpmps, 0);
+		pidController.setSmartMotionMaxVelocity(maxVelocity_rpm, 0);
+
+		motor.setSmartCurrentLimit(45);
 		motor.setSecondaryCurrentLimit(65);
 
-		encoder.setPositionConversionFactor((1 / gearRatio) * 2 * Math.PI); // motor revolutions * arm rev / motor rev * arm
-		// radians / arm rev = arm radians
-		encoder.setVelocityConversionFactor((1 / gearRatio) * (2 * Math.PI) * (1 / 60)); // RPM * arm rev / motor rev *
-																																											// radians /
-		// revolution * min / sec = rad/s
+		// motor revolutions * arm rev / motor rev * arm degrees / arm rev = arm degrees
+		encoder.setPositionConversionFactor((1 / gearRatio) * 360);
+		// // RPM * arm rev / motor rev * degrees / revolution * min / sec = deg/s
+		// encoder.setVelocityConversionFactor((1 / gearRatio) * 360 * (1 / 60));
+
+		if (tuningMode) {
+			new AutoSetterTunableNumber("Arm/kP", kP, (value) -> pidController.setP(value));
+			new AutoSetterTunableNumber("Arm/kD", kD, (value) -> pidController.setD(value));
+		}
 	}
 
 	@Override
@@ -58,8 +69,8 @@ public class Arm extends SubsystemBase {
 		public double current_A = 0.0;
 		public double voltage_V = 0.0;
 		public double temperature_C = 0.0;
-		public double position_rad = 0.0;
-		public double velocity_radps = 0.0;
+		public double position_deg = 0.0;
+		public double velocity_rpm = 0.0;
 	}
 
 	public final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
@@ -68,26 +79,22 @@ public class Arm extends SubsystemBase {
 		inputs.current_A = motor.getOutputCurrent();
 		inputs.voltage_V = motor.getBusVoltage();
 		inputs.temperature_C = motor.getMotorTemperature();
-		inputs.position_rad = encoder.getPosition();
-		inputs.velocity_radps = encoder.getVelocity();
+		inputs.position_deg = encoder.getPosition();
+		inputs.velocity_rpm = encoder.getVelocity();
 	}
 
-	public void setPosition(double position_rad) {
-		targetPosition_rad = position_rad;
-		pidController.setReference(targetPosition_rad, ControlType.kPosition, 0,
-			feedforwardController.calculate(targetPosition_rad, 0));
+	public void setPosition(double position_deg) {
+		targetPosition_deg = position_deg;
+		pidController.setReference(targetPosition_deg, ControlType.kSmartMotion, 0,
+			feedforwardController.calculate(targetPosition_deg, 0));
 	}
 
 	public void stopArm() {
-		pidController.setReference(0, ControlType.kDutyCycle, 0, feedforwardController.calculate(inputs.position_rad, 0));
+		pidController.setReference(0, ControlType.kDutyCycle, 0, feedforwardController.calculate(inputs.position_deg, 0));
 		// Set
 	}
 
 	public boolean closeEnough() {
-		if (MathUtil.isNear(targetPosition_rad, inputs.position_rad, closeVar)) {
-			return true;
-		} else {
-			return false;
-		}
+		return MathUtil.isNear(targetPosition_deg, inputs.position_deg, closeVar);
 	}
 }

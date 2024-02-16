@@ -17,7 +17,11 @@ public final class ArmConstants {
 	public static final double kV = 0;
 	public static final double kA = 0;
 
-	public static final double verticalArmPos_Rad = 1.5708;
+	public static final double verticalArmPos_deg = 90;
+
+	// smartmotion (all values are for the motor, not the arm)
+	public static double maxAccel_rpmps = 400;
+	public static double maxVelocity_rpm = 800;
 
 	// Conversion
 	public static final int gearRatio = 1; // 1 IS PLACEHOLDER
