@@ -78,6 +78,7 @@ public class RobotContainer {
 	public final Intake intake = new Intake();
 	public final Swerve swerve = new Swerve(gyro/* , vision */);
 	public final Shooter shooter = new Shooter();
+	public final Intake intake = new Intake();
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
