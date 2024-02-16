@@ -159,7 +159,8 @@ public class RobotContainer {
 
 		// operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
 		operatorController.x().onTrue(new StopShooter(shooter));
-		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake));
+		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake, false));
+		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
 
 		// When in tuning mode, create multiple testing options on shuffleboard as well as bind commands to a unique
 		// 'testing' controller
