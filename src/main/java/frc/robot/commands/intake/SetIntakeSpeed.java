@@ -37,7 +37,6 @@ public class SetIntakeSpeed extends Command {
 	public void initialize() {
 		if (!intake.detectNote())
 			intake.setMotorSpeed(speed);
-		System.out.println("Command has started");
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
@@ -48,7 +47,6 @@ public class SetIntakeSpeed extends Command {
 	@Override
 	public void end(boolean interrupted) {
 		intake.stopMotor();
-		System.out.println("command ended");
 	}
 
 	// Returns true when the command should end.

@@ -29,7 +29,6 @@ public class Intake extends SubsystemBase {
 
 	public void setMotorSpeed(double speed) {
 		motor.set(speed);
-		System.out.println("Motor speed set");
 	}
 
 	public void setMotorVoltage(double voltage_V) {
@@ -62,7 +61,6 @@ public class Intake extends SubsystemBase {
 
 	public void stopMotor() {
 		motor.stopMotor();
-		System.out.println("motor stopped");
 	}
 
 }

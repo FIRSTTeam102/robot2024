@@ -119,7 +119,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		inputs.anglePosition_rad = SparkUtil.cleanValue(inputs.anglePosition_rad, angleRelativeEncoder.getPosition());
 		inputs.angleAbsolutePosition_rad = SparkUtil.cleanValue(inputs.angleAbsolutePosition_rad,
 			// ensure offset is properly wrapped
-			Conversions.truncate(Conversions.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad), 2));
+			Conversions.truncate(Conversions.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad), 3));
 		// inputs.angleVelocity_radps = angleAbsoluteEncoder.getVelocity(); // gives garbage data
 		// inputs.angleAbsolutePosition_rad = angleAbsoluteEncoder.getPosition() - angleOffset_rad;s
 		inputs.angleVelocity_radps = SparkUtil.cleanValue(inputs.angleVelocity_radps, angleRelativeEncoder.getVelocity());
