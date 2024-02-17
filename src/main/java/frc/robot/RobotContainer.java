@@ -17,6 +17,7 @@ import frc.robot.subsystems.SystemAlerter;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
@@ -175,12 +176,16 @@ public class RobotContainer {
 				.withWidget(BuiltInWidgets.kNumberSlider)
 				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
 			var shooterVelocityEntry = Shuffleboard.getTab("Test").add("Shooter Velocity", 0).getEntry();
+			var armPositionEntry = Shuffleboard.getTab("Test").add("Arm Position (degrees)", 0).getEntry();
 
 			testController.x().onTrue(new StopShooter(shooter));
+			testController.y()
+				.onTrue(Commands.runOnce(() -> arm.setPosition(armPositionEntry.getDouble(boolTriggerThreshold)), arm));
 			testController.b()
 				.onTrue(new InstantCommand(() -> shooter.setVelocity(shooterVelocityEntry.getDouble(0)), shooter));
 			testController.a()
 				.onTrue(new InstantCommand(() -> shooter.setPercentOutput(shooterSpeedEntry.getDouble(0)), shooter));
+
 			testController.rightBumper()
 				.whileTrue(Commands
 					.runEnd(() -> intake.setMotorVoltage(intakeSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(), intake)
@@ -188,6 +193,8 @@ public class RobotContainer {
 			testController.leftBumper().whileTrue(
 				new StartEndCommand(() -> intake.setMotorVoltage(indexSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(),
 					intake));
+
+			testController.leftTrigger(boolTriggerThreshold).whileTrue(new ManualArmControl(arm, testController::getLeftY));
 		}
 	}
 
