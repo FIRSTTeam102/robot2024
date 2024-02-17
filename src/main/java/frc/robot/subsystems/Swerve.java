@@ -11,6 +11,7 @@ import frc.robot.subsystems.swerve.SwerveModuleIOReal;
 import frc.robot.subsystems.swerve.SwerveModuleIOSim;
 import frc.robot.util.LocalADStarAK;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -63,11 +64,11 @@ public class Swerve extends SubsystemBase {
 	public GyroIO gyroIO;
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
 
-	// private Vision vision;
+	private Vision vision;
 	private double translationY;
 	private double translationX;
 
-	public Swerve(GyroIO gyroIO/* , Vision vision */) {
+	public Swerve(GyroIO gyroIO, Vision vision) {
 		modules = new SwerveModule[moduleConstants.length];
 		int moduleNumber = 0;
 		for (var mod : moduleConstants) {
@@ -76,6 +77,8 @@ public class Swerve extends SubsystemBase {
 				: new SwerveModuleIOSim());
 			moduleNumber++;
 		}
+
+		this.vision = vision;
 
 		this.gyroIO = gyroIO;
 		zeroYaw();
@@ -241,28 +244,34 @@ public class Swerve extends SubsystemBase {
 		var pose = poseEstimator.getEstimatedPosition();
 		translationY = pose.getY();
 		translationX = pose.getX();
+
+		// Rotation2d rotation = new Rotation2d(vision.fieldInputs.fieldspaceRotationX_rad);
+		// double translationX = vision.fieldInputs.fieldspaceTranslationY_m;
+		// double translationY = vision.fieldInputs.fieldspaceTranslationX_m;
+		// Pose2d visionPose = new Pose2d(translationX, translationY, rotation);
+		// poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.fieldInputs.fieldspaceTotalLatency_s);
 		// todo: estimate without using gyro?
 
-		// // Every 0.02s, updating pose2d
-		// if (vision.inputs.pipeline == pipeline.AprilTag.value && vision.isPipelineReady()
-		// && vision.inputs.target == true) {
-		// visionSeenCount++;
-		// if (visionSeenCount > 2) { // fixme: temporary
-		// var visionPose = new Pose2d(vision.inputs.botpose_fieldspaceTranslationX_m,
-		// vision.inputs.botpose_fieldspaceTranslationY_m,
-		// new Rotation2d(vision.inputs.botpose_fieldspaceRotationZ_rad));
-		// Logger.recordOutput("Odometry/VisionPose", visionPose);
-		// // var distance = Math.hypot(
-		// // Math.abs(translationX - vision.inputs.botpose_fieldspaceTranslationX_m),
-		// // Math.abs(translationY - vision.inputs.botpose_fieldspaceTranslationY_m));
-		// poseEstimator.addVisionMeasurement(visionPose, timer.get() - vision.inputs.botpose_latency_s);
-		// // VecBuilder.fill(distance / 2, distance / 2, 100));
-		// }
-		// } else
-		// visionSeenCount = 0;
-
+		// Every 0.02s, updating pose2d
+		if (vision.fieldInputs.hasTarget == true) {
+			visionSeenCount++;
+			if (visionSeenCount > 2) { // The if statement is used to eliminate "hallucinations". Schizophrenic robot smh
+				var visionPose = new Pose2d(vision.fieldInputs.fieldspaceTranslationX_m,
+					vision.fieldInputs.fieldspaceTranslationY_m,
+					Rotation2d(vision.fieldInputs.fieldspaceRotationX_rad)); // continuation of lines 259-261. Create a new pose2d
+																																		// using X,Y and rotation
+				Logger.recordOutput("Odometry/VisionPose", visionPose); // log the odometry to advantage kit
+				var distance = Math.hypot( // use pythagorean theorem to find the distance from the last position
+					Math.abs(translationX - vision.fieldInputs.fieldspaceTranslationX_m),
+					Math.abs(translationY - vision.fieldInputs.fieldspaceTranslationY_m));
+				poseEstimator.addVisionMeasurement(visionPose,
+					timer.get() - vision.fieldInputs.fieldspaceTotalLatency_s); // remove lag from the time in the calculation of
+																																			// estimated pose
+				VecBuilder.fill(distance / 2, distance / 2, 100);
+			}
+		} else
+			visionSeenCount = 0;
 		Logger.recordOutput("Odometry/Robot", pose);
-
 		// update field pose
 		for (int i = 0; i < modules.length; i++) {
 			modulePoses[i] = new Pose2d(
@@ -279,6 +288,11 @@ public class Swerve extends SubsystemBase {
 	}
 
 	// until advantagescope wpilog imports are fixed, use built in data log to gather data
+
+	private Rotation2d Rotation2d(double fieldspaceRotationX_rad) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'Rotation2d'");
+	}
 
 	// public final SysIdRoutine driveSysIdRoutine = new SysIdRoutine(
 	// new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
