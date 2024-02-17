@@ -9,11 +9,13 @@ public final class Constants {
 		Active, Replay;
 	}
 
-	/** publishes many constants to NT for hot editing */
+	/** publishes many constants to NT for hot editing & other non-competition functionality */
 	public static final boolean tuningMode = true;
 
 	public static class OperatorConstants {
 		public static final int driverControllerPort = 0;
+		public static final int operaterControllerPort = 1;
+		public static final int testControllerPort = 2;
 
 		public static final double xboxStickDeadband = 0.1;
 		public static final double boolTriggerThreshold = 0.3;

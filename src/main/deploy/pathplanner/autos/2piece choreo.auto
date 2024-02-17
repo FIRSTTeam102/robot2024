@@ -1,0 +1,55 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3126474618911743,
+      "y": 5.567087650299072
+    },
+    "rotation": -3.948572916368557e-39
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "AimAndShoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2piece.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2piece.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AimAndShoot"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}

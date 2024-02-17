@@ -1,6 +1,7 @@
 package frc.robot;
 
-import static frc.robot.constants.Constants.OperatorConstants.driverControllerPort;
+import static frc.robot.constants.Constants.tuningMode;
+import static frc.robot.constants.Constants.OperatorConstants.*;
 
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
@@ -8,12 +9,19 @@ import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
+
+import frc.robot.subsystems.SystemAlerter;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.intake.SetIntakeSpeed;
+import frc.robot.commands.shooter.StopShooter;
+import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 
@@ -21,19 +29,24 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,6 +65,8 @@ public class RobotContainer {
 	}
 
 	private final CommandXboxController driverController = new CommandXboxController(driverControllerPort);
+	private final CommandXboxController operatorController = new CommandXboxController(operaterControllerPort);
+	private final CommandXboxController testController = new CommandXboxController(testControllerPort);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
 
@@ -61,27 +76,41 @@ public class RobotContainer {
 
 	/* subsystems */
 	public final Vision vision = new Vision();
-	public final Swerve swerve = new Swerve(gyro, vision);
+	public final Arm arm = new Arm();
+	public final Intake intake = new Intake();
+	public final Swerve swerve = new Swerve(gyro/* , vision */);
 	public final Shooter shooter = new Shooter();
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
 	public RobotContainer() {
 		DriverStation.silenceJoystickConnectionWarning(true);
 
+		new SystemAlerter();
+
 		configureBindings();
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("XStance", new XStance(swerve));
+		NamedCommands.registerCommand("AimAndShoot",
+			Commands.print("aiming and shooting").andThen(Commands.waitSeconds(1)));
+		NamedCommands.registerCommand("Intake", Commands.print("arm to intaking position & rollers running"));
+		NamedCommands.registerCommand("WaitIntake",
+			Commands.print("wait for intake note sensor").andThen(Commands.waitSeconds(1)));
+		NamedCommands.registerCommand("SafeArm", Commands.print("move arm to safe position inside frame"));
 
 		// create paths
 		autoChooser.addOption("nothing", Commands.none());
-		autoChooser.addDefaultOption("example", new PathPlannerAuto("Example Auto"));
+		final List<String> autoNames = AutoBuilder.getAllAutoNames();
+		for (final String autoName : autoNames) {
+			final Command auto = new PathPlannerAuto(autoName);
+			autoChooser.addOption(autoName, auto);
+		}
 
-		var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
+		final var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
 			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
-			.withSize(5, 4).withPosition(4, 5);
+			.withSize(5, 4).withPosition(4, 5).withWidget(Alert.widgetName);
 		driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.11:5800/stream.mjpg"))
 			.withProperties(Map.of("show crosshair", false, "show controls", false))
 			.withWidget(BuiltInWidgets.kCameraStream)
@@ -96,6 +125,10 @@ public class RobotContainer {
 			autoChooser.addOption("sysid swerve angle", sysIdTestSet(swerve.angleSysIdRoutine));
 			autoChooser.addOption("sysid shooter", sysIdTestSet(shooter.sysIdRoutine));
 		}
+
+		// shouldn't require tuningMode as we might run it randomly in comp
+		// needs to run when disabled so motors don't run
+		SmartDashboard.putData("swerve angle calibration", new SwerveAngleOffsetCalibration(swerve));
 	}
 
 	/**
@@ -119,12 +152,45 @@ public class RobotContainer {
 
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
-		driverController.rightBumper()
-			.whileTrue(teleopSwerve.holdRotateAroundPiece());
+		// driverController.rightBumper()
+		// .whileTrue(teleopSwerve.holdRotateAroundPiece());
 
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
+
+		// operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
+		operatorController.x().onTrue(new StopShooter(shooter));
+		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake, false));
+		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
+
+		// When in tuning mode, create multiple testing options on shuffleboard as well as bind commands to a unique
+		// 'testing' controller
+		if (tuningMode) {
+			var indexSpeedEntry = Shuffleboard.getTab("Test").add("Index Speed", 0)
+				.withWidget(BuiltInWidgets.kNumberSlider)
+				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
+			var intakeSpeedEntry = Shuffleboard.getTab("Test").add("Intake Speed", 0)
+				.withWidget(BuiltInWidgets.kNumberSlider)
+				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
+			var shooterSpeedEntry = Shuffleboard.getTab("Test").add("Shooter Speed", 0)
+				.withWidget(BuiltInWidgets.kNumberSlider)
+				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
+			var shooterVelocityEntry = Shuffleboard.getTab("Test").add("Shooter Velocity", 0).getEntry();
+
+			testController.x().onTrue(new StopShooter(shooter));
+			testController.b()
+				.onTrue(new InstantCommand(() -> shooter.setVelocity(shooterVelocityEntry.getDouble(0)), shooter));
+			testController.a()
+				.onTrue(new InstantCommand(() -> shooter.setPercentOutput(shooterSpeedEntry.getDouble(0)), shooter));
+			testController.rightBumper()
+				.whileTrue(Commands
+					.runEnd(() -> intake.setMotorVoltage(intakeSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(), intake)
+					.until(() -> intake.inputs.noteSensor).unless(() -> intake.inputs.noteSensor));
+			testController.leftBumper().whileTrue(
+				new StartEndCommand(() -> intake.setMotorVoltage(indexSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(),
+					intake));
+		}
 	}
 
 	/**
@@ -148,7 +214,7 @@ public class RobotContainer {
 			routine.dynamic(SysIdRoutine.Direction.kReverse));
 	}
 
-	Alert tuningModeAlert = new Alert("tuning mode enabled", AlertType.Info);
+	Alert tuningModeAlert = new Alert("tuning mode enabled, expect decreased performance", AlertType.Info);
 	Alert driverControllerAlert = new Alert("driver controller not connected properly", AlertType.Error);
 
 	public void updateOIAlert() {

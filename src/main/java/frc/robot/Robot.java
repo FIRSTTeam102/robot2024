@@ -4,6 +4,7 @@ import static frc.robot.constants.Constants.*;
 
 import frc.robot.constants.BuildConstants;
 import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
+import frc.robot.util.VirtualSubsystem;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,6 +16,7 @@ import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
+import com.pathplanner.lib.util.PPLibTelemetry;
 import com.pathplanner.lib.util.PathPlannerLogging;
 
 import com.revrobotics.REVPhysicsSim;
@@ -25,7 +27,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import org.littletonrobotics.urcl.URCL;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -81,14 +82,18 @@ public class Robot extends LoggedRobot {
 		PathPlannerLogging.setLogActivePathCallback(
 			(poses) -> Logger.recordOutput("Odometry/PPTrajectory", poses.toArray(new Pose2d[poses.size()])));
 
-		// disable LiveWindow telemetry in favor of AdvantageKit to reduce processing each tick
-		LiveWindow.disableAllTelemetry();
-
-		Logger.registerURCL(URCL.startExternal());
+		// if (tuningMode)
+		// Logger.registerURCL(URCL.startExternal());
 
 		Logger.start();
 
 		robotContainer = RobotContainer.getInstance();
+
+		// disable LiveWindow telemetry in favor of AdvantageKit to reduce processing each tick
+		LiveWindow.disableAllTelemetry();
+
+		if (!tuningMode)
+			PPLibTelemetry.enableCompetitionMode();
 	}
 
 	/**
@@ -100,6 +105,11 @@ public class Robot extends LoggedRobot {
 	 */
 	@Override
 	public void robotPeriodic() {
+		if (tuningMode)
+			AutoSetterTunableNumberManager.periodic();
+
+		VirtualSubsystem.periodicAll();
+
 		/*
 		 * Runs the Scheduler. This is responsible for polling buttons, adding newly-scheduled
 		 * commands, running already-scheduled commands, removing finished or interrupted commands,
@@ -107,9 +117,6 @@ public class Robot extends LoggedRobot {
 		 * block in order for anything in the Command-based framework to work.
 		 */
 		CommandScheduler.getInstance().run();
-
-		if (tuningMode)
-			AutoSetterTunableNumberManager.periodic();
 	}
 
 	/** This function is called once each time the robot enters Disabled mode. */

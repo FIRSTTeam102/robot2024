@@ -36,8 +36,7 @@ public class TeleopSwerve extends Command {
 	public Command holdRotateAroundPiece() {
 		return Commands.startEnd(
 			() -> {
-				// todo: update for 2024
-				swerve.setCenterRotation(SwerveConstants.trackWidth_m + Units.inchesToMeters(13), 0);
+				swerve.setCenterRotation(SwerveConstants.trackWidth_m + Units.inchesToMeters(12), 0);
 			},
 			() -> {
 				swerve.setCenterRotation(0, 0);
