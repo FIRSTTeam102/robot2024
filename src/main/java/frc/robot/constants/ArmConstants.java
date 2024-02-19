@@ -1,8 +1,8 @@
 package frc.robot.constants;
 
 public final class ArmConstants {
-	public static final int leadMotorId = 29;
-	public static final int followerMotorId = 30;
+	public static final int leadMotorId = 31;
+	public static final int followerMotorId = 32;
 
 	public static final double shaftEncoderOffset_deg = 0.0; // needs to be tuned
 

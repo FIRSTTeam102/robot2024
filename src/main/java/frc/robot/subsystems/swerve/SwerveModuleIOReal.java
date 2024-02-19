@@ -112,7 +112,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	public void updateInputs(SwerveModuleIOInputs inputs) {
 		inputs.driveDistance_m = SparkUtil.cleanValue(inputs.driveDistance_m, driveRelativeEncoder.getPosition());
 		inputs.driveVelocity_mps = SparkUtil.cleanValue(inputs.driveVelocity_mps, driveRelativeEncoder.getVelocity());
-		inputs.driveAppliedVoltage_V = driveMotor.getBusVoltage() * driveMotor.getAppliedOutput();
+		inputs.driveAppliedVoltage_V = 12 * driveMotor.getAppliedOutput();
 		inputs.driveBusVoltage_V = driveMotor.getBusVoltage();
 		inputs.driveCurrent_A = driveMotor.getOutputCurrent();
 		inputs.driveTemperature_C = driveMotor.getMotorTemperature();
@@ -124,7 +124,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		// inputs.angleVelocity_radps = angleAbsoluteEncoder.getVelocity(); // gives garbage data
 		// inputs.angleAbsolutePosition_rad = angleAbsoluteEncoder.getPosition() - angleOffset_rad;s
 		inputs.angleVelocity_radps = SparkUtil.cleanValue(inputs.angleVelocity_radps, angleRelativeEncoder.getVelocity());
-		inputs.angleAppliedVoltage_V = angleMotor.getBusVoltage() * angleMotor.getAppliedOutput();
+		inputs.angleAppliedVoltage_V = 12 * angleMotor.getAppliedOutput();
 		inputs.angleBusVoltage_V = angleMotor.getBusVoltage();
 		inputs.angleCurrent_A = angleMotor.getOutputCurrent();
 		inputs.angleTemperature_C = angleMotor.getMotorTemperature();
