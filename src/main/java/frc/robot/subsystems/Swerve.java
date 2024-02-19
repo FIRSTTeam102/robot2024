@@ -315,7 +315,7 @@ public class Swerve extends SubsystemBase {
 			log -> {
 				for (int i = 0; i < modules.length; i++)
 					log.motor("drive" + i)
-						.voltage(Units.Volts.of(modules[i].inputs.driveVoltage_V))
+						.voltage(Units.Volts.of(modules[i].inputs.driveAppliedVoltage_V))
 						.linearPosition(Units.Meters.of(modules[i].inputs.driveDistance_m))
 						.linearVelocity(Units.MetersPerSecond.of(modules[i].inputs.driveVelocity_mps));
 			},
@@ -342,7 +342,7 @@ public class Swerve extends SubsystemBase {
 			log -> {
 				for (int i = 0; i < modules.length; i++)
 					log.motor("angle" + i)
-						.voltage(Units.Volts.of(modules[i].inputs.angleVoltage_V))
+						.voltage(Units.Volts.of(modules[i].inputs.angleAppliedVoltage_V))
 						.linearPosition(Units.Meters.of(modules[i].inputs.angleAbsolutePosition_rad))
 						.linearVelocity(Units.MetersPerSecond.of(modules[i].inputs.angleVelocity_radps));
 			},

@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.AutoLog;
 /** Add your docs here. */
 public class PieceVisionIO {
 	@AutoLog
-	public class PieceVisionIOInputs {
+	public static class PieceVisionIOInputs {
 		public int pipeline = 0;
 		public boolean hasTarget = false;
 		public int targetAprilTag = 0;
@@ -30,7 +30,7 @@ public class PieceVisionIO {
 		public double targetspaceRotationY_rad = 0.0;
 		public double targetspaceRotationZ_rad = 0.0;
 
-		//This stuff is useless, but is still stuf that will be logged bc why not
+		// This stuff is useless, but is still stuf that will be logged bc why not
 		public double fieldspaceTranslationX_m = 0.0;
 		public double fieldspaceTranslationY_m = 0.0;
 		public double fieldspaceTranslationZ_m = 0.0;

@@ -7,10 +7,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 public final class SwerveConstants {
 	// FL, FR, BL, BR (matches AdvantageScope convention)
 	public static final SwerveModuleConstants moduleConstants[] = {
-		new SwerveModuleConstants(21, 22, .73),
-		new SwerveModuleConstants(23, 24, 1.84),
-		new SwerveModuleConstants(25, 26, 3.68),
-		new SwerveModuleConstants(27, 28, 2.90)
+		new SwerveModuleConstants(21, 22, .719),
+		new SwerveModuleConstants(23, 24, 4.986),
+		new SwerveModuleConstants(25, 26, 3.760),
+		new SwerveModuleConstants(27, 28, 2.902)
 	};
 
 	// the left-to-right distance between the drivetrain wheels, should be measured from center to center

@@ -13,9 +13,8 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
-import frc.robot.subsystems.Vision;
-
 import frc.robot.subsystems.SystemAlerter;
+import frc.robot.subsystems.Vision;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
@@ -79,7 +78,7 @@ public class RobotContainer {
 	public final Vision vision = new Vision();
 	public final Arm arm = new Arm();
 	public final Intake intake = new Intake();
-	public final Swerve swerve = new Swerve(gyro/* , vision */);
+	public final Swerve swerve = new Swerve(gyro, vision);
 	public final Shooter shooter = new Shooter();
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */

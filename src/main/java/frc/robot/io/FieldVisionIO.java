@@ -9,7 +9,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public class FieldVisionIO {
 	@AutoLog
-	public class FieldVisionIOInputs {
+	public static class FieldVisionIOInputs {
 		public int pipeline = 0;
 		public boolean hasTarget = false;
 		public int targetAprilTag = 0;
