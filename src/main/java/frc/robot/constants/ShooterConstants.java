@@ -1,8 +1,8 @@
 package frc.robot.constants;
 
 public final class ShooterConstants {
-	public static final int leadMotorId = 29;
-	public static final int followerMotorId = 30;
+	public static final int leadMotorId = 32;
+	public static final int followerMotorId = 33;
 
 	public static final double kP = .0005627;
 	public static final double kD = 0;
