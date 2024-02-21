@@ -59,6 +59,7 @@ public class RobotContainer {
 	private static RobotContainer instance = null;
 
 	public static RobotContainer getInstance() {
+
 		if (instance == null)
 			instance = new RobotContainer();
 		return instance;

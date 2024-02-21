@@ -1,5 +1,7 @@
 package frc.robot.commands.shooter;
 
+import frc.robot.constants.LightsConstants;
+import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,7 +20,7 @@ public class SetShooterVelocity extends Command {
 	@Override
 	public void initialize() {
 		shooter.setVelocity(targetVelocity);
-
+		Lights.lightArray[LightsConstants.shooterSpunUp] = true;
 	}
 
 	@Override

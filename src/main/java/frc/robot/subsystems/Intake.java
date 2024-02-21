@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.IntakeConstants.*;
 
+import frc.robot.constants.LightsConstants;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -25,6 +27,12 @@ public class Intake extends SubsystemBase {
 	public void periodic() {
 		updateInputs(inputs);
 		Logger.processInputs(getName(), inputs);
+
+		if (inputs.noteSensor == true) {
+			Lights.lightArray[LightsConstants.noteClaimed] = true;
+		} else {
+			Lights.lightArray[LightsConstants.noteClaimed] = false;
+		}
 	}
 
 	public void setMotorSpeed(double speed) {

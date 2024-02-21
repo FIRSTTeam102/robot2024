@@ -5,7 +5,9 @@
 package frc.robot.commands.intake;
 
 import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.LightsConstants;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Lights;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -43,6 +45,7 @@ public class SetIntakeSpeed extends Command {
 		// detect a note, don't run
 		if (isIndexing || !intake.detectNote())
 			intake.setMotorSpeed(speed);
+		Lights.lightArray[2] = true;
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
@@ -53,6 +56,7 @@ public class SetIntakeSpeed extends Command {
 	@Override
 	public void end(boolean interrupted) {
 		intake.stopMotor();
+		Lights.lightArray[LightsConstants.orderIntake] = false;
 	}
 
 	// Returns true when the command should end.
