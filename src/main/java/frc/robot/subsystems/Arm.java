@@ -41,13 +41,16 @@ public class Arm extends SubsystemBase {
 
 	public Arm() {
 		leadMotor.setIdleMode(IdleMode.kBrake);
+		leadMotor.setInverted(true);
 		leadMotor.setSmartCurrentLimit(45);
 		leadMotor.setSecondaryCurrentLimit(65);
+		leadMotor.enableVoltageCompensation(12);
 
 		followerMotor.setIdleMode(IdleMode.kBrake);
 		followerMotor.setSmartCurrentLimit(45);
 		followerMotor.setSecondaryCurrentLimit(65);
-		followerMotor.follow(leadMotor);
+		followerMotor.enableVoltageCompensation(12);
+		followerMotor.follow(leadMotor, true);
 
 		pidController.setFeedbackDevice(shaftEncoder);
 		pidController.setP(kP);
@@ -76,12 +79,14 @@ public class Arm extends SubsystemBase {
 	@AutoLog
 	public static class ArmIOInputs {
 		public double leadCurrent_A = 0.0;
-		public double leadVoltage_V = 0.0;
+		public double leadBusVoltage_V = 0.0;
+		public double leadAppliedVoltage_V = 0.0;
 		public double leadTemperature_C = 0.0;
 		public double leadPercentOutput = 0.0;
 
 		public double followerCurrent_A = 0.0;
-		public double followerVoltage_V = 0.0;
+		public double followerBusVoltage_V = 0.0;
+		public double followerAppliedVoltage_V = 0.0;
 		public double followerTemperature_C = 0.0;
 		public double followerPercentOutput = 0.0;
 
@@ -93,12 +98,14 @@ public class Arm extends SubsystemBase {
 
 	private void updateInputs(ArmIOInputs inputs) {
 		inputs.leadCurrent_A = leadMotor.getOutputCurrent();
-		inputs.leadVoltage_V = leadMotor.getBusVoltage();
+		inputs.leadBusVoltage_V = leadMotor.getBusVoltage();
+		inputs.leadAppliedVoltage_V = 12 * leadMotor.getAppliedOutput();
 		inputs.leadTemperature_C = leadMotor.getMotorTemperature();
 		inputs.leadPercentOutput = leadMotor.getAppliedOutput();
 
 		inputs.followerCurrent_A = followerMotor.getOutputCurrent();
-		inputs.followerVoltage_V = followerMotor.getBusVoltage();
+		inputs.followerBusVoltage_V = followerMotor.getBusVoltage();
+		inputs.leadAppliedVoltage_V = 12 * followerMotor.getAppliedOutput();
 		inputs.followerTemperature_C = followerMotor.getMotorTemperature();
 		inputs.followerPercentOutput = followerMotor.getAppliedOutput();
 
@@ -116,7 +123,7 @@ public class Arm extends SubsystemBase {
 		pidController.setReference(voltage_V, ControlType.kVoltage, 0, 0);
 	}
 
-	public void stopArm() {
+	public void stop() {
 		pidController.setReference(0, ControlType.kDutyCycle, 0,
 			feedforwardController.calculate(inputs.shaftPosition_deg, 0));
 		// Set

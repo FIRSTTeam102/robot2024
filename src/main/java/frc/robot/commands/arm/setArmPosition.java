@@ -29,7 +29,7 @@ public class setArmPosition extends Command {
 
 	@Override
 	public void end(boolean interrupted) {
-		arm.stopArm();
+		arm.stop();
 	}
 
 	// Returns true when the command should end.
