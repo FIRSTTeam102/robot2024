@@ -35,7 +35,7 @@ public class ManualArmControl extends Command {
 		if (deadbandInput == 0) {
 			arm.stop();
 		} else { // else, scale banded input by max manual output and then convert to volts (linearly with max of 12 V)
-			arm.setMotorVoltage((ArmConstants.manualMaxOutput * deadbandInput) * 12);
+			arm.setMotorVoltage(-(ArmConstants.manualMaxOutput * deadbandInput) * 12);
 		}
 	}
 

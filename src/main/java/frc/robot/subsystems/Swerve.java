@@ -258,8 +258,9 @@ public class Swerve extends SubsystemBase {
 			if (visionSeenCount > 2) { // The if statement is used to eliminate "hallucinations". Schizophrenic robot smh
 				var visionPose = new Pose2d(vision.fieldInputs.fieldspaceTranslationX_m,
 					vision.fieldInputs.fieldspaceTranslationY_m,
-					Rotation2d(vision.fieldInputs.fieldspaceRotationX_rad)); // continuation of lines 259-261. Create a new pose2d
-																																		// using X,Y and rotation
+					new Rotation2d(vision.fieldInputs.fieldspaceRotationX_rad)); // continuation of lines 259-261. Create a new
+																																				// pose2d
+				// using X,Y and rotation
 				Logger.recordOutput("Odometry/VisionPose", visionPose); // log the odometry to advantage kit
 				var distance = Math.hypot( // use pythagorean theorem to find the distance from the last position
 					Math.abs(translationX - vision.fieldInputs.fieldspaceTranslationX_m),

@@ -14,6 +14,7 @@ public class Vision extends SubsystemBase {
 	private PieceVisionIO pieceIO = new PieceVisionIO();
 	public FieldVisionIOInputsAutoLogged fieldInputs = new FieldVisionIOInputsAutoLogged();
 	public PieceVisionIOInputsAutoLogged pieceInputs = new PieceVisionIOInputsAutoLogged();
+
 	public Vision() {}
 
 	@Override
@@ -21,7 +22,7 @@ public class Vision extends SubsystemBase {
 		fieldIO.updateInputs(fieldInputs);
 		pieceIO.updateInputs(pieceInputs);
 		Logger.processInputs(getName() + "/field", fieldInputs);
-		Logger.processInputs(getName() + "/field", pieceInputs);
+		Logger.processInputs(getName() + "/piece", pieceInputs);
 	}
 }
 

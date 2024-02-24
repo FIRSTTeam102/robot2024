@@ -1,9 +1,7 @@
 package frc.robot.subsystems;
 
 import static frc.robot.constants.ArmConstants.*;
-import static frc.robot.constants.Constants.tuningMode;
 
-import frc.robot.util.AutoSetterTunableNumber;
 import frc.robot.util.Math102;
 
 import edu.wpi.first.math.MathUtil;
@@ -43,10 +41,13 @@ public class Arm extends SubsystemBase {
 
 	public Arm() {
 		leadMotor.setIdleMode(IdleMode.kBrake);
-		leadMotor.setInverted(true);
+		leadMotor.setInverted(false);
 		leadMotor.setSmartCurrentLimit(45);
 		leadMotor.setSecondaryCurrentLimit(65);
 		leadMotor.enableVoltageCompensation(12);
+
+		// leadMotor.setSoftLimit(SoftLimitDirection.kReverse, 100);
+		// leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
 		followerMotor.setIdleMode(IdleMode.kBrake);
 		followerMotor.setSmartCurrentLimit(45);
@@ -56,8 +57,10 @@ public class Arm extends SubsystemBase {
 
 		// revolutions * deg / rev = deg
 		shaftEncoder.setPositionConversionFactor(360);
+		// rev / sec * sec / min = RPM
+		shaftEncoder.setVelocityConversionFactor(60);
 		shaftEncoder.setInverted(true);
-		shaftEncoder.setZeroOffset(shaftEncoderOffset_deg);
+		shaftEncoder.setZeroOffset(0);
 
 		pidController.setFeedbackDevice(shaftEncoder);
 		// Smart motion applies a velocity and acceleration limiter as it travels to the target position. More info can be
@@ -66,6 +69,7 @@ public class Arm extends SubsystemBase {
 		pidController.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, 0);
 		pidController.setSmartMotionMaxAccel(maxAccel_rpmps, 0);
 		pidController.setSmartMotionMaxVelocity(maxVelocity_rpm, 0);
+		pidController.setSmartMotionAllowedClosedLoopError(accuracyTolerance_deg, 0);
 		pidController.setOutputRange(minOutput, maxOutput);
 		// since we are using smartmotion, the PID numbers are for velocity control, not position.
 		pidController.setP(kP);
@@ -75,10 +79,10 @@ public class Arm extends SubsystemBase {
 		pidController.setPositionPIDWrappingMinInput(0);
 		pidController.setPositionPIDWrappingMaxInput(360);
 
-		if (tuningMode) {
-			new AutoSetterTunableNumber("Arm/kP", kP, (value) -> pidController.setP(value));
-			new AutoSetterTunableNumber("Arm/kD", kD, (value) -> pidController.setD(value));
-		}
+		// if (tuningMode) {
+		// new AutoSetterTunableNumber("Arm/kP", kP, (value) -> pidController.setP(value));
+		// new AutoSetterTunableNumber("Arm/kD", kD, (value) -> pidController.setD(value));
+		// }
 	}
 
 	@Override
@@ -103,6 +107,7 @@ public class Arm extends SubsystemBase {
 
 		public double shaftPosition_deg = 0.0;
 		public double shaftVelocity_rpm = 0.0;
+		public double motorVelocity_rpm = 0.0;
 	}
 
 	public final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
@@ -120,17 +125,19 @@ public class Arm extends SubsystemBase {
 		inputs.followerTemperature_C = followerMotor.getMotorTemperature();
 		inputs.followerPercentOutput = followerMotor.getAppliedOutput();
 
-		inputs.shaftPosition_deg = Math102.truncate(shaftEncoder.getPosition(), 2);
+		inputs.shaftPosition_deg = Math102.truncate(shaftEncoder.getPosition() - shaftEncoderOffset_deg, 2);
 		inputs.shaftVelocity_rpm = Math102.truncate(shaftEncoder.getVelocity(), 2);
+		inputs.motorVelocity_rpm = Math102.truncate(motorEncoder.getVelocity(), 2);
 	}
 
 	public void setPosition(double position_deg) {
 		targetPosition_deg = position_deg;
-		pidController.setReference(targetPosition_deg, ControlType.kSmartMotion, 0,
+		pidController.setReference(targetPosition_deg + shaftEncoderOffset_deg, ControlType.kSmartMotion, 0,
 			feedforwardController.calculate(Units.degreesToRadians(targetPosition_deg), 0));
 	}
 
 	public void setMotorVoltage(double voltage_V) {
+		Logger.recordOutput("Arm/targetVoltage_V", voltage_V);
 		pidController.setReference(voltage_V, ControlType.kVoltage, 0,
 			feedforwardController.calculate(Units.degreesToRadians(inputs.shaftPosition_deg), 0));
 	}
