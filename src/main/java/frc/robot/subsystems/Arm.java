@@ -4,7 +4,7 @@ import static frc.robot.constants.ArmConstants.*;
 import static frc.robot.constants.Constants.tuningMode;
 
 import frc.robot.util.AutoSetterTunableNumber;
-import frc.robot.util.Conversions;
+import frc.robot.util.Math102;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
@@ -120,8 +120,8 @@ public class Arm extends SubsystemBase {
 		inputs.followerTemperature_C = followerMotor.getMotorTemperature();
 		inputs.followerPercentOutput = followerMotor.getAppliedOutput();
 
-		inputs.shaftPosition_deg = Conversions.truncate(shaftEncoder.getPosition(), 2);
-		inputs.shaftVelocity_rpm = Conversions.truncate(shaftEncoder.getVelocity(), 2);
+		inputs.shaftPosition_deg = Math102.truncate(shaftEncoder.getPosition(), 2);
+		inputs.shaftVelocity_rpm = Math102.truncate(shaftEncoder.getVelocity(), 2);
 	}
 
 	public void setPosition(double position_deg) {
@@ -142,6 +142,6 @@ public class Arm extends SubsystemBase {
 	}
 
 	public boolean closeEnough() {
-		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, accuracyTolerance);
+		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, accuracyTolerance_deg);
 	}
 }

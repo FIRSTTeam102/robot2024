@@ -6,6 +6,7 @@ import static frc.robot.constants.Constants.OperatorConstants.*;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
+import frc.robot.constants.IntakeConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -19,6 +20,7 @@ import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
 import frc.robot.commands.arm.ManualArmControl;
+import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
@@ -141,29 +143,46 @@ public class RobotContainer {
 	 * joysticks}.
 	 */
 	private void configureBindings() {
+		// *DRIVER CONTROLS*
+		//
 		var teleopSwerve = new TeleopSwerve(
 			() -> -driverController.getLeftY(),
 			() -> -driverController.getLeftX(),
 			() -> -driverController.getRightX(),
-			driverController.getHID()::getLeftBumper, // override speed
-			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // preceise mode
+			() -> false, // no overdrive functionality
+			// driverController.getHID()::getLeftBumper, // override speed
+			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // precise mode
 			swerve);
 		swerve.setDefaultCommand(teleopSwerve);
 
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
-		// driverController.rightBumper()
-		// .whileTrue(teleopSwerve.holdRotateAroundPiece());
 
+		// right bumper -> rotate to speaker
+		// left bumper -> rotate to note
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
+		// b -> trap/climb align maybe?
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 
-		// operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
-		operatorController.x().onTrue(new StopShooter(shooter));
-		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake, false));
-		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
+		// dpad left -> call for coopertition (lights)
+		// dpad right -> call for amplify (lights)
 
+		// *OPERATOR CONTROLS*
+		//
+		operatorController.a().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
+		// b -> scoring preset for base of speaker
+		operatorController.x().onTrue(new StopShooter(shooter));
+		// y -> set shooter speed and arm angle based on limelight
+		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 0));
+		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 90));
+		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, false));
+		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
+		// dpad up -> climber up
+		// dpad down -> climber down
+
+		// *TESTING CONTROLS*
+		//
 		// When in tuning mode, create multiple testing options on shuffleboard as well as bind commands to a unique
 		// 'testing' controller
 		if (tuningMode) {

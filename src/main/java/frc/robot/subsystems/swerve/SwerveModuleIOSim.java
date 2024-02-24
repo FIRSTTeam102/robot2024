@@ -3,7 +3,7 @@ package frc.robot.subsystems.swerve;
 import static frc.robot.constants.Constants.loopPeriod_s;
 import static frc.robot.constants.SwerveConstants.*;
 
-import frc.robot.util.Conversions;
+import frc.robot.util.Math102;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -39,7 +39,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 	private double angleApplied_V = 0.0;
 
 	public SwerveModuleIOSim() {
-		angleController.enableContinuousInput(0, Conversions.twoPi);
+		angleController.enableContinuousInput(0, Math102.twoPi);
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class SwerveModuleIOSim implements SwerveModuleIO {
 		inputs.driveCurrent_A = Math.abs(driveSim.getCurrentDrawAmps());
 
 		inputs.anglePosition_rad = angleSim.getAngularPositionRad();
-		inputs.angleAbsolutePosition_rad = Conversions.angleModulus2pi(angleInitPosition_rad + inputs.anglePosition_rad);
+		inputs.angleAbsolutePosition_rad = Math102.angleModulus2pi(angleInitPosition_rad + inputs.anglePosition_rad);
 		inputs.angleVelocity_radps = angleSim.getAngularVelocityRadPerSec();
 		inputs.angleAppliedVoltage_V = angleApplied_V;
 		inputs.angleCurrent_A = Math.abs(angleSim.getCurrentDrawAmps());

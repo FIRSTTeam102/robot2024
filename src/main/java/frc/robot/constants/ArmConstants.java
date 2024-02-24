@@ -32,5 +32,5 @@ public final class ArmConstants {
 	// public static final int gearRatio = 1; // 1 IS PLACEHOLDER
 
 	// closeEnough
-	public static final double accuracyTolerance = 0.1;
+	public static final double accuracyTolerance_deg = 3;
 }
