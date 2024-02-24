@@ -170,13 +170,17 @@ public class RobotContainer {
 
 		// *OPERATOR CONTROLS*
 		//
+		// Move arm down to intake position and run intake, then lift arm after finished
+		var intakeSequence = Commands.parallel(new SetArmPosition(arm, 0), new SetIntakeSpeed(intake, false))
+			.andThen(new SetArmPosition(arm, 10));
 		operatorController.a().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
 		// b -> scoring preset for base of speaker
 		operatorController.x().onTrue(new StopShooter(shooter));
 		// y -> set shooter speed and arm angle based on limelight
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 0));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 90));
-		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, false));
+		// operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, false));
+		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(intakeSequence);
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
 		// dpad up -> climber up
 		// dpad down -> climber down
