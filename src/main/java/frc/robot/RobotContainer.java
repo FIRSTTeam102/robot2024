@@ -195,7 +195,7 @@ public class RobotContainer {
 				new StartEndCommand(() -> intake.setMotorVoltage(indexSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(),
 					intake));
 
-			testController.leftTrigger(boolTriggerThreshold).whileTrue(new ManualArmControl(arm, testController::getLeftY));
+			testController.rightStick().whileTrue(new ManualArmControl(arm, testController::getLeftY));
 		}
 	}
 

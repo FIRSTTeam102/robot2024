@@ -1,10 +1,9 @@
 package frc.robot.commands.arm;
 
 import frc.robot.constants.ArmConstants;
-import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.subsystems.Arm;
+import frc.robot.util.ControllerUtil;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import java.util.function.DoubleSupplier;
@@ -32,11 +31,11 @@ public class ManualArmControl extends Command {
 	@Override
 	public void execute() {
 		// apply deadband to input. Run stationary feedforward ("stopped") if banded input is 0
-		double deadbandInput = MathUtil.applyDeadband(speedSupplier.getAsDouble(), OperatorConstants.xboxStickDeadband);
+		double deadbandInput = ControllerUtil.scaleAxis(speedSupplier.getAsDouble());
 		if (deadbandInput == 0) {
 			arm.stop();
-		} else { // else, scale banded input by max output and then convert to volts (linearly with max of 12 V)
-			arm.setMotorVoltage((ArmConstants.maxOutput * deadbandInput) * 12);
+		} else { // else, scale banded input by max manual output and then convert to volts (linearly with max of 12 V)
+			arm.setMotorVoltage((ArmConstants.manualMaxOutput * deadbandInput) * 12);
 		}
 	}
 
