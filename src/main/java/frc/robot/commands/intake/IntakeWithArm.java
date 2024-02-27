@@ -19,8 +19,10 @@ public class IntakeWithArm extends Command {
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		arm.setPosition(-2);
-		intake.setMotorSpeed(IntakeConstants.intakeSpeed);
+		if (!intake.inputs.noteSensor) {
+			arm.setPosition(-2);
+			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
+		}
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
