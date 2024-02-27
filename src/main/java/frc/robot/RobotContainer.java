@@ -7,6 +7,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.ShooterConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -21,7 +22,9 @@ import frc.robot.util.Alert.AlertType;
 
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
+import frc.robot.commands.intake.IntakeWithArm;
 import frc.robot.commands.intake.SetIntakeSpeed;
+import frc.robot.commands.shooter.SetShooterVelocity;
 import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
@@ -170,20 +173,20 @@ public class RobotContainer {
 
 		// *OPERATOR CONTROLS*
 		//
-		// Move arm down to intake position and run intake, then lift arm after finished
-		var intakeSequence = Commands.parallel(new SetArmPosition(arm, 0), new SetIntakeSpeed(intake, false))
-			.andThen(new SetArmPosition(arm, 10));
-		operatorController.a().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
-		// b -> scoring preset for base of speaker
+		operatorController.a().whileTrue(new SetShooterVelocity(shooter, 1000));
+		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, 0),
+			new SetShooterVelocity(shooter, ShooterConstants.subwooferVelocity_rpm)));
 		operatorController.x().onTrue(new StopShooter(shooter));
 		// y -> set shooter speed and arm angle based on limelight
-		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 0));
-		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 90));
-		// operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, false));
-		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(intakeSequence);
+		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 10));
+		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 75));
+		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
 		// dpad up -> climber up
 		// dpad down -> climber down
+
+		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
+		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));
 
 		// *TESTING CONTROLS*
 		//

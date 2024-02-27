@@ -7,9 +7,9 @@ public final class ArmConstants {
 	public static final double shaftEncoderOffset_deg = 4.22; // needs to be tuned
 
 	// pid
-	public static final double kP = .00012;
+	public static final double kP = .000065;
 	public static final double kI = 0;
-	public static final double kD = .000001;
+	public static final double kD = .0000013;
 
 	public static final double maxOutput = .5;
 	public static final double minOutput = -maxOutput;
@@ -26,11 +26,11 @@ public final class ArmConstants {
 
 	// smartmotion
 	public static double maxAccel_rpmps = 7200;
-	public static double maxVelocity_rpm = 3200;
+	public static double maxVelocity_rpm = 3800;
 
 	// Conversion (not needed)
 	// public static final int gearRatio = 1; // 1 IS PLACEHOLDER
 
 	// closeEnough
-	public static final double accuracyTolerance_deg = .3;
+	public static final double accuracyTolerance_deg = .4;
 }

@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
+import com.revrobotics.CANSparkBase.SoftLimitDirection;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -46,8 +47,10 @@ public class Arm extends SubsystemBase {
 		leadMotor.setSecondaryCurrentLimit(65);
 		leadMotor.enableVoltageCompensation(12);
 
-		// leadMotor.setSoftLimit(SoftLimitDirection.kReverse, 100);
-		// leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+		leadMotor.setSoftLimit(SoftLimitDirection.kForward, (float) (100 + shaftEncoderOffset_deg));
+		leadMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) (-1.5 + shaftEncoderOffset_deg));
+		leadMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+		leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
 		followerMotor.setIdleMode(IdleMode.kBrake);
 		followerMotor.setSmartCurrentLimit(45);
@@ -83,6 +86,9 @@ public class Arm extends SubsystemBase {
 		// new AutoSetterTunableNumber("Arm/kP", kP, (value) -> pidController.setP(value));
 		// new AutoSetterTunableNumber("Arm/kD", kD, (value) -> pidController.setD(value));
 		// }
+
+		leadMotor.burnFlash();
+		followerMotor.burnFlash();
 	}
 
 	@Override
