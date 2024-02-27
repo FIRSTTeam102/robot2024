@@ -173,7 +173,7 @@ public class RobotContainer {
 
 		// *OPERATOR CONTROLS*
 		//
-		operatorController.a().whileTrue(Commands.parallel(new SetArmPosition(arm, 75), new SetShooterVelocity(shooter, 1000)));
+		operatorController.a().onTrue(Commands.parallel(new SetArmPosition(arm, 75), new SetShooterVelocity(shooter, 1000)));
 		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, 0),
 			new SetShooterVelocity(shooter, ShooterConstants.subwooferVelocity_rpm)));
 		operatorController.x().onTrue(new StopShooter(shooter));
