@@ -48,7 +48,7 @@ public class FieldVisionIO {
 	private NetworkTableEntry clEntry = table.getEntry("cl");
 	private NetworkTableEntry tlEntry = table.getEntry("tl");
 
-	private NetworkTableEntry targetspaceEntry = table.getEntry("targetspace");
+	private NetworkTableEntry targetspaceEntry = table.getEntry("botpose_targetspace");
 	private double[] targetspaceCache = new double[6]; // array that will hold all the positions
 
 	private NetworkTableEntry botpose_wpiblueEntry = table.getEntry("botpose_wpiblue");

@@ -173,13 +173,14 @@ public class RobotContainer {
 
 		// *OPERATOR CONTROLS*
 		//
-		operatorController.a().onTrue(Commands.parallel(new SetArmPosition(arm, 75), new SetShooterVelocity(shooter, 1000)));
-		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, 0),
+		operatorController.a()
+			.onTrue(Commands.parallel(new SetArmPosition(arm, 84), new SetShooterVelocity(shooter, 1750)));
+		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, -1.5),
 			new SetShooterVelocity(shooter, ShooterConstants.subwooferVelocity_rpm)));
 		operatorController.x().onTrue(new StopShooter(shooter));
 		// y -> set shooter speed and arm angle based on limelight
-		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 10));
-		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 75));
+		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
+		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 84));
 		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
 		// dpad up -> climber up

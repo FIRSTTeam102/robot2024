@@ -32,7 +32,7 @@ public class IntakeWithArm extends Command {
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
-		arm.setPosition(10);
+		arm.setPosition(4);
 		intake.stopMotor();
 	}
 
