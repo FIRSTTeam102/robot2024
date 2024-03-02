@@ -47,7 +47,7 @@ public class Arm extends SubsystemBase {
 		leadMotor.setSecondaryCurrentLimit(65);
 		leadMotor.enableVoltageCompensation(12);
 
-		leadMotor.setSoftLimit(SoftLimitDirection.kForward, (float) (100 + shaftEncoderOffset_deg));
+		leadMotor.setSoftLimit(SoftLimitDirection.kForward, (float) (110 + shaftEncoderOffset_deg));
 		leadMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) (-1.5 + shaftEncoderOffset_deg));
 		leadMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
 		leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
