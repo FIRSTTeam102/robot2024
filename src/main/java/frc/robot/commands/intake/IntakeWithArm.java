@@ -20,7 +20,7 @@ public class IntakeWithArm extends Command {
 	@Override
 	public void initialize() {
 		if (!intake.inputs.noteSensor) {
-			arm.setPosition(-2);
+			arm.setPosition(-1.5);
 			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
 		}
 	}

@@ -175,7 +175,7 @@ public class RobotContainer {
 		//
 		operatorController.a()
 			.onTrue(Commands.parallel(new SetArmPosition(arm, 84), new SetShooterVelocity(shooter, 1750)));
-		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, -1.5),
+		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, -1),
 			new SetShooterVelocity(shooter, ShooterConstants.subwooferVelocity_rpm)));
 		operatorController.x().onTrue(new StopShooter(shooter));
 		// y -> set shooter speed and arm angle based on limelight
