@@ -290,11 +290,6 @@ public class Swerve extends SubsystemBase {
 
 	// until advantagescope wpilog imports are fixed, use built in data log to gather data
 
-	private Rotation2d Rotation2d(double fieldspaceRotationX_rad) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'Rotation2d'");
-	}
-
 	// public final SysIdRoutine driveSysIdRoutine = new SysIdRoutine(
 	// new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
 	// new SysIdRoutine.Mechanism(
