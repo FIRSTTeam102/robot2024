@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.IntakeConstants.*;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -19,6 +20,7 @@ public class Intake extends SubsystemBase {
 
 	public Intake() {
 		motor.setIdleMode(IdleMode.kBrake);
+		motor.enableVoltageCompensation(12);
 	}
 
 	@Override
@@ -28,11 +30,8 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void setMotorSpeed(double speed) {
-		motor.set(speed);
-	}
-
-	public void setMotorVoltage(double voltage_V) {
-		motor.setVoltage(voltage_V);
+		speed = MathUtil.clamp(speed, -1, 1);
+		motor.setVoltage(speed * 12);
 	}
 
 	@AutoLog

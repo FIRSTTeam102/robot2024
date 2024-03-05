@@ -216,10 +216,10 @@ public class RobotContainer {
 
 			testController.rightBumper()
 				.whileTrue(Commands
-					.runEnd(() -> intake.setMotorVoltage(intakeSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(), intake)
+					.runEnd(() -> intake.setMotorSpeed(intakeSpeedEntry.getDouble(0)), () -> intake.stopMotor(), intake)
 					.until(() -> intake.inputs.noteSensor).unless(() -> intake.inputs.noteSensor));
 			testController.leftBumper().whileTrue(
-				new StartEndCommand(() -> intake.setMotorVoltage(indexSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(),
+				new StartEndCommand(() -> intake.setMotorSpeed(indexSpeedEntry.getDouble(0)), () -> intake.stopMotor(),
 					intake));
 
 			testController.rightStick().whileTrue(new ManualArmControl(arm, testController::getLeftY));
