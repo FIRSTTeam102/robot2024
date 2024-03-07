@@ -41,6 +41,7 @@ public class Arm extends SubsystemBase {
 	private double targetPosition_deg = 0;
 
 	public Arm() {
+		leadMotor.restoreFactoryDefaults();
 		leadMotor.setIdleMode(IdleMode.kBrake);
 		leadMotor.setInverted(false);
 		leadMotor.setSmartCurrentLimit(45);
@@ -52,6 +53,7 @@ public class Arm extends SubsystemBase {
 		leadMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
 		leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
+		followerMotor.restoreFactoryDefaults();
 		followerMotor.setIdleMode(IdleMode.kBrake);
 		followerMotor.setSmartCurrentLimit(45);
 		followerMotor.setSecondaryCurrentLimit(65);
