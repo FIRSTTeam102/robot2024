@@ -1,5 +1,6 @@
 package frc.robot.io;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -13,7 +14,6 @@ public class FieldVisionIO {
 		public int pipeline = 0;
 		public boolean hasTarget = false;
 		public int targetAprilTag = 0;
-		public NetworkTableEntry priorityID;
 
 		public double crosshairToTargetErrorX_rad = 0.0;
 		public double crosshairToTargetErrorY_rad = 0.0;
@@ -55,6 +55,9 @@ public class FieldVisionIO {
 	private NetworkTableEntry botpose_wpiblueEntry = table.getEntry("botpose_wpiblue");
 	private double[] botpose_wpiblueCache = new double[7];
 
+	private LinearFilter targetSpaceXFilter = LinearFilter.movingAverage(40);
+	private LinearFilter targetSpaceZFilter = LinearFilter.movingAverage(40);
+
 	public void updateInputs(FieldVisionIOInputs inputs) {
 		inputs.pipeline = pipelineEntry.getNumber(inputs.pipeline).intValue();
 		inputs.hasTarget = tvEntry.getDouble(0) == 1;
@@ -65,9 +68,9 @@ public class FieldVisionIO {
 
 		targetspaceCache = targetspaceEntry.getDoubleArray(targetspaceCache);
 		if (targetspaceCache.length > 0) {
-			inputs.targetspaceTranslationX_m = targetspaceCache[0];
+			inputs.targetspaceTranslationX_m = targetSpaceXFilter.calculate(targetspaceCache[0]);
 			inputs.targetspaceTranslationY_m = targetspaceCache[1];
-			inputs.targetspaceTranslationZ_m = targetspaceCache[2];
+			inputs.targetspaceTranslationZ_m = targetSpaceZFilter.calculate(targetspaceCache[2]);
 			inputs.targetspaceRotationX_rad = Math.toRadians(targetspaceCache[3]);
 			inputs.targetspaceRotationY_rad = Math.toRadians(targetspaceCache[4]);
 			inputs.targetspaceRotationZ_rad = Math.toRadians(targetspaceCache[5]);

@@ -130,6 +130,8 @@ public class RobotContainer {
 			autoChooser.addOption("sysid swerve drive", sysIdTestSet(swerve.driveSysIdRoutine));
 			autoChooser.addOption("sysid swerve angle", sysIdTestSet(swerve.angleSysIdRoutine));
 			autoChooser.addOption("sysid shooter", sysIdTestSet(shooter.sysIdRoutine));
+
+			vision.setPriorityId(7);
 		}
 
 		// shouldn't require tuningMode as we might run it randomly in comp
@@ -177,7 +179,7 @@ public class RobotContainer {
 		//
 		operatorController.a()
 			.onTrue(Commands.parallel(new SetArmPosition(arm, 84), new SetShooterVelocity(shooter, 1750)));
-		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, -1),
+		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, -1.5),
 			new SetShooterVelocity(shooter, ShooterConstants.subwooferVelocity_rpm)));
 		operatorController.x().onTrue(new StopShooter(shooter));
 		// y -> set shooter speed and arm angle based on limelight
@@ -224,6 +226,7 @@ public class RobotContainer {
 				new StartEndCommand(() -> intake.setMotorSpeed(indexSpeedEntry.getDouble(0)), () -> intake.stopMotor(),
 					intake));
 
+			testController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
 			testController.rightStick().whileTrue(new ManualArmControl(arm, testController::getLeftY));
 		}
 	}
