@@ -13,6 +13,7 @@ public class FieldVisionIO {
 		public int pipeline = 0;
 		public boolean hasTarget = false;
 		public int targetAprilTag = 0;
+		public NetworkTableEntry priorityID;
 
 		public double crosshairToTargetErrorX_rad = 0.0;
 		public double crosshairToTargetErrorY_rad = 0.0;
@@ -87,4 +88,5 @@ public class FieldVisionIO {
 			inputs.fieldspaceTotalLatency_s = (tlEntry.getDouble(0) - clEntry.getDouble(0)) / 1000;
 		}
 	}
+
 }

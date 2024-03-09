@@ -68,6 +68,8 @@ public class Swerve extends SubsystemBase {
 	private double translationY;
 	private double translationX;
 
+	public static boolean fieldrelativity;
+
 	public Swerve(GyroIO gyroIO, Vision vision) {
 		modules = new SwerveModule[moduleConstants.length];
 		int moduleNumber = 0;
@@ -191,6 +193,7 @@ public class Swerve extends SubsystemBase {
 	 * for rotation zero is away from the driver, positive is CCW
 	 */
 	public void drive(Translation2d translation_mps, double rotation_radps, boolean fieldRelative) {
+		fieldrelativity = fieldRelative;
 		SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(
 			fieldRelative
 				? ChassisSpeeds.fromFieldRelativeSpeeds(

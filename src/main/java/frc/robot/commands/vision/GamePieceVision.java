@@ -56,7 +56,8 @@ public class GamePieceVision extends Command {
 
 		// Generate a continuously updated rotation to GamePiece
 		System.out.println("Swerve --> GamePiece");
-		swerve.drive(new Translation2d(0, 0), robotRotate_radps, false);
+		swerve.drive(new Translation2d(0, 0), robotRotate_radps, false); // TELL DRIVE THAT THEY ARE ALWAYS ROBOT ORIENTED
+																																			// WHEN ALIGN TO NOTE
 	}
 
 	// Called once the command ends or is interrupted.

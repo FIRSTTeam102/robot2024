@@ -5,6 +5,8 @@ import frc.robot.io.FieldVisionIOInputsAutoLogged;
 import frc.robot.io.PieceVisionIO;
 import frc.robot.io.PieceVisionIOInputsAutoLogged;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import org.littletonrobotics.junction.Logger;
@@ -14,6 +16,8 @@ public class Vision extends SubsystemBase {
 	private PieceVisionIO pieceIO = new PieceVisionIO();
 	public FieldVisionIOInputsAutoLogged fieldInputs = new FieldVisionIOInputsAutoLogged();
 	public PieceVisionIOInputsAutoLogged pieceInputs = new PieceVisionIOInputsAutoLogged();
+	private NetworkTableEntry priorityIdEntry = NetworkTableInstance.getDefault().getTable("limelight-fv")
+		.getEntry("priorityid");
 
 	public Vision() {}
 
@@ -23,6 +27,10 @@ public class Vision extends SubsystemBase {
 		pieceIO.updateInputs(pieceInputs);
 		Logger.processInputs(getName() + "/field", fieldInputs);
 		Logger.processInputs(getName() + "/piece", pieceInputs);
+	}
+
+	public void setPriorityId(int id) {
+		priorityIdEntry.setNumber(id);
 	}
 }
 
