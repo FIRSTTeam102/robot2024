@@ -29,6 +29,7 @@ import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
+import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -163,8 +164,8 @@ public class RobotContainer {
 
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
-
-		// right bumper -> rotate to speaker
+		// right bumper -> rotate to speaker apriltag
+		driverController.rightBumper().whileTrue(new AprilTagVision(vision, swerve));
 		// left bumper -> rotate to note
 		driverController.leftBumper().onTrue(new GamePieceVision(vision, swerve));
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());

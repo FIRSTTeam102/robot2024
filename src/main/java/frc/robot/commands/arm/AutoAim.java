@@ -40,7 +40,9 @@ public class AutoAim extends Command {
 
 	@Override
 	public void execute() {
-
+		if (vision.findDistance() > 1)
+			;
+		// add if statements for the range now
 	}
 
 	@Override

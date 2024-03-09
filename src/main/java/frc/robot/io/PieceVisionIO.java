@@ -66,7 +66,7 @@ public class PieceVisionIO {
 		inputs.hasTarget = tvEntry.getDouble(0) == 1;
 		inputs.targetAprilTag = tidEntry.getNumber(inputs.targetAprilTag).intValue();
 		inputs.crosshairToTargetErrorX_rad = Math.toRadians(txEntry.getDouble(inputs.crosshairToTargetErrorX_rad));
-		inputs.crosshairToTargetErrorY_rad = Math.toRadians(tyEntry.getDouble(inputs.crosshairToTargetErrorX_rad));
+		inputs.crosshairToTargetErrorY_rad = Math.toRadians(tyEntry.getDouble(inputs.crosshairToTargetErrorY_rad));
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);
 
 		targetspaceCache = targetspaceEntry.getDoubleArray(targetspaceCache);

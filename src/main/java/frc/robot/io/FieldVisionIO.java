@@ -65,6 +65,7 @@ public class FieldVisionIO {
 		inputs.crosshairToTargetErrorX_rad = Math.toRadians(txEntry.getDouble(inputs.crosshairToTargetErrorX_rad));
 		inputs.crosshairToTargetErrorY_rad = Math.toRadians(tyEntry.getDouble(inputs.crosshairToTargetErrorX_rad));
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);
+		inputs.ty = tyEntry.getDouble(inputs.ty);
 
 		targetspaceCache = targetspaceEntry.getDoubleArray(targetspaceCache);
 		if (targetspaceCache.length > 0) {

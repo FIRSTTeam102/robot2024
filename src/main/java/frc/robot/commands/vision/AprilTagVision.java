@@ -19,11 +19,15 @@ import java.util.Optional;
 
 public class AprilTagVision extends Command {
 	/** Creates a new AprilTagVision. */
-	private Vision vision;
-	private Swerve swerve;
+	private static Vision vision;
+	private static Swerve swerve;
 	private boolean isAligned;
 	private double robotRotate_radps;
 	Optional<Alliance> alliance = DriverStation.getAlliance();
+	public static double rotationalOffset = Math.atan2(VisionConstants.limelightXOffset, vision.findDistance()); // inverse
+																																																								// tangent
+																																																								// of
+																																																								// X/y
 
 	public AprilTagVision(Vision vision, Swerve swerve) {
 		addRequirements(swerve);
@@ -67,9 +71,7 @@ public class AprilTagVision extends Command {
 		robotRotate_radps *= -1; // Rotate opposite of error
 
 		System.out.println("Swerve --> Shooting Speaker");
-		swerve.drive(new Translation2d(0, 0), robotRotate_radps, Swerve.fieldrelativity); // Swerve.Field Relative is Hacky,
-																																											// janky, and uses global
-																																											// variables.
+		swerve.drive(new Translation2d(0, 0), robotRotate_radps - rotationalOffset, false);
 	}
 
 	// Called once the command ends or is interrupted.
