@@ -14,6 +14,7 @@ public class FieldVisionIO {
 		public int pipeline = 0;
 		public boolean hasTarget = false;
 		public int targetAprilTag = 0;
+		public double ty = 0;
 
 		public double crosshairToTargetErrorX_rad = 0.0;
 		public double crosshairToTargetErrorY_rad = 0.0;
