@@ -13,7 +13,7 @@ public class FieldVisionIO {
 		public int pipeline = 0;
 		public boolean hasTarget = false;
 		public int targetAprilTag = 0;
-		public NetworkTableEntry priorityID;
+		public double ty;
 
 		public double crosshairToTargetErrorX_rad = 0.0;
 		public double crosshairToTargetErrorY_rad = 0.0;
@@ -62,6 +62,7 @@ public class FieldVisionIO {
 		inputs.crosshairToTargetErrorX_rad = Math.toRadians(txEntry.getDouble(inputs.crosshairToTargetErrorX_rad));
 		inputs.crosshairToTargetErrorY_rad = Math.toRadians(tyEntry.getDouble(inputs.crosshairToTargetErrorX_rad));
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);
+		inputs.ty = tyEntry.getDouble(inputs.ty);
 
 		targetspaceCache = targetspaceEntry.getDoubleArray(targetspaceCache);
 		if (targetspaceCache.length > 0) {
