@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import frc.robot.constants.ScoringConstants;
 import frc.robot.constants.ScoringConstants.ScoringPosition;
-import frc.robot.constants.VisionConstants;
 import frc.robot.io.FieldVisionIO;
 import frc.robot.io.FieldVisionIOInputsAutoLogged;
 import frc.robot.io.PieceVisionIO;
@@ -41,13 +40,14 @@ public class Vision extends SubsystemBase {
 		priorityIdEntry.setNumber(id);
 	}
 
-	public double findDistance() {
-		double targetOffsetAngle_Vertical = fieldInputs.ty;
-		double angleToGoalDegrees = VisionConstants.limelightMountAngleDegrees + targetOffsetAngle_Vertical;
-		double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
-
-		double distance = (VisionConstants.goalHeight - VisionConstants.LensHeight) / Math.tan(angleToGoalRadians);
-
+	public double find2dDistance() {
+		/*
+		 * double targetOffsetAngle_Vertical = fieldInputs.ty;
+		 * double angleToGoalDegrees = VisionConstants.limelightMountAngleDegrees + targetOffsetAngle_Vertical;
+		 * double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+		 * double distance = (VisionConstants.goalHeight - VisionConstants.LensHeight) / Math.tan(angleToGoalRadians);
+		 */
+		double distance = Math.hypot(fieldInputs.targetspaceTranslationX_m, fieldInputs.targetspaceTranslationZ_m);
 		return distance;
 	}
 

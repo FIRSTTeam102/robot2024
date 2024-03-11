@@ -24,15 +24,15 @@ public class AprilTagVision extends Command {
 	private boolean isAligned;
 	private double robotRotate_radps;
 	Optional<Alliance> alliance = DriverStation.getAlliance();
-	public static double rotationalOffset = Math.atan2(VisionConstants.limelightXOffset, vision.findDistance()); // inverse
-																																																								// tangent
-																																																								// of
-																																																								// X/y
+	public static double rotationalOffset = Math.atan2(VisionConstants.limelightXOffset, vision.find2dDistance()); // inverse
+																																																									// tangent
+																																																									// of
+																																																									// X/y
 
 	public AprilTagVision(Vision vision, Swerve swerve) {
 		addRequirements(swerve);
-		this.vision = vision;
-		this.swerve = swerve;
+		AprilTagVision.vision = vision; // VScode was throwing me an error. Using AprilTagVision class specifier was the fix
+		AprilTagVision.swerve = swerve;
 	}
 
 	// Called when the command is initially scheduled.

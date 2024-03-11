@@ -7,6 +7,7 @@ package frc.robot.commands.arm;
 import frc.robot.constants.VisionConstants;
 import frc.robot.io.FieldVisionIOInputsAutoLogged;
 import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,15 +17,17 @@ import edu.wpi.first.wpilibj2.command.Command;
 import java.util.Optional;
 
 public class AutoAim extends Command {
+	private Shooter shooter;
 	private Arm arm;
 	private Vision vision; // needed just to set the priority tag to stare at
 	private FieldVisionIOInputsAutoLogged fieldvisionio; // the data we take from
 	Optional<Alliance> alliance = DriverStation.getAlliance();
 
 	/** Creates a new AutoAim. */
-	public AutoAim(Arm arm, Vision vision) {
+	public AutoAim(Arm arm, Vision vision, Shooter shooter) {
 		this.arm = arm;
 		this.vision = vision;
+		this.shooter = shooter;
 	}
 
 	// Called when the command is initially scheduled.
@@ -40,13 +43,16 @@ public class AutoAim extends Command {
 
 	@Override
 	public void execute() {
-		if (vision.findDistance() > 1)
-			;
-		// add if statements for the range now
+		var scoringPositon = vision.estimateScoringPosition_map();
+		arm.setPosition(scoringPositon.armAngle_deg());
+		shooter.setVelocity(scoringPositon.shooterSpeed_rpm());
 	}
 
 	@Override
-	public void end(boolean interrupted) {}
+	public void end(boolean interrupted) {
+		arm.setPosition(5);
+		shooter.setVelocity(0);
+	}
 
 	// Returns true when the command should end.
 	@Override
