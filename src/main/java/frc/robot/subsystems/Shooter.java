@@ -36,6 +36,8 @@ public class Shooter extends SubsystemBase {
 	private double targetVelocity_rpm = 0.0;
 
 	public Shooter() {
+		leadMotor.restoreFactoryDefaults();
+		followerMotor.restoreFactoryDefaults();
 		if (tuningMode) {
 			new AutoSetterTunableNumber("Shooter/kP", kP, (double value) -> pidController.setP(value));
 			new AutoSetterTunableNumber("Shooter/kD", kD, (double value) -> pidController.setD(value));
@@ -57,6 +59,8 @@ public class Shooter extends SubsystemBase {
 		// only fetch position when tuning
 		SparkUtil.setPeriodicFrames(leadMotor, true, true, tuningMode, false, false, false, false);
 		SparkUtil.setPeriodicFrames(followerMotor, false, false, false, false, false, false, false);
+		leadMotor.burnFlash();
+		followerMotor.burnFlash();
 	}
 
 	public void setVelocity(double velocity_rpm) {

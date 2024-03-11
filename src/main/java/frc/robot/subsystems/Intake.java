@@ -19,8 +19,11 @@ public class Intake extends SubsystemBase {
 	private final DigitalInput noteSensor = new DigitalInput(sensorId);
 
 	public Intake() {
+		motor.restoreFactoryDefaults();
 		motor.setIdleMode(IdleMode.kBrake);
 		motor.enableVoltageCompensation(12);
+		motor.burnFlash();
+
 	}
 
 	@Override
