@@ -19,15 +19,15 @@ import java.util.Optional;
 
 public class AprilTagVision extends Command {
 	/** Creates a new AprilTagVision. */
-	private static Vision vision;
-	private static Swerve swerve;
+	private Vision vision;
+	private Swerve swerve;
 	private boolean isAligned;
 	private double robotRotate_radps;
 	Optional<Alliance> alliance = DriverStation.getAlliance();
-	public static double rotationalOffset = Math.atan2(VisionConstants.limelightXOffset, vision.findDistance()); // inverse
-																																																								// tangent
-																																																								// of
-																																																								// X/y
+	public double rotationalOffset = Math.atan2(VisionConstants.limelightXOffset, vision.findDistance()); // inverse
+																																																				// tangent
+																																																				// of
+																																																				// X/y
 
 	public AprilTagVision(Vision vision, Swerve swerve) {
 		addRequirements(swerve);
