@@ -3,12 +3,14 @@ package frc.robot;
 import static frc.robot.constants.Constants.*;
 
 import frc.robot.constants.BuildConstants;
+import frc.robot.subsystems.Lights;
 import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
 import frc.robot.util.VirtualSubsystem;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -28,6 +30,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import java.util.Optional;
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -38,6 +42,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
 	private Command autonomousCommand;
 	private RobotContainer robotContainer;
+
+	Optional<Alliance> alliance = DriverStation.getAlliance();
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -129,6 +135,7 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void disabledPeriodic() {
 		robotContainer.updateOIAlert();
+		Lights.setStatus(frc.robot.constants.LightsConstants.Mode.Disabled);
 	}
 
 	/** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -144,7 +151,9 @@ public class Robot extends LoggedRobot {
 
 	/** This function is called periodically during autonomous. */
 	@Override
-	public void autonomousPeriodic() {}
+	public void autonomousPeriodic() {
+		Lights.setStatus(frc.robot.constants.LightsConstants.Mode.Auto);
+	}
 
 	@Override
 	public void teleopInit() {
@@ -160,7 +169,14 @@ public class Robot extends LoggedRobot {
 
 	/** This function is called periodically during operator control. */
 	@Override
-	public void teleopPeriodic() {}
+	public void teleopPeriodic() {
+		if (alliance.get() == Alliance.Red) {
+			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.TeleopRED);
+		} else {
+			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.TeleopBLUE);
+		}
+
+	}
 
 	@Override
 	public void testInit() {

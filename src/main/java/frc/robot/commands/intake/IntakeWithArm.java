@@ -3,6 +3,7 @@ package frc.robot.commands.intake;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Lights;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -22,6 +23,7 @@ public class IntakeWithArm extends Command {
 		if (!intake.inputs.noteSensor) {
 			arm.setPosition(-1.5);
 			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
+			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.Intaking);
 		}
 	}
 
