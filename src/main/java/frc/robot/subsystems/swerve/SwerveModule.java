@@ -2,7 +2,7 @@ package frc.robot.subsystems.swerve;
 
 import static frc.robot.constants.SwerveConstants.maxVelocity_mps;
 
-import frc.robot.util.Conversions;
+import frc.robot.util.Math102;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -126,7 +126,7 @@ public class SwerveModule {
 
 		lastAngle = angle;
 		Logger.recordOutput("SwerveModule " + moduleNumber + "/targetAngle_rad",
-			Conversions.angleModulus2pi(angle.getRadians()));
+			Math102.angleModulus2pi(angle.getRadians()));
 	}
 
 	public void setDriveBrakeMode(boolean enable) {

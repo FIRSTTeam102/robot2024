@@ -6,6 +6,7 @@ import static frc.robot.constants.ShooterConstants.*;
 import frc.robot.util.AutoSetterTunableNumber;
 import frc.robot.util.SparkUtil;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,6 +36,8 @@ public class Shooter extends SubsystemBase {
 	private double targetVelocity_rpm = 0.0;
 
 	public Shooter() {
+		leadMotor.restoreFactoryDefaults();
+		followerMotor.restoreFactoryDefaults();
 		if (tuningMode) {
 			new AutoSetterTunableNumber("Shooter/kP", kP, (double value) -> pidController.setP(value));
 			new AutoSetterTunableNumber("Shooter/kD", kD, (double value) -> pidController.setD(value));
@@ -47,18 +50,22 @@ public class Shooter extends SubsystemBase {
 		pidController.setD(kD);
 
 		leadMotor.setIdleMode(IdleMode.kCoast);
+		leadMotor.enableVoltageCompensation(12);
 
 		followerMotor.setIdleMode(IdleMode.kCoast);
+		followerMotor.enableVoltageCompensation(12);
 		followerMotor.follow(leadMotor);
 
 		// only fetch position when tuning
 		SparkUtil.setPeriodicFrames(leadMotor, true, true, tuningMode, false, false, false, false);
 		SparkUtil.setPeriodicFrames(followerMotor, false, false, false, false, false, false, false);
+		leadMotor.burnFlash();
+		followerMotor.burnFlash();
 	}
 
 	public void setVelocity(double velocity_rpm) {
-		targetVelocity_rpm = velocity_rpm;
-		pidController.setReference(velocity_rpm, ControlType.kVelocity, 0, feedforward.calculate(velocity_rpm));
+		targetVelocity_rpm = MathUtil.clamp(velocity_rpm, 0, maxVelocity_rpm);
+		pidController.setReference(targetVelocity_rpm, ControlType.kVelocity, 0, feedforward.calculate(targetVelocity_rpm));
 	}
 
 	public void setPercentOutput(double speed) {
@@ -79,12 +86,14 @@ public class Shooter extends SubsystemBase {
 	public static class ShooterIOInputs {
 		// public double leadPosition_rot = 0.0;
 		public double leadVelocity_rpm = 0.0;
-		public double leadVoltage_V = 0.0;
+		public double leadBusVoltage_V = 0.0;
+		public double leadAppliedVoltage_V = 0.0;
 		public double leadCurrent_A = 0.0;
 		public double leadTemperature_C = 0.0;
 		public double leadPercentOutput = 0.0;
 
-		public double followerVoltage_V = 0.0;
+		public double followerBusVoltage_V = 0.0;
+		public double followerAppliedVoltage_V = 0.0;
 		public double followerCurrent_A = 0.0;
 		public double followerTemperature_C = 0.0;
 		public double followerPercentOutput = 0.0;
@@ -95,13 +104,15 @@ public class Shooter extends SubsystemBase {
 	private void updateInputs(ShooterIOInputs inputs) {
 		// inputs.leadPosition_rot = encoder.getPosition();
 		inputs.leadVelocity_rpm = encoder.getVelocity();
-		inputs.leadVoltage_V = leadMotor.getBusVoltage();
+		inputs.leadBusVoltage_V = leadMotor.getBusVoltage();
+		inputs.leadAppliedVoltage_V = leadMotor.getAppliedOutput() * 12;
 		inputs.leadCurrent_A = leadMotor.getOutputCurrent();
 		inputs.leadTemperature_C = leadMotor.getMotorTemperature();
 		inputs.leadPercentOutput = leadMotor.getAppliedOutput();
 
 		// important to log to ensure proper functionality
-		inputs.followerVoltage_V = followerMotor.getBusVoltage();
+		inputs.followerBusVoltage_V = followerMotor.getBusVoltage();
+		inputs.followerAppliedVoltage_V = followerMotor.getAppliedOutput() * 12;
 		inputs.followerCurrent_A = followerMotor.getOutputCurrent();
 		inputs.followerTemperature_C = followerMotor.getMotorTemperature();
 		inputs.followerPercentOutput = followerMotor.getAppliedOutput();
@@ -115,7 +126,7 @@ public class Shooter extends SubsystemBase {
 			},
 			log -> {
 				log.motor("shooter-lead")
-					.voltage(Units.Volts.of(inputs.leadVoltage_V * inputs.leadPercentOutput))
+					.voltage(Units.Volts.of(inputs.leadAppliedVoltage_V))
 					.angularPosition(Units.Rotations.of(encoder.getPosition()))
 					.angularVelocity(Units.RPM.of(inputs.leadVelocity_rpm));
 			},

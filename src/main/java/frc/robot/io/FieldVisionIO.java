@@ -1,5 +1,6 @@
 package frc.robot.io;
 
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -13,6 +14,7 @@ public class FieldVisionIO {
 		public int pipeline = 0;
 		public boolean hasTarget = false;
 		public int targetAprilTag = 0;
+		public double ty = 0;
 
 		public double crosshairToTargetErrorX_rad = 0.0;
 		public double crosshairToTargetErrorY_rad = 0.0;
@@ -48,11 +50,14 @@ public class FieldVisionIO {
 	private NetworkTableEntry clEntry = table.getEntry("cl");
 	private NetworkTableEntry tlEntry = table.getEntry("tl");
 
-	private NetworkTableEntry targetspaceEntry = table.getEntry("targetspace");
+	private NetworkTableEntry targetspaceEntry = table.getEntry("botpose_targetspace");
 	private double[] targetspaceCache = new double[6]; // array that will hold all the positions
 
 	private NetworkTableEntry botpose_wpiblueEntry = table.getEntry("botpose_wpiblue");
 	private double[] botpose_wpiblueCache = new double[7];
+
+	private LinearFilter targetSpaceXFilter = LinearFilter.movingAverage(40);
+	private LinearFilter targetSpaceZFilter = LinearFilter.movingAverage(40);
 
 	public void updateInputs(FieldVisionIOInputs inputs) {
 		inputs.pipeline = pipelineEntry.getNumber(inputs.pipeline).intValue();
@@ -61,12 +66,13 @@ public class FieldVisionIO {
 		inputs.crosshairToTargetErrorX_rad = Math.toRadians(txEntry.getDouble(inputs.crosshairToTargetErrorX_rad));
 		inputs.crosshairToTargetErrorY_rad = Math.toRadians(tyEntry.getDouble(inputs.crosshairToTargetErrorX_rad));
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);
+		inputs.ty = tyEntry.getDouble(inputs.ty);
 
 		targetspaceCache = targetspaceEntry.getDoubleArray(targetspaceCache);
 		if (targetspaceCache.length > 0) {
-			inputs.targetspaceTranslationX_m = targetspaceCache[0];
+			inputs.targetspaceTranslationX_m = targetSpaceXFilter.calculate(targetspaceCache[0]);
 			inputs.targetspaceTranslationY_m = targetspaceCache[1];
-			inputs.targetspaceTranslationZ_m = targetspaceCache[2];
+			inputs.targetspaceTranslationZ_m = targetSpaceZFilter.calculate(targetspaceCache[2]);
 			inputs.targetspaceRotationX_rad = Math.toRadians(targetspaceCache[3]);
 			inputs.targetspaceRotationY_rad = Math.toRadians(targetspaceCache[4]);
 			inputs.targetspaceRotationZ_rad = Math.toRadians(targetspaceCache[5]);
@@ -87,4 +93,5 @@ public class FieldVisionIO {
 			inputs.fieldspaceTotalLatency_s = (tlEntry.getDouble(0) - clEntry.getDouble(0)) / 1000;
 		}
 	}
+
 }

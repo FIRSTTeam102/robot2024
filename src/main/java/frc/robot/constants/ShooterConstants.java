@@ -1,14 +1,16 @@
 package frc.robot.constants;
 
 public final class ShooterConstants {
-	public static final int leadMotorId = 29;
-	public static final int followerMotorId = 30;
+	public static final int leadMotorId = 32;
+	public static final int followerMotorId = 33;
 
-	public static final double kP = .0005627;
-	public static final double kD = 0;
+	public static final double kP = .00007018;
+	public static final double kD = .0000025;
 
-	public static final double kS = .16982;
-	public static final double kV = .12824;
-	public static final double kA = .01449;
-	public static final double shooterVelocity = 1166;
+	public static final double kS = 0.026257;
+	public static final double kV = .00224;
+	public static final double kA = .008631;
+
+	public static final double maxVelocity_rpm = 5000;
+	public static final double subwooferVelocity_rpm = 3250;
 }
