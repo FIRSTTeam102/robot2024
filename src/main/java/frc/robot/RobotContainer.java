@@ -1,6 +1,5 @@
 package frc.robot;
 
-import static frc.robot.constants.Constants.tuningMode;
 import static frc.robot.constants.Constants.OperatorConstants.*;
 
 import frc.robot.constants.Constants;
@@ -32,6 +31,7 @@ import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -166,7 +166,7 @@ public class RobotContainer {
 		// right bumper -> rotate to speaker apriltag
 		// driverController.rightBumper().whileTrue(new AprilTagVision(vision, swerve));
 		// left bumper -> rotate to note
-		driverController.leftBumper().onTrue(new GamePieceVision(vision, swerve));
+		driverController.leftBumper().whileTrue(new GamePieceVision(vision, swerve));
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		// b -> trap/climb align maybe?
 		driverController.x().whileTrue(new XStance(swerve));
@@ -197,7 +197,7 @@ public class RobotContainer {
 		//
 		// When in tuning mode, create multiple testing options on shuffleboard as well as bind commands to a unique
 		// 'testing' controller
-		if (tuningMode) {
+		if (Constants.tuningMode) {
 			var indexSpeedEntry = Shuffleboard.getTab("Test").add("Index Speed", 0)
 				.withWidget(BuiltInWidgets.kNumberSlider)
 				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
@@ -228,6 +228,10 @@ public class RobotContainer {
 
 			testController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
 			testController.rightStick().whileTrue(new ManualArmControl(arm, testController::getLeftY));
+
+			testController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kForward), arm));
+			testController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kReverse), arm));
+			testController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kOff), arm));
 		}
 	}
 

@@ -41,8 +41,9 @@ public class SetIntakeSpeed extends Command {
 	public void initialize() {
 		// Run motor only if we are either indexing or don't detect a note. Or, if we are intaking (not indexing) and we
 		// detect a note, don't run
-		if (isIndexing || !intake.detectNote())
-			intake.setMotorSpeed(speed);
+		if (isIndexing || !intake.isHoldingNote())
+			;
+		intake.setMotorSpeed(speed);
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
@@ -60,6 +61,6 @@ public class SetIntakeSpeed extends Command {
 	public boolean isFinished() {
 		// If we are intaking and we detect a note, cancel automatically. If we are indexing, the command will only be
 		// canceled on interrupt
-		return (!isIndexing && intake.detectNote());
+		return (!isIndexing && intake.inputs.noteSensor);
 	}
 }

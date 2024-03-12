@@ -11,12 +11,23 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkMax;
 
 import org.littletonrobotics.junction.AutoLog;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+
+import lombok.Getter;
+import lombok.Setter;
 
 public class Intake extends SubsystemBase {
 	private final CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
 
 	private final DigitalInput noteSensor = new DigitalInput(sensorId);
+
+	@Getter
+	@Setter
+	@AutoLogOutput
+	private boolean holdingNote = false;
+
+	private boolean cachedNoteSensor = false;
 
 	public Intake() {
 		motor.restoreFactoryDefaults();
@@ -30,6 +41,12 @@ public class Intake extends SubsystemBase {
 	public void periodic() {
 		updateInputs(inputs);
 		Logger.processInputs(getName(), inputs);
+
+		if ((inputs.noteSensor != cachedNoteSensor) && inputs.noteSensor) {
+			holdingNote = !holdingNote;
+		}
+
+		cachedNoteSensor = inputs.noteSensor;
 	}
 
 	public void setMotorSpeed(double speed) {
@@ -54,11 +71,6 @@ public class Intake extends SubsystemBase {
 		inputs.tempature_C = motor.getMotorTemperature();
 		inputs.percentOutput = motor.getAppliedOutput();
 		inputs.noteSensor = !noteSensor.get();
-	}
-
-	public boolean detectNote() {
-		return inputs.noteSensor;
-
 	}
 
 	public void stopMotor() {

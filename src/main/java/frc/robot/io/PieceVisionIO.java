@@ -42,7 +42,7 @@ public class PieceVisionIO {
 	}
 
 	// Network table declarations
-	private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-gp");
+	private NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight-gpv");
 
 	private NetworkTableEntry pipelineEntry = table.getEntry("pipeline");
 	private NetworkTableEntry tvEntry = table.getEntry("tv");
