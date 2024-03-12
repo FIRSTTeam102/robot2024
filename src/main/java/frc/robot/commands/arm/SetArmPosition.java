@@ -4,18 +4,24 @@
 
 package frc.robot.commands.arm;
 
+import frc.robot.constants.ArmConstants;
 import frc.robot.subsystems.Arm;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class setArmPosition extends Command {
+public class SetArmPosition extends Command {
 	private Arm arm;
 	protected double targetPosition_rad; // did I do this right?
 
-	/** Creates a new setArmPosition. */
-	public setArmPosition(Arm arm, double targetPosition_rad) {
+	/**
+	 * Command to set the arm position, cancels the command and moves on 
+	 * after being within the range given by {@link ArmConstants#accuracyTolerance_deg accuracyTolerance}
+	 * @param arm Arm subsystem
+	 * @param targetPosition_deg Position in degrees to set the arm to (0 is horizontal to robot base)
+	 */
+	public SetArmPosition(Arm arm, double targetPosition_deg) {
 		this.arm = arm;
-		this.targetPosition_rad = targetPosition_rad;
+		this.targetPosition_rad = targetPosition_deg;
 		addRequirements(arm);
 	}
 
@@ -29,7 +35,10 @@ public class setArmPosition extends Command {
 
 	@Override
 	public void end(boolean interrupted) {
-		arm.stopArm();
+		// only stop if interrupted. Otherwise, continue adjusting arm position just move on to another command
+		if (interrupted) {
+			arm.stop();
+		}
 	}
 
 	// Returns true when the command should end.

@@ -4,7 +4,7 @@ import static frc.robot.constants.Constants.tuningMode;
 import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.util.AutoSetterTunableNumber;
-import frc.robot.util.Conversions;
+import frc.robot.util.Math102;
 import frc.robot.util.SparkUtil;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -92,16 +92,16 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 		anglePidController.setFeedbackDevice(angleAbsoluteEncoder);
 
 		angleRelativeEncoder = angleMotor.getEncoder();
-		angleRelativeEncoder.setPositionConversionFactor(Conversions.twoPi / angleGearRatio); // rad
-		angleRelativeEncoder.setVelocityConversionFactor(Conversions.twoPi / angleGearRatio / 60.0); // radps
+		angleRelativeEncoder.setPositionConversionFactor(Math102.twoPi / angleGearRatio); // rad
+		angleRelativeEncoder.setVelocityConversionFactor(Math102.twoPi / angleGearRatio / 60.0); // radps
 
 		// on first cycle, reset relative encoder to absolute
-		angleRelativeEncoder.setPosition(Conversions.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad));
+		angleRelativeEncoder.setPosition(Math102.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad));
 
 		// wrap betwee 0 and 2pi radians
 		anglePidController.setPositionPIDWrappingEnabled(true);
 		anglePidController.setPositionPIDWrappingMinInput(0);
-		anglePidController.setPositionPIDWrappingMaxInput(Conversions.twoPi);
+		anglePidController.setPositionPIDWrappingMaxInput(Math102.twoPi);
 
 		SparkUtil.setPeriodicFrames(angleMotor, false, true, true, true, false, false, false);
 
@@ -112,18 +112,20 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 	public void updateInputs(SwerveModuleIOInputs inputs) {
 		inputs.driveDistance_m = SparkUtil.cleanValue(inputs.driveDistance_m, driveRelativeEncoder.getPosition());
 		inputs.driveVelocity_mps = SparkUtil.cleanValue(inputs.driveVelocity_mps, driveRelativeEncoder.getVelocity());
-		inputs.driveVoltage_V = driveMotor.getBusVoltage() * driveMotor.getAppliedOutput();
+		inputs.driveAppliedVoltage_V = 12 * driveMotor.getAppliedOutput();
+		inputs.driveBusVoltage_V = driveMotor.getBusVoltage();
 		inputs.driveCurrent_A = driveMotor.getOutputCurrent();
 		inputs.driveTemperature_C = driveMotor.getMotorTemperature();
 
 		inputs.anglePosition_rad = SparkUtil.cleanValue(inputs.anglePosition_rad, angleRelativeEncoder.getPosition());
 		inputs.angleAbsolutePosition_rad = SparkUtil.cleanValue(inputs.angleAbsolutePosition_rad,
 			// ensure offset is properly wrapped
-			Conversions.truncate(Conversions.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad), 3));
+			Math102.truncate(Math102.angleModulus2pi(angleAbsoluteEncoder.getPosition() - angleOffset_rad), 3));
 		// inputs.angleVelocity_radps = angleAbsoluteEncoder.getVelocity(); // gives garbage data
 		// inputs.angleAbsolutePosition_rad = angleAbsoluteEncoder.getPosition() - angleOffset_rad;s
 		inputs.angleVelocity_radps = SparkUtil.cleanValue(inputs.angleVelocity_radps, angleRelativeEncoder.getVelocity());
-		inputs.angleVoltage_V = angleMotor.getBusVoltage() * angleMotor.getAppliedOutput();
+		inputs.angleAppliedVoltage_V = 12 * angleMotor.getAppliedOutput();
+		inputs.angleBusVoltage_V = angleMotor.getBusVoltage();
 		inputs.angleCurrent_A = angleMotor.getOutputCurrent();
 		inputs.angleTemperature_C = angleMotor.getMotorTemperature();
 	}
@@ -145,7 +147,7 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 	@Override
 	public void setAnglePosition(Rotation2d angle) {
-		final double targetAngle_rad = Conversions.angleModulus2pi(angle.getRadians() + angleOffset_rad);
+		final double targetAngle_rad = Math102.angleModulus2pi(angle.getRadians() + angleOffset_rad);
 		anglePidController.setReference(targetAngle_rad, ControlType.kPosition);
 		// 0, angleFeedforward.calculate(targetAngle_rad));
 	}
@@ -162,6 +164,6 @@ public class SwerveModuleIOReal implements SwerveModuleIO {
 
 	@Override
 	public double getDriveCharacterizationVelocity_radps() {
-		return Conversions.twoPi * (driveRelativeEncoder.getVelocity() / wheelCircumference_m); // undo unit conversion
+		return Math102.twoPi * (driveRelativeEncoder.getVelocity() / wheelCircumference_m); // undo unit conversion
 	}
 }

@@ -1,27 +1,36 @@
 package frc.robot.constants;
 
 public final class ArmConstants {
-	public static final int motorId = 2; // placeholder
+	public static final int leadMotorId = 29;
+	public static final int followerMotorId = 30;
+
+	public static final double shaftEncoderOffset_deg = 4.22; // needs to be tuned
 
 	// pid
-	public static final double kP = 0;
+	public static final double kP = .000095;
 	public static final double kI = 0;
-	public static final double kD = 0;
+	public static final double kD = .00000165;
 
-	public static final double minOutput = -1;
-	public static final double maxOutput = 1;
+	public static final double maxOutput = .5;
+	public static final double minOutput = -maxOutput;
+
+	public static final double manualMaxOutput = .4;
 
 	// feedforward
 	public static final double kS = 0;
-	public static final double kG = 0;
+	public static final double kG = .5;
 	public static final double kV = 0;
 	public static final double kA = 0;
 
-	public static final double verticalArmPos_Rad = 1.5708;
+	public static final double verticalArmPos_deg = 90;
 
-	// Conversion
-	public static final int gearRatio = 1; // 1 IS PLACEHOLDER
+	// smartmotion
+	public static double maxAccel_rpmps = 7200;
+	public static double maxVelocity_rpm = 3800;
+
+	// Conversion (not needed)
+	// public static final int gearRatio = 1; // 1 IS PLACEHOLDER
 
 	// closeEnough
-	public static final double closeVar = 0.1;
+	public static final double accuracyTolerance_deg = .6;
 }

@@ -1,11 +1,12 @@
 package frc.robot;
 
-import static frc.robot.constants.Constants.tuningMode;
 import static frc.robot.constants.Constants.OperatorConstants.*;
 
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
+import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.ShooterConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -14,16 +15,23 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.SystemAlerter;
+import frc.robot.subsystems.Vision;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.arm.ManualArmControl;
+import frc.robot.commands.arm.SetArmPosition;
+import frc.robot.commands.intake.IntakeWithArm;
 import frc.robot.commands.intake.SetIntakeSpeed;
+import frc.robot.commands.shooter.SetShooterVelocity;
 import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
+import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -73,10 +81,10 @@ public class RobotContainer {
 		: new GyroIOSim();
 
 	/* subsystems */
-	// public final Vision vision = new Vision();
+	public final Vision vision = new Vision();
 	public final Arm arm = new Arm();
 	public final Intake intake = new Intake();
-	public final Swerve swerve = new Swerve(gyro/* , vision */);
+	public final Swerve swerve = new Swerve(gyro, vision);
 	public final Shooter shooter = new Shooter();
 
 	/** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -122,6 +130,8 @@ public class RobotContainer {
 			autoChooser.addOption("sysid swerve drive", sysIdTestSet(swerve.driveSysIdRoutine));
 			autoChooser.addOption("sysid swerve angle", sysIdTestSet(swerve.angleSysIdRoutine));
 			autoChooser.addOption("sysid shooter", sysIdTestSet(shooter.sysIdRoutine));
+
+			vision.setPriorityId(7);
 		}
 
 		// shouldn't require tuningMode as we might run it randomly in comp
@@ -139,32 +149,55 @@ public class RobotContainer {
 	 * joysticks}.
 	 */
 	private void configureBindings() {
+		// *DRIVER CONTROLS*
+		//
 		var teleopSwerve = new TeleopSwerve(
 			() -> -driverController.getLeftY(),
 			() -> -driverController.getLeftX(),
 			() -> -driverController.getRightX(),
-			driverController.getHID()::getLeftBumper, // override speed
-			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // preceise mode
+			() -> false, // no overdrive functionality
+			// driverController.getHID()::getLeftBumper, // override speed
+			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // precise mode
 			swerve);
 		swerve.setDefaultCommand(teleopSwerve);
 
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
-		// driverController.rightBumper()
-		// .whileTrue(teleopSwerve.holdRotateAroundPiece());
-
+		// right bumper -> rotate to speaker apriltag
+		// driverController.rightBumper().whileTrue(new AprilTagVision(vision, swerve));
+		// left bumper -> rotate to note
+		driverController.leftBumper().whileTrue(new GamePieceVision(vision, swerve));
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
+		// b -> trap/climb align maybe?
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 
-		// operatorController.y().onTrue(new SetShooterVelocity(shooter, shooterVelocity));
-		operatorController.x().onTrue(new StopShooter(shooter));
-		operatorController.rightBumper().whileTrue(new SetIntakeSpeed(intake, false));
-		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
+		// dpad left -> call for coopertition (lights)
+		// dpad right -> call for amplify (lights)
 
+		// *OPERATOR CONTROLS*
+		//
+		operatorController.a()
+			.onTrue(Commands.parallel(new SetArmPosition(arm, 84), new SetShooterVelocity(shooter, 1750)));
+		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, -1.5),
+			new SetShooterVelocity(shooter, ShooterConstants.subwooferVelocity_rpm)));
+		operatorController.x().onTrue(new StopShooter(shooter));
+		// y -> set shooter speed and arm angle based on limelight
+		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
+		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 84));
+		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
+		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
+		// dpad up -> climber up
+		// dpad down -> climber down
+
+		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
+		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));
+
+		// *TESTING CONTROLS*
+		//
 		// When in tuning mode, create multiple testing options on shuffleboard as well as bind commands to a unique
 		// 'testing' controller
-		if (tuningMode) {
+		if (Constants.tuningMode) {
 			var indexSpeedEntry = Shuffleboard.getTab("Test").add("Index Speed", 0)
 				.withWidget(BuiltInWidgets.kNumberSlider)
 				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
@@ -175,19 +208,30 @@ public class RobotContainer {
 				.withWidget(BuiltInWidgets.kNumberSlider)
 				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
 			var shooterVelocityEntry = Shuffleboard.getTab("Test").add("Shooter Velocity", 0).getEntry();
+			var armPositionEntry = Shuffleboard.getTab("Test").add("Arm Position (degrees)", 0).getEntry();
 
 			testController.x().onTrue(new StopShooter(shooter));
+			testController.y()
+				.onTrue(Commands.runOnce(() -> arm.setPosition(armPositionEntry.getDouble(boolTriggerThreshold)), arm));
 			testController.b()
 				.onTrue(new InstantCommand(() -> shooter.setVelocity(shooterVelocityEntry.getDouble(0)), shooter));
 			testController.a()
 				.onTrue(new InstantCommand(() -> shooter.setPercentOutput(shooterSpeedEntry.getDouble(0)), shooter));
+
 			testController.rightBumper()
 				.whileTrue(Commands
-					.runEnd(() -> intake.setMotorVoltage(intakeSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(), intake)
+					.runEnd(() -> intake.setMotorSpeed(intakeSpeedEntry.getDouble(0)), () -> intake.stopMotor(), intake)
 					.until(() -> intake.inputs.noteSensor).unless(() -> intake.inputs.noteSensor));
 			testController.leftBumper().whileTrue(
-				new StartEndCommand(() -> intake.setMotorVoltage(indexSpeedEntry.getDouble(0) * 12), () -> intake.stopMotor(),
+				new StartEndCommand(() -> intake.setMotorSpeed(indexSpeedEntry.getDouble(0)), () -> intake.stopMotor(),
 					intake));
+
+			testController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
+			testController.rightStick().whileTrue(new ManualArmControl(arm, testController::getLeftY));
+
+			testController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kForward), arm));
+			testController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kReverse), arm));
+			testController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kOff), arm));
 		}
 	}
 
