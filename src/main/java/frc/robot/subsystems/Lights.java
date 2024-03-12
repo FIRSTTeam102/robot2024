@@ -1,63 +1,33 @@
-// Copyright (c) FIRST and other WPILib contributors.
+
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems;
 
-import frc.robot.constants.LightsConstants;
+import frc.robot.constants.LightsConstants.Mode;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.DigitalOutput;
 
-public class Lights extends SubsystemBase {
-	private DigitalInput firstlightInput = new DigitalInput(LightsConstants.firstLightInputPin);
-	private DigitalInput secondlightInput = new DigitalInput(LightsConstants.secondLightInputPin);
-	private DigitalInput threeDigitalInput = new DigitalInput(LightsConstants.thirdLightInputPin);
+import org.littletonrobotics.junction.Logger;
 
-	public static boolean[] lightArray = new boolean[8]; // The array that will be used for lights
+import java.util.BitSet;
+
+public class Lights {
+	private static DigitalOutput[] pins = {
+		new DigitalOutput(1),
+		new DigitalOutput(2),
+		new DigitalOutput(3),
+		new DigitalOutput(4)
+	};
 
 	public Lights() {}
 
-	@Override
-	public void periodic() { // optimise to escape as soon as it hits a true
-		if (Lights.lightArray[LightsConstants.orderAmplify] == true) {
-			// send arduino byte
-		}
-		if (Lights.lightArray[LightsConstants.orderCoop] == true) {
-			// send arduino byte
-		}
-		if (Lights.lightArray[LightsConstants.orderIntake] == true) {
-			// send arduino byte
-		}
-		if (Lights.lightArray[LightsConstants.shooterSpunUp] == true) {
-			// send arduino byte
-		}
-		if (Lights.lightArray[LightsConstants.noteClaimed] == true) {
-			// send arduino byte
-		}
-		if (Lights.lightArray[LightsConstants.noteShot] == true) {
-			// send arduino byte
+	public static void setStatus(Mode mode) {
+		int code = mode.getCode();
+		BitSet bits = BitSet.valueOf(new byte[] {(byte) code});
+		for (int i = 0; i <= 3; i++) {
+			pins[i].set(bits.get(i));
 		}
 
-	}
-
-	public void sendByte(boolean firstDigit, boolean secondDigit, boolean thirdDigit) {
-		firstlightInput = firstDigit; // why doesn't this work
-	}
-
-	public void callCoop(boolean called) {
-		if (called) { // no need to check since it's a boolean. It's automatically assumed true
-			Lights.lightArray[LightsConstants.orderCoop] = true;
-		} else {
-			Lights.lightArray[LightsConstants.orderCoop] = false;
-		}
-	}
-
-	public void callAmplify(boolean called) {
-		if (called) { // no need to check since it's a boolean. It's automatically assumed true
-			Lights.lightArray[LightsConstants.orderAmplify] = true;
-		} else {
-			Lights.lightArray[LightsConstants.orderAmplify] = false;
-		}
+		Logger.recordOutput("Lights/CurrentStatus", mode);
 	}
 }

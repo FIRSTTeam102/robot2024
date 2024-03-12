@@ -4,16 +4,18 @@
 
 package frc.robot.constants;
 
-public class LightsConstants {
-	public static final char firstLightInputPin = 5000;
-	public static final char secondLightInputPin = 5000;
-	public static final char thirdLightInputPin = 5000;
+import lombok.Getter;
 
-	public static final char orderAmplify = 0;
-	public static final char orderCoop = 1;
-	public static final char orderIntake = 2;
-	public static final char shooterSpunUp = 3;
-	public static final char noteClaimed = 4;
-	public static final char noteShot = 5;
+public final class LightsConstants {
+	public enum Mode {
+		Shooting(0), Intaking(1), Disabled(2), Auto(3), We_can_shoot(4), TeleopRED(5), TeleopBLUE(6), Climb(
+			7), We_have_a_note(8);
 
+		@Getter
+		private final int code;
+
+		private Mode(int code) {
+			this.code = code;
+		}
+	}
 }

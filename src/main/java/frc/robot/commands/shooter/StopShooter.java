@@ -1,7 +1,5 @@
 package frc.robot.commands.shooter;
 
-import frc.robot.constants.LightsConstants;
-import frc.robot.subsystems.Lights;
 import frc.robot.subsystems.Shooter;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,8 +16,6 @@ public class StopShooter extends Command {
 	@Override
 	public void initialize() {
 		shooter.stop();
-		Lights.lightArray[LightsConstants.shooterSpunUp] = false;
-		Lights.lightArray[LightsConstants.noteShot] = true;
 
 	}
 
