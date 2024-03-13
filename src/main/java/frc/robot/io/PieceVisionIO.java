@@ -55,11 +55,8 @@ public class PieceVisionIO {
 	private NetworkTableEntry clEntry = table.getEntry("cl");
 	private NetworkTableEntry tlEntry = table.getEntry("tl");
 
-	private NetworkTableEntry targetspaceEntry = table.getEntry("targetspace");
+	private NetworkTableEntry targetspaceEntry = table.getEntry("botpose_targetspace");
 	private double[] targetspaceCache = new double[6]; // array that will hold all the positions
-
-	private NetworkTableEntry botpose_wpiblueEntry = table.getEntry("botpose_wpiblue");
-	private double[] botpose_wpiblueCache = new double[7];
 
 	public void updateInputs(PieceVisionIOInputs inputs) {
 		inputs.pipeline = pipelineEntry.getNumber(inputs.pipeline).intValue();
@@ -70,7 +67,7 @@ public class PieceVisionIO {
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);
 
 		targetspaceCache = targetspaceEntry.getDoubleArray(targetspaceCache);
-		if (targetspaceCache.length > 0) {
+		if (targetspaceCache.length > 1) {
 			inputs.targetspaceTranslationX_m = targetspaceCache[0];
 			inputs.targetspaceTranslationY_m = targetspaceCache[1];
 			inputs.targetspaceTranslationZ_m = targetspaceCache[2];
@@ -79,19 +76,5 @@ public class PieceVisionIO {
 			inputs.targetspaceRotationZ_rad = Math.toRadians(targetspaceCache[5]);
 		} else
 			DriverStation.reportWarning("invalid targetspace array from limelight", true);
-
-		if (botpose_wpiblueCache.length > 0) {
-			botpose_wpiblueCache = botpose_wpiblueEntry.getDoubleArray(botpose_wpiblueCache);
-			inputs.fieldspaceTranslationX_m = botpose_wpiblueCache[0];
-			inputs.fieldspaceTranslationY_m = botpose_wpiblueCache[1];
-			inputs.fieldspaceTranslationZ_m = botpose_wpiblueCache[2];
-			inputs.fieldspaceRotationX_rad = Math.toRadians(botpose_wpiblueCache[3]);
-			inputs.fieldspaceRotationY_rad = Math.toRadians(botpose_wpiblueCache[4]);
-			inputs.fieldspaceRotationZ_rad = Math.toRadians(botpose_wpiblueCache[5]);
-			inputs.fieldspaceTotalLatency_s = botpose_wpiblueCache[6] / 1000;
-		} else {
-			DriverStation.reportWarning("(Piece Vision)invalid wpiblue array from limelight", true);
-			inputs.fieldspaceTotalLatency_s = (tlEntry.getDouble(0) - clEntry.getDouble(0)) / 1000;
-		}
 	}
 }

@@ -6,6 +6,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.ScoringConstants.ScoringPosition;
 import frc.robot.constants.ShooterConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
@@ -23,7 +24,7 @@ import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.intake.IntakeWithArm;
 import frc.robot.commands.intake.SetIntakeSpeed;
-import frc.robot.commands.shooter.SetShooterVelocity;
+import frc.robot.commands.scoring.SetScoringPosition;
 import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
@@ -98,7 +99,7 @@ public class RobotContainer {
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("XStance", new XStance(swerve));
 		NamedCommands.registerCommand("AimAndShoot",
-			Commands.print("aiming and shooting").andThen(Commands.waitSeconds(1)));
+			(new SetArmPosition(arm, 5)).andThen(Commands.print("arm moving to shooting position and shooting")));
 		NamedCommands.registerCommand("Intake", Commands.print("arm to intaking position & rollers running"));
 		NamedCommands.registerCommand("WaitIntake",
 			Commands.print("wait for intake note sensor").andThen(Commands.waitSeconds(1)));
@@ -178,17 +179,18 @@ public class RobotContainer {
 		// *OPERATOR CONTROLS*
 		//
 		operatorController.a()
-			.onTrue(Commands.parallel(new SetArmPosition(arm, 84), new SetShooterVelocity(shooter, 1750)));
-		operatorController.b().onTrue(Commands.parallel(new SetArmPosition(arm, -1.5),
-			new SetShooterVelocity(shooter, ShooterConstants.subwooferVelocity_rpm)));
+			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
+		operatorController.b()
+			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
 		operatorController.x().onTrue(new StopShooter(shooter));
-		// y -> set shooter speed and arm angle based on limelight
+		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 84));
 		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
-		// dpad up -> climber up
-		// dpad down -> climber down
+		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kForward), arm));
+		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kReverse), arm));
+		operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kOff), arm));
 
 		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
 		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));
@@ -218,7 +220,7 @@ public class RobotContainer {
 			testController.a()
 				.onTrue(new InstantCommand(() -> shooter.setPercentOutput(shooterSpeedEntry.getDouble(0)), shooter));
 
-			testController.rightBumper()
+			testController.leftTrigger(boolTriggerThreshold)
 				.whileTrue(Commands
 					.runEnd(() -> intake.setMotorSpeed(intakeSpeedEntry.getDouble(0)), () -> intake.stopMotor(), intake)
 					.until(() -> intake.inputs.noteSensor).unless(() -> intake.inputs.noteSensor));

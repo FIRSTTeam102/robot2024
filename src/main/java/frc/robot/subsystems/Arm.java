@@ -165,6 +165,6 @@ public class Arm extends SubsystemBase {
 	}
 
 	public boolean closeEnough() {
-		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, accuracyTolerance_deg);
+		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, 5);
 	}
 }

@@ -42,9 +42,9 @@ public final class SwerveConstants {
 	public static final double angleRampTime_s = 0.5;
 	public static final boolean angleEncoderInverted = false;
 
-	public static final double maxVelocity_mps = 5676 /* NEO max RPM */
+	public static final double maxVelocity_mps = 4704 /* NEO max RPM */
 		/ 60.0 / driveGearRatio * wheelCircumference_m;
-	public static final double maxAngularVelocity_radps = 5676 /* NEO max RPM */
+	public static final double maxAngularVelocity_radps = 4704 /* NEO max RPM */
 		/ 60.0 / angleGearRatio / Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
 
 	// calculated with choreo, todo: see if empirical can match these
