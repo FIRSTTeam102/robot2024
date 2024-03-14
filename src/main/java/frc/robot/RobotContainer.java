@@ -25,6 +25,7 @@ import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.intake.IntakeWithArm;
 import frc.robot.commands.intake.SetIntakeSpeed;
 import frc.robot.commands.scoring.SetScoringPosition;
+import frc.robot.commands.shooter.SetShooterVelocity;
 import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
@@ -118,7 +119,7 @@ public class RobotContainer {
 			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
 			.withSize(5, 4).withPosition(4, 5).withWidget(Alert.widgetName);
-		driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.11:5800/stream.mjpg"))
+		driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.12:5800/stream.mjpg"))
 			.withProperties(Map.of("show crosshair", false, "show controls", false))
 			.withWidget(BuiltInWidgets.kCameraStream)
 			.withSize(11, 5)
@@ -138,6 +139,7 @@ public class RobotContainer {
 		// shouldn't require tuningMode as we might run it randomly in comp
 		// needs to run when disabled so motors don't run
 		SmartDashboard.putData("swerve angle calibration", new SwerveAngleOffsetCalibration(swerve));
+		SmartDashboard.putData("Clean Motor", new SetShooterVelocity(shooter, 1500));
 	}
 
 	/**
@@ -182,7 +184,7 @@ public class RobotContainer {
 			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
 		operatorController.b()
 			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
-		operatorController.x().onTrue(new StopShooter(shooter));
+		operatorController.x().onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(4, 0)));
 		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 84));
@@ -250,11 +252,11 @@ public class RobotContainer {
 	private Command sysIdTestSet(SysIdRoutine routine) {
 		return Commands.sequence(
 			routine.quasistatic(SysIdRoutine.Direction.kForward),
-			Commands.waitSeconds(2),
+			Commands.waitSeconds(3),
 			routine.quasistatic(SysIdRoutine.Direction.kReverse),
-			Commands.waitSeconds(2),
+			Commands.waitSeconds(3),
 			routine.dynamic(SysIdRoutine.Direction.kForward),
-			Commands.waitSeconds(2),
+			Commands.waitSeconds(3),
 			routine.dynamic(SysIdRoutine.Direction.kReverse));
 	}
 

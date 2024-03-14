@@ -69,11 +69,11 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setPercentOutput(double speed) {
-		pidController.setReference(speed, ControlType.kDutyCycle, 0, 0);
+		pidController.setReference(speed * 12, ControlType.kVoltage, 0, 0);
 	}
 
 	public void stop() {
-		pidController.setReference(0, ControlType.kDutyCycle);
+		pidController.setReference(0, ControlType.kVoltage);
 	}
 
 	@Override
