@@ -57,6 +57,8 @@ public class Vision extends SubsystemBase {
 		double angle = -20 + (14.9 * distance) + (-.889 * Math.pow(distance, 2));
 		double speed = 2515 + (990 * distance) + (-473 * Math.pow(distance, 2)) + (79.4 * Math.pow(distance, 3));
 
+		Logger.recordOutput("Vision/targetPosition", new double[] {angle, speed});
+
 		return new ScoringPosition(angle, speed);
 	}
 
@@ -92,6 +94,8 @@ public class Vision extends SubsystemBase {
 			interpolationDistance);
 		double speed = MathUtil.interpolate(lowerPosition.shooterSpeed_rpm(), upperPosition.shooterSpeed_rpm(),
 			interpolationDistance);
+
+		Logger.recordOutput("Vision/targetPosition", new double[] {angle, speed});
 
 		return new ScoringPosition(angle, speed);
 	}

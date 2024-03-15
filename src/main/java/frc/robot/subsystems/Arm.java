@@ -7,6 +7,7 @@ import frc.robot.util.Math102;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.AbsoluteEncoder;
@@ -35,6 +36,8 @@ public class Arm extends SubsystemBase {
 	private AbsoluteEncoder shaftEncoder = leadMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
 
 	private ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
+
+	private Relay climberRelay = new Relay(0);
 
 	@Getter
 	@AutoLogOutput
@@ -150,6 +153,11 @@ public class Arm extends SubsystemBase {
 			feedforwardController.calculate(Units.degreesToRadians(inputs.shaftPosition_deg), 0));
 	}
 
+	public void setClimberRelay(Relay.Value value) {
+		climberRelay.set(value);
+		Logger.recordOutput("Arm/relaySetting", value);
+	}
+
 	public void stop() {
 		pidController.setReference(0, ControlType.kDutyCycle, 0,
 			feedforwardController.calculate(Units.degreesToRadians(inputs.shaftPosition_deg), 0));
@@ -157,6 +165,6 @@ public class Arm extends SubsystemBase {
 	}
 
 	public boolean closeEnough() {
-		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, accuracyTolerance_deg);
+		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, 5);
 	}
 }
