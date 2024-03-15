@@ -9,6 +9,7 @@ import frc.robot.util.VirtualSubsystem;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -38,6 +39,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
 	private Command autonomousCommand;
 	private RobotContainer robotContainer;
+
+	Alliance alliance;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -158,6 +161,13 @@ public class Robot extends LoggedRobot {
 		}
 
 		robotContainer.arm.setPosition(5);
+		alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue;
+
+		// for limelight shooting targeting
+		switch (alliance) {
+			case Red -> robotContainer.vision.setPriorityId(4);
+			case Blue -> robotContainer.vision.setPriorityId(7);
+		}
 	}
 
 	/** This function is called periodically during operator control. */
