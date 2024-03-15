@@ -21,6 +21,10 @@ public class Lights {
 
 	public Lights() {}
 
+	/**
+	 * Sends the desired mode to the lights arduino through the DIO pins
+	 * @param mode Desired lights mode
+	 */
 	public static void setStatus(Mode mode) {
 		int code = mode.getCode();
 		BitSet bits = BitSet.valueOf(new byte[] {(byte) code});

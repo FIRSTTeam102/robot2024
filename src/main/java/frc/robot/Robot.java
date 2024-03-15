@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.constants.Constants.*;
 
 import frc.robot.constants.BuildConstants;
+import frc.robot.constants.LightsConstants;
 import frc.robot.subsystems.Lights;
 import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
 import frc.robot.util.VirtualSubsystem;
@@ -43,7 +44,7 @@ public class Robot extends LoggedRobot {
 	private Command autonomousCommand;
 	private RobotContainer robotContainer;
 
-	Optional<Alliance> alliance = DriverStation.getAlliance();
+	Optional<Alliance> alliance;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -165,17 +166,19 @@ public class Robot extends LoggedRobot {
 		if (autonomousCommand != null) {
 			autonomousCommand.cancel();
 		}
+
+		alliance = DriverStation.getAlliance();
 	}
 
 	/** This function is called periodically during operator control. */
 	@Override
 	public void teleopPeriodic() {
-		if (alliance.get() == Alliance.Red) {
-			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.TeleopRED);
-		} else {
-			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.TeleopBLUE);
+		if (alliance.isPresent()) {
+			switch (alliance.get()) {
+				case Red -> Lights.setStatus(LightsConstants.Mode.TeleopRED);
+				case Blue -> Lights.setStatus(LightsConstants.Mode.TeleopBLUE);
+			}
 		}
-
 	}
 
 	@Override
