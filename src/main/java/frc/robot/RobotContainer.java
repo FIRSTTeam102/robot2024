@@ -175,7 +175,7 @@ public class RobotContainer {
 		// b -> trap/climb align maybe?
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
-		driverController.b().whileTrue(new AprilTagVision(vision, swerve));
+		driverController.rightBumper().whileTrue(new AprilTagVision(vision, swerve));
 
 		// dpad left -> call for coopertition (lights)
 		// dpad right -> call for amplify (lights)
