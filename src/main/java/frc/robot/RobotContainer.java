@@ -198,14 +198,14 @@ public class RobotContainer {
 
 		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
 		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));
-		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kForward), arm));
-		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kReverse), arm));
-		operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kOff), arm));
+
 		// *TESTING CONTROLS*
 		//
 		// When in tuning mode, create multiple testing options on shuffleboard as well as bind commands to a unique
 		// 'testing' controller
-		if (Constants.tuningMode) {
+		if (Constants.tuningMode)
+
+		{
 			var indexSpeedEntry = Shuffleboard.getTab("Test").add("Index Speed", 0)
 				.withWidget(BuiltInWidgets.kNumberSlider)
 				.withProperties(Map.of("min", -1, "max", 1)).getEntry();
