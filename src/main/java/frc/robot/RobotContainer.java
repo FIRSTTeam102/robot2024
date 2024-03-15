@@ -30,7 +30,6 @@ import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
-import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -175,7 +174,6 @@ public class RobotContainer {
 		// b -> trap/climb align maybe?
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
-		driverController.rightBumper().whileTrue(new AprilTagVision(vision, swerve));
 
 		// dpad left -> call for coopertition (lights)
 		// dpad right -> call for amplify (lights)
