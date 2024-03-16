@@ -30,6 +30,7 @@ import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
+import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -98,24 +99,11 @@ public class RobotContainer {
 
 		configureBindings();
 
-		// named commands must be registered before any paths are created
-		NamedCommands.registerCommand("XStance", new XStance(swerve));
-		NamedCommands.registerCommand("Speaker Setting",
-			new SetScoringPosition(arm, shooter, new ScoringPosition(4, ShooterConstants.subwooferVelocity_rpm)));
-		NamedCommands.registerCommand("WaitIntake", new IntakeWithArm(intake, arm));
-		NamedCommands.registerCommand("Arm Down", new SetArmPosition(arm, 4));
-		NamedCommands.registerCommand("Amp Setting", new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
-		NamedCommands.registerCommand("Slow Forward (DOES NOT CANCEL, DEADLINE WITH OTHER COMMANDS)",
-			Commands.startEnd(() -> swerve.drive(new Translation2d(.3, 0), 0, false), () -> swerve.stop(), swerve));
-		// create paths
 		autoChooser.addOption("nothing", Commands.none());
-		final List<String> autoNames = AutoBuilder.getAllAutoNames();
-		for (final String autoName : autoNames) {
-			final Command auto = new PathPlannerAuto(autoName);
-			autoChooser.addOption(autoName, auto);
-		}
 
 		final var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
+		var delayEntry = driveTab.add("Delay Auto?", false).withWidget(BuiltInWidgets.kToggleSwitch).withSize(3, 1)
+			.getEntry();
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
 			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
@@ -125,6 +113,29 @@ public class RobotContainer {
 			.withWidget(BuiltInWidgets.kCameraStream)
 			.withSize(11, 5)
 			.withPosition(0, 0);
+
+		// named commands must be registered before any paths are created
+		NamedCommands.registerCommand("OptDelay", Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0));
+		NamedCommands.registerCommand("XStance", new XStance(swerve));
+		NamedCommands.registerCommand("SpeakerAlign", new AprilTagVision(vision, swerve).withTimeout(1));
+		NamedCommands.registerCommand("SpeakerSetting",
+			new SetScoringPosition(arm, shooter, new ScoringPosition(4, ShooterConstants.subwooferVelocity_rpm)));
+		NamedCommands.registerCommand("LimelightSetting",
+			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_map));
+		NamedCommands.registerCommand("WaitIntake", new IntakeWithArm(intake, arm));
+		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
+		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
+		NamedCommands.registerCommand("AmpSetting", new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
+		NamedCommands.registerCommand("SlowForward",
+			Commands.startEnd(() -> swerve.drive(new Translation2d(.3, 0), 0, false), () -> swerve.stop(), swerve)
+				.withTimeout(1.5));
+		NamedCommands.registerCommand("ResetScoring", new SetScoringPosition(arm, shooter, new ScoringPosition(4, 0)));
+		// create paths
+		final List<String> autoNames = AutoBuilder.getAllAutoNames();
+		for (final String autoName : autoNames) {
+			final Command auto = new PathPlannerAuto(autoName);
+			autoChooser.addOption(autoName, auto);
+		}
 
 		if (Constants.tuningMode) {
 			tuningModeAlert.set(true);
@@ -168,7 +179,7 @@ public class RobotContainer {
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
 		// right bumper -> rotate to speaker apriltag
-		// driverController.rightBumper().whileTrue(new AprilTagVision(vision, swerve));
+		driverController.rightBumper().whileTrue(new AprilTagVision(vision, swerve));
 		// left bumper -> rotate to note
 		driverController.leftBumper().whileTrue(new GamePieceVision(vision, swerve));
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
@@ -185,15 +196,16 @@ public class RobotContainer {
 			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
 		operatorController.b()
 			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
-		operatorController.x().onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(4, 0)));
-		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
+		operatorController.x().onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(40, 0)));
+		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_map));
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
-		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 84));
+		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
 		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
 		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kForward), arm));
 		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kReverse), arm));
 		operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kOff), arm));
+		operatorController.povRight().onTrue(Commands.runOnce(() -> intake.resetNoteDetection()));
 
 		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
 		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));

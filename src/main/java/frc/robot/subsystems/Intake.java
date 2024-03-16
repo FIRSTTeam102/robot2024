@@ -4,6 +4,8 @@ import static frc.robot.constants.IntakeConstants.*;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -35,6 +37,8 @@ public class Intake extends SubsystemBase {
 		motor.enableVoltageCompensation(12);
 		motor.burnFlash();
 
+		Shuffleboard.getTab("drive").addBoolean("Holding Note?", () -> holdingNote).withWidget(BuiltInWidgets.kBooleanBox);
+
 	}
 
 	@Override
@@ -52,6 +56,11 @@ public class Intake extends SubsystemBase {
 	public void setMotorSpeed(double speed) {
 		speed = MathUtil.clamp(speed, -1, 1);
 		motor.setVoltage(speed * 12);
+	}
+
+	public void resetNoteDetection() {
+		holdingNote = false;
+		cachedNoteSensor = false;
 	}
 
 	@AutoLog

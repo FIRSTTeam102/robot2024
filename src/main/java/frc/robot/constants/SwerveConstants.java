@@ -48,10 +48,10 @@ public final class SwerveConstants {
 		/ 60.0 / angleGearRatio / Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
 
 	// calculated with choreo, todo: see if empirical can match these
-	public static final double theoreticalMaxVelocity_mps = 4.420;
-	public static final double theoreticalMaxAcceleration_mps2 = 27.971;
-	public static final double theoreticalMaxAngularVelocity_radps = 10.817;
-	public static final double theoreticalMaxAngularAcceleration_radps2 = 95.242;
+	public static final double theoreticalMaxVelocity_mps = 3.663;
+	public static final double theoreticalMaxAcceleration_mps2 = 11.697;
+	public static final double theoreticalMaxAngularVelocity_radps = 8.865;
+	public static final double theoreticalMaxAngularAcceleration_radps2 = 39.829;
 
 	/* drive motor PID values */
 	public static final double driveKp = 0.15138;

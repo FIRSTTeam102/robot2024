@@ -57,7 +57,8 @@ public class Vision extends SubsystemBase {
 		double angle = -20 + (14.9 * distance) + (-.889 * Math.pow(distance, 2));
 		double speed = 2515 + (990 * distance) + (-473 * Math.pow(distance, 2)) + (79.4 * Math.pow(distance, 3));
 
-		Logger.recordOutput("Vision/targetPosition", new double[] {angle, speed});
+		Logger.recordOutput("Vision/targetPosition_deg", angle);
+		Logger.recordOutput("Vision/targetPosition_rpm", speed);
 
 		return new ScoringPosition(angle, speed);
 	}

@@ -20,8 +20,8 @@ public class GamePieceVision extends Command {
 	private Swerve swerve;
 	private double robotRotate_radps;
 	private boolean isAligned;
-	private PIDController pidController = new PIDController(VisionConstants.gamePieceRotateKp, 0,
-		VisionConstants.gamePieceRotateKd);
+	private PIDController pidController = new PIDController(VisionConstants.visionRotateKp, 0,
+		VisionConstants.visionRotateKd);
 
 	/** Creates a new GamePieceVision. */
 	public GamePieceVision(Vision vision, Swerve swerve) {
