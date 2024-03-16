@@ -102,7 +102,10 @@ public class Swerve extends SubsystemBase {
 				new ReplanningConfig()),
 			() -> {
 				var alliance = DriverStation.getAlliance();
-				return alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+				if (alliance.isPresent()) {
+					return alliance.get() == DriverStation.Alliance.Red;
+				}
+				return false;
 			},
 			this);
 		Pathfinding.setPathfinder(new LocalADStarAK());
@@ -152,7 +155,7 @@ public class Swerve extends SubsystemBase {
 	 * (like at the start of an autonomous path)
 	 */
 	public void resetOdometry(Pose2d pose) {
-		poseEstimator.resetPosition(getYaw(), getPositions(), pose);
+		poseEstimator.resetPosition(getYaw().plus(Rotation2d.fromDegrees(Robot.isBlue() ? 0 : 180)), getPositions(), pose);
 	}
 
 	public void resetModuleOffsets() {
@@ -240,7 +243,8 @@ public class Swerve extends SubsystemBase {
 		Logger.recordOutput("Swerve/States", moduleStates);
 
 		// update odometry
-		poseEstimator.updateWithTime(timer.get(), getYaw(), modulePositions);
+		poseEstimator.updateWithTime(timer.get(), getYaw().plus(Rotation2d.fromDegrees(Robot.isBlue() ? 0 : 180)),
+			modulePositions);
 		var pose = poseEstimator.getEstimatedPosition();
 		translationY = pose.getY();
 		translationX = pose.getX();
@@ -258,8 +262,9 @@ public class Swerve extends SubsystemBase {
 			if (visionSeenCount > 2) { // The if statement is used to eliminate "hallucinations". Schizophrenic robot smh
 				var visionPose = new Pose2d(vision.fieldInputs.fieldspaceTranslationX_m,
 					vision.fieldInputs.fieldspaceTranslationY_m,
-					new Rotation2d(vision.fieldInputs.fieldspaceRotationX_rad)); // continuation of lines 259-261. Create a new
-																																				// pose2d
+					new Rotation2d(vision.fieldInputs.fieldspaceRotationX_rad)
+						.plus(Rotation2d.fromDegrees(Robot.isBlue() ? 0 : 180))); // continuation of lines 259-261. Create a new
+				// pose2d
 				// using X,Y and rotation
 				Logger.recordOutput("Odometry/VisionPose", visionPose); // log the odometry to advantage kit
 				var distance = Math.hypot( // use pythagorean theorem to find the distance from the last position

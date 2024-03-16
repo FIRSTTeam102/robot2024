@@ -101,6 +101,8 @@ public class Robot extends LoggedRobot {
 
 		if (!tuningMode)
 			PPLibTelemetry.enableCompetitionMode();
+
+		// robotContainer.swerve.zeroYaw();
 	}
 
 	/**
