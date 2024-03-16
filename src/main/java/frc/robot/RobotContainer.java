@@ -125,6 +125,7 @@ public class RobotContainer {
 		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);
 		NamedCommands.registerCommand("XStance", new XStance(swerve));
 		NamedCommands.registerCommand("SpeakerAlign", new AprilTagVision(vision, swerve).withTimeout(1));
+		NamedCommands.registerCommand("NoteAlign", new GamePieceVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("SpeakerSetting",
 			new SetScoringPosition(arm, shooter, new ScoringPosition(4, ShooterConstants.subwooferVelocity_rpm)));
 		NamedCommands.registerCommand("LimelightSetting",
