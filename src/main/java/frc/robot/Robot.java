@@ -3,6 +3,8 @@ package frc.robot;
 import static frc.robot.constants.Constants.*;
 
 import frc.robot.constants.BuildConstants;
+import frc.robot.constants.LightsConstants;
+import frc.robot.subsystems.Lights;
 import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
 import frc.robot.util.VirtualSubsystem;
 
@@ -128,11 +130,13 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void disabledInit() {
 		robotContainer.swerve.stop();
+		Lights.setStatus(LightsConstants.Mode.Disabled);
 	}
 
 	@Override
 	public void disabledPeriodic() {
 		robotContainer.updateOIAlert();
+
 	}
 
 	/** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -152,11 +156,15 @@ public class Robot extends LoggedRobot {
 			case Red -> robotContainer.vision.setPriorityId(4);
 			case Blue -> robotContainer.vision.setPriorityId(7);
 		}
+
+		Lights.setStatus(LightsConstants.Mode.Auto);
 	}
 
 	/** This function is called periodically during autonomous. */
 	@Override
-	public void autonomousPeriodic() {}
+	public void autonomousPeriodic() {
+
+	}
 
 	@Override
 	public void teleopInit() {
@@ -175,14 +183,22 @@ public class Robot extends LoggedRobot {
 
 		// for limelight shooting targeting
 		switch (alliance) {
-			case Red -> robotContainer.vision.setPriorityId(4);
-			case Blue -> robotContainer.vision.setPriorityId(7);
+			case Red -> {
+				robotContainer.vision.setPriorityId(4);
+				Lights.setStatus(LightsConstants.Mode.TeleopRED);
+			}
+			case Blue -> {
+				robotContainer.vision.setPriorityId(7);
+				Lights.setStatus(LightsConstants.Mode.TeleopBLUE);
+			}
 		}
 	}
 
 	/** This function is called periodically during operator control. */
 	@Override
-	public void teleopPeriodic() {}
+	public void teleopPeriodic() {
+
+	}
 
 	@Override
 	public void testInit() {
