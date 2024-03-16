@@ -32,6 +32,7 @@ import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.GamePieceVision;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -100,13 +101,13 @@ public class RobotContainer {
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("XStance", new XStance(swerve));
-		NamedCommands.registerCommand("AimAndShoot",
-			(new SetArmPosition(arm, 5)).andThen(Commands.print("arm moving to shooting position and shooting")));
-		NamedCommands.registerCommand("Intake", Commands.print("arm to intaking position & rollers running"));
-		NamedCommands.registerCommand("WaitIntake",
-			Commands.print("wait for intake note sensor").andThen(Commands.waitSeconds(1)));
-		NamedCommands.registerCommand("SafeArm", Commands.print("move arm to safe position inside frame"));
-
+		NamedCommands.registerCommand("Speaker Setting",
+			new SetScoringPosition(arm, shooter, new ScoringPosition(4, ShooterConstants.subwooferVelocity_rpm)));
+		NamedCommands.registerCommand("WaitIntake", new IntakeWithArm(intake, arm));
+		NamedCommands.registerCommand("Arm Down", new SetArmPosition(arm, 4));
+		NamedCommands.registerCommand("Amp Setting", new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
+		NamedCommands.registerCommand("Slow Forward (DOES NOT CANCEL, DEADLINE WITH OTHER COMMANDS)",
+			Commands.startEnd(() -> swerve.drive(new Translation2d(.3, 0), 0, false), () -> swerve.stop(), swerve));
 		// create paths
 		autoChooser.addOption("nothing", Commands.none());
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();

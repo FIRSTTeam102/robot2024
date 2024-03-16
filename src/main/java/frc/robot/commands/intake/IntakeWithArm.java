@@ -20,7 +20,7 @@ public class IntakeWithArm extends Command {
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		if (!intake.inputs.noteSensor) {
+		if (!intake.isHoldingNote()) {
 			arm.setPosition(-1.5);
 			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
 			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.Intaking);
@@ -41,6 +41,6 @@ public class IntakeWithArm extends Command {
 	// Returns true when the command should end.
 	@Override
 	public boolean isFinished() {
-		return intake.inputs.noteSensor;
+		return intake.isHoldingNote();
 	}
 }

@@ -43,7 +43,7 @@ public class Robot extends LoggedRobot {
 	private Command autonomousCommand;
 	private RobotContainer robotContainer;
 
-	Optional<Alliance> alliance = DriverStation.getAlliance();
+	Alliance alliance;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -147,6 +147,14 @@ public class Robot extends LoggedRobot {
 		if (autonomousCommand != null) {
 			autonomousCommand.schedule();
 		}
+    
+    alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue;
+
+		// for limelight shooting targeting
+		switch (alliance) {
+			case Red -> robotContainer.vision.setPriorityId(4);
+			case Blue -> robotContainer.vision.setPriorityId(7);
+		}
 	}
 
 	/** This function is called periodically during autonomous. */
@@ -167,12 +175,19 @@ public class Robot extends LoggedRobot {
 		}
 
 		robotContainer.arm.setPosition(5);
+		alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue;
+
+		// for limelight shooting targeting
+		switch (alliance) {
+			case Red -> robotContainer.vision.setPriorityId(4);
+			case Blue -> robotContainer.vision.setPriorityId(7);
+		}
 	}
 
 	/** This function is called periodically during operator control. */
 	@Override
 	public void teleopPeriodic() {
-		if (alliance.get() == Alliance.Red) {
+		if (alliance == Alliance.Red) {
 			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.TeleopRED);
 		} else {
 			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.TeleopBLUE);

@@ -62,6 +62,6 @@ public class SetIntakeSpeed extends Command {
 	public boolean isFinished() {
 		// If we are intaking and we detect a note, cancel automatically. If we are indexing, the command will only be
 		// canceled on interrupt
-		return (!isIndexing && intake.inputs.noteSensor);
+		return (!isIndexing && intake.isHoldingNote());
 	}
 }
