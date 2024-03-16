@@ -17,7 +17,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 import lombok.Getter;
-import lombok.Setter;
 
 public class Intake extends SubsystemBase {
 	private final CANSparkMax motor = new CANSparkMax(motorId, MotorType.kBrushless);
@@ -25,10 +24,8 @@ public class Intake extends SubsystemBase {
 	private final DigitalInput noteSensor = new DigitalInput(sensorId);
 
 	@Getter
-	@Setter
 	@AutoLogOutput
 	private boolean holdingNote = false;
-
 	private boolean cachedNoteSensor = false;
 
 	public Intake() {
@@ -58,9 +55,20 @@ public class Intake extends SubsystemBase {
 		motor.setVoltage(speed * 12);
 	}
 
+	/**
+	 * Manually set the note sensor and corresponding holding logic to a specific value
+	 * @param value
+	 */
+	public void resetNoteDetection(boolean value) {
+		holdingNote = value;
+		cachedNoteSensor = value;
+	}
+
+	/**
+	 * Default version of {@link Intake#resetNoteDetection(boolean)} with false as the default value.
+	 */
 	public void resetNoteDetection() {
-		holdingNote = false;
-		cachedNoteSensor = false;
+		resetNoteDetection(false);
 	}
 
 	@AutoLog

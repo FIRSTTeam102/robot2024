@@ -17,7 +17,6 @@ public class PieceVisionIO {
 	public static class PieceVisionIOInputs {
 		public int pipeline = 0;
 		public boolean hasTarget = false;
-		public int targetAprilTag = 0;
 
 		public double crosshairToTargetErrorX_rad = 0.0;
 		public double crosshairToTargetErrorY_rad = 0.0;
@@ -46,7 +45,6 @@ public class PieceVisionIO {
 
 	private NetworkTableEntry pipelineEntry = table.getEntry("pipeline");
 	private NetworkTableEntry tvEntry = table.getEntry("tv");
-	private NetworkTableEntry tidEntry = table.getEntry("tid");
 
 	private NetworkTableEntry txEntry = table.getEntry("tx");
 	private NetworkTableEntry tyEntry = table.getEntry("ty");
@@ -61,7 +59,6 @@ public class PieceVisionIO {
 	public void updateInputs(PieceVisionIOInputs inputs) {
 		inputs.pipeline = pipelineEntry.getNumber(inputs.pipeline).intValue();
 		inputs.hasTarget = tvEntry.getDouble(0) == 1;
-		inputs.targetAprilTag = tidEntry.getNumber(inputs.targetAprilTag).intValue();
 		inputs.crosshairToTargetErrorX_rad = Math.toRadians(txEntry.getDouble(inputs.crosshairToTargetErrorX_rad));
 		inputs.crosshairToTargetErrorY_rad = Math.toRadians(tyEntry.getDouble(inputs.crosshairToTargetErrorY_rad));
 		inputs.targetArea = taEntry.getDouble(inputs.targetArea);

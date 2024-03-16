@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3126474618832242,
-      "y": 5.567087649501998
+      "x": 1.3126474618911743,
+      "y": 5.567087650299072
     },
-    "rotation": 3.2524999489111804e-11
+    "rotation": -8.345126428911687e-30
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "OptDelay"
+            "name": "Options"
           }
         },
         {
@@ -38,31 +38,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2piece.1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "WaitIntake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "LimelightSetting"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Index"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ResetScoring"
+            "pathName": "exit center.1"
           }
         }
       ]

@@ -7,10 +7,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 public final class SwerveConstants {
 	// FL, FR, BL, BR (matches AdvantageScope convention)
 	public static final SwerveModuleConstants moduleConstants[] = {
-		new SwerveModuleConstants(21, 22, .705),
-		new SwerveModuleConstants(23, 24, 1.714),
-		new SwerveModuleConstants(25, 26, 3.406),
-		new SwerveModuleConstants(27, 28, 2.893)
+		new SwerveModuleConstants(21, 22, .695),
+		new SwerveModuleConstants(23, 24, 1.775),
+		new SwerveModuleConstants(25, 26, 3.369),
+		new SwerveModuleConstants(27, 28, 2.863)
 	};
 
 	// the left-to-right distance between the drivetrain wheels, should be measured from center to center
@@ -42,9 +42,9 @@ public final class SwerveConstants {
 	public static final double angleRampTime_s = 0.5;
 	public static final boolean angleEncoderInverted = false;
 
-	public static final double maxVelocity_mps = 4704 /* NEO max RPM */
+	public static final double maxVelocity_mps = 5650 /* NEO max RPM */
 		/ 60.0 / driveGearRatio * wheelCircumference_m;
-	public static final double maxAngularVelocity_radps = 4704 /* NEO max RPM */
+	public static final double maxAngularVelocity_radps = 5650 /* NEO max RPM */
 		/ 60.0 / angleGearRatio / Math.hypot(trackWidth_m / 2.0, wheelBase_m / 2.0);
 
 	// calculated with choreo, todo: see if empirical can match these

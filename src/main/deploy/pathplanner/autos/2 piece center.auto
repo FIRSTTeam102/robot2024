@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.29,
-      "y": 5.57
+      "x": 1.3126474618832242,
+      "y": 5.567087649501998
     },
-    "rotation": 0.0
+    "rotation": 3.2524999489111804e-11
   },
   "command": {
     "type": "sequential",
@@ -14,13 +14,25 @@
         {
           "type": "named",
           "data": {
-            "name": "AimAndShoot"
+            "name": "Options"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Intake"
+            "name": "SpeakerSetting"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Index"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetScoring"
           }
         },
         {
@@ -36,20 +48,26 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "2piece.2"
+            "name": "LimelightSetting"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "AimAndShoot"
+            "name": "Index"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetScoring"
           }
         }
       ]
     }
   },
   "folder": null,
-  "choreoAuto": false
+  "choreoAuto": true
 }

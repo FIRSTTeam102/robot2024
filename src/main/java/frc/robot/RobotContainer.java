@@ -103,7 +103,10 @@ public class RobotContainer {
 
 		final var driveTab = Shuffleboard.getTab(ShuffleboardConstants.driveTab);
 		var delayEntry = driveTab.add("Delay Auto?", false).withWidget(BuiltInWidgets.kToggleSwitch).withSize(3, 1)
+			.withPosition(0, 6)
 			.getEntry();
+		var noteStartEntry = driveTab.add("Starting with Note?", false).withWidget(BuiltInWidgets.kToggleSwitch)
+			.withSize(3, 1).withPosition(0, 7).getEntry();
 		driveTab.add("auto routine", autoChooser.getSendableChooser())
 			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
@@ -114,22 +117,27 @@ public class RobotContainer {
 			.withSize(11, 5)
 			.withPosition(0, 0);
 
+		Command shuffleboardAutoOptions = Commands.parallel(
+			Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0),
+			Commands.runOnce(() -> intake.resetNoteDetection(true)));
+
 		// named commands must be registered before any paths are created
-		NamedCommands.registerCommand("OptDelay", Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0));
+		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);
 		NamedCommands.registerCommand("XStance", new XStance(swerve));
 		NamedCommands.registerCommand("SpeakerAlign", new AprilTagVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("SpeakerSetting",
 			new SetScoringPosition(arm, shooter, new ScoringPosition(4, ShooterConstants.subwooferVelocity_rpm)));
 		NamedCommands.registerCommand("LimelightSetting",
-			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_map));
-		NamedCommands.registerCommand("WaitIntake", new IntakeWithArm(intake, arm));
+			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
+		NamedCommands.registerCommand("WaitIntake",
+			new IntakeWithArm(intake, arm).beforeStarting(() -> intake.resetNoteDetection(), intake));
 		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
 		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
 		NamedCommands.registerCommand("AmpSetting", new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
 		NamedCommands.registerCommand("SlowForward",
 			Commands.startEnd(() -> swerve.drive(new Translation2d(.3, 0), 0, false), () -> swerve.stop(), swerve)
 				.withTimeout(1.5));
-		NamedCommands.registerCommand("ResetScoring", new SetScoringPosition(arm, shooter, new ScoringPosition(4, 0)));
+		NamedCommands.registerCommand("ResetScoring", new SetScoringPosition(arm, shooter, new ScoringPosition(40, 0)));
 		// create paths
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();
 		for (final String autoName : autoNames) {
@@ -197,15 +205,17 @@ public class RobotContainer {
 		operatorController.b()
 			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
 		operatorController.x().onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(40, 0)));
-		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_map));
+		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
 		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
 		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kForward), arm));
 		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kReverse), arm));
-		operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kOff), arm));
+		// operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Value.kOff), arm));
 		operatorController.povRight().onTrue(Commands.runOnce(() -> intake.resetNoteDetection()));
+
+		operatorController.start().toggleOnTrue(Commands.startEnd(() -> arm.setMotorVoltage(-3.7), () -> arm.stop(), arm));
 
 		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
 		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));

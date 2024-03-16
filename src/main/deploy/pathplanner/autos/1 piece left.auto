@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3126474618911743,
-      "y": 5.567087650299072
+      "x": 0.7669039964675903,
+      "y": 6.639083385467529
     },
-    "rotation": -9.463536699418992e-30
+    "rotation": 57.72434388873349
   },
   "command": {
     "type": "sequential",
@@ -14,7 +14,7 @@
         {
           "type": "named",
           "data": {
-            "name": "OptDelay"
+            "name": "Options"
           }
         },
         {
@@ -38,7 +38,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "exit.1"
+            "pathName": "2 piece left.3"
           }
         }
       ]

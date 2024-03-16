@@ -1,0 +1,85 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7669039964675903,
+      "y": 6.639083385467529
+    },
+    "rotation": 57.72434388873349
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Options"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerSetting"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Index"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetScoring"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 piece left.1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitIntake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 piece left.2"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerSetting"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Index"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetScoring"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 piece left.3"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}
