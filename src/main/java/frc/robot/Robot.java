@@ -3,6 +3,7 @@ package frc.robot;
 import static frc.robot.constants.Constants.*;
 
 import frc.robot.constants.BuildConstants;
+import frc.robot.constants.LightsConstants;
 import frc.robot.subsystems.Lights;
 import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
 import frc.robot.util.VirtualSubsystem;
@@ -29,8 +30,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-
-import java.util.Optional;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -130,12 +129,13 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void disabledInit() {
 		robotContainer.swerve.stop();
+		Lights.setStatus(LightsConstants.Mode.Disabled);
 	}
 
 	@Override
 	public void disabledPeriodic() {
 		robotContainer.updateOIAlert();
-		Lights.setStatus(frc.robot.constants.LightsConstants.Mode.Disabled);
+
 	}
 
 	/** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -147,20 +147,22 @@ public class Robot extends LoggedRobot {
 		if (autonomousCommand != null) {
 			autonomousCommand.schedule();
 		}
-    
-    alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue;
+
+		alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue;
 
 		// for limelight shooting targeting
 		switch (alliance) {
 			case Red -> robotContainer.vision.setPriorityId(4);
 			case Blue -> robotContainer.vision.setPriorityId(7);
 		}
+
+		Lights.setStatus(LightsConstants.Mode.Auto);
 	}
 
 	/** This function is called periodically during autonomous. */
 	@Override
 	public void autonomousPeriodic() {
-		Lights.setStatus(frc.robot.constants.LightsConstants.Mode.Auto);
+
 	}
 
 	@Override
@@ -179,19 +181,20 @@ public class Robot extends LoggedRobot {
 
 		// for limelight shooting targeting
 		switch (alliance) {
-			case Red -> robotContainer.vision.setPriorityId(4);
-			case Blue -> robotContainer.vision.setPriorityId(7);
+			case Red -> {
+				robotContainer.vision.setPriorityId(4);
+				Lights.setStatus(LightsConstants.Mode.TeleopRED);
+			}
+			case Blue -> {
+				robotContainer.vision.setPriorityId(7);
+				Lights.setStatus(LightsConstants.Mode.TeleopBLUE);
+			}
 		}
 	}
 
 	/** This function is called periodically during operator control. */
 	@Override
 	public void teleopPeriodic() {
-		if (alliance == Alliance.Red) {
-			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.TeleopRED);
-		} else {
-			Lights.setStatus(frc.robot.constants.LightsConstants.Mode.TeleopBLUE);
-		}
 
 	}
 

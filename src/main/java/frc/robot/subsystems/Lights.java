@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 import frc.robot.constants.LightsConstants.Mode;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
+import edu.wpi.first.wpilibj.DriverStation;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -29,5 +30,24 @@ public class Lights {
 		}
 
 		Logger.recordOutput("Lights/CurrentStatus", mode);
+	}
+
+	public static void setDefaultStatus() {
+		if (DriverStation.isDisabled()) {
+			setStatus(Mode.Disabled);
+			return;
+		}
+		if (DriverStation.isAutonomous()) {
+			setStatus(Mode.Auto);
+			return;
+		}
+
+		var alliance = DriverStation.getAlliance();
+		if (alliance.isPresent()) {
+			switch (alliance.get()) {
+				case Red -> setStatus(Mode.TeleopRED);
+				case Blue -> setStatus(Mode.TeleopBLUE);
+			}
+		}
 	}
 }
