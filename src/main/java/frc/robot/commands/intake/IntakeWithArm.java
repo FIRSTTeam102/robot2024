@@ -1,8 +1,10 @@
 package frc.robot.commands.intake;
 
 import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.LightsConstants;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Lights;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -22,6 +24,7 @@ public class IntakeWithArm extends Command {
 		if (!intake.isHoldingNote()) {
 			arm.setPosition(-1.5);
 			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
+			Lights.setStatus(LightsConstants.Mode.Intaking);
 		}
 	}
 
@@ -34,6 +37,7 @@ public class IntakeWithArm extends Command {
 	public void end(boolean interrupted) {
 		arm.setPosition(4);
 		intake.stopMotor();
+		Lights.setDefaultStatus();
 	}
 
 	// Returns true when the command should end.
