@@ -1,0 +1,61 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3126474618911743,
+      "y": 5.567087650299072
+    },
+    "rotation": 0.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Options"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerSetting"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Index"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetScoring"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitUntilEnd"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "exit center.1"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}

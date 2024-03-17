@@ -41,7 +41,7 @@ public class IntakeWithArm extends Command {
 			arm.setPosition(4);
 		else
 			arm.setPosition(40);
-		Commands.waitSeconds(.02).andThen(intake::stopMotor, intake).schedule();
+		Commands.waitSeconds(.015).andThen(intake::stopMotor, intake).schedule();
 		Lights.setDefaultStatus();
 	}
 

@@ -1,14 +1,16 @@
 package frc.robot.subsystems;
 
-import static frc.robot.constants.Constants.tuningMode;
 import static frc.robot.constants.ShooterConstants.*;
 
+import frc.robot.constants.Constants;
 import frc.robot.util.AutoSetterTunableNumber;
 import frc.robot.util.SparkUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
@@ -38,12 +40,16 @@ public class Shooter extends SubsystemBase {
 	public Shooter() {
 		leadMotor.restoreFactoryDefaults();
 		followerMotor.restoreFactoryDefaults();
-		if (tuningMode) {
+		if (Constants.tuningMode) {
 			new AutoSetterTunableNumber("Shooter/kP", kP, (double value) -> pidController.setP(value));
 			new AutoSetterTunableNumber("Shooter/kD", kD, (double value) -> pidController.setD(value));
 
 			new AutoSetterTunableNumber("Shooter/setpoint", 0, (double value) -> setVelocity(value));
 		}
+
+		Shuffleboard.getTab("drive")
+			.addBoolean("Shooter at Target Speed?", () -> MathUtil.isNear(targetVelocity_rpm, inputs.leadVelocity_rpm, 50))
+			.withWidget(BuiltInWidgets.kBooleanBox);
 
 		pidController.setP(kP);
 		pidController.setI(0);
@@ -57,7 +63,7 @@ public class Shooter extends SubsystemBase {
 		followerMotor.follow(leadMotor);
 
 		// only fetch position when tuning
-		SparkUtil.setPeriodicFrames(leadMotor, true, true, tuningMode, false, false, false, false);
+		SparkUtil.setPeriodicFrames(leadMotor, true, true, Constants.tuningMode, false, false, false, false);
 		SparkUtil.setPeriodicFrames(followerMotor, false, false, false, false, false, false, false);
 		leadMotor.burnFlash();
 		followerMotor.burnFlash();

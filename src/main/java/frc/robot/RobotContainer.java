@@ -120,7 +120,7 @@ public class RobotContainer {
 
 		Command shuffleboardAutoOptions = Commands.parallel(
 			Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0),
-			Commands.runOnce(() -> intake.resetNoteDetection(true)));
+			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))));
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);
@@ -131,6 +131,7 @@ public class RobotContainer {
 			new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
 		NamedCommands.registerCommand("LimelightSetting",
 			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
+		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
 		NamedCommands.registerCommand("WaitIntake",
 			new IntakeWithArm(intake, arm).beforeStarting(() -> intake.resetNoteDetection(), intake));
 		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
@@ -210,7 +211,7 @@ public class RobotContainer {
 			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
 		operatorController.x().onTrue(
 			new SetScoringPosition(arm, shooter, new ScoringPosition(40, 0)).andThen(() -> intake.resetNoteDetection()));
-		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
+		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(1, 2950)));
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
 		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
