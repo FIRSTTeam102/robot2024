@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3126474618911743,
+      "x": 1.3126474618911605,
       "y": 5.567087650299072
     },
-    "rotation": 4.78577780999322e-30
+    "rotation": 5.013350972124652e-28
   },
   "command": {
     "type": "sequential",
@@ -15,6 +15,68 @@
           "type": "named",
           "data": {
             "name": "Options"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerSetting"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Index"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopShooter"
+          }
+        },
+        {
+          "type": "race",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "WaitIntake"
+                }
+              },
+              {
+                "type": "sequential",
+                "data": {
+                  "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "4 piece.1"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 3.0
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "4 piece.2"
           }
         },
         {
@@ -64,7 +126,7 @@
                     {
                       "type": "path",
                       "data": {
-                        "pathName": "2piece.1"
+                        "pathName": "4 piece.3"
                       }
                     }
                   ]
@@ -82,7 +144,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2piece.2"
+            "pathName": "4 piece.4"
           }
         },
         {

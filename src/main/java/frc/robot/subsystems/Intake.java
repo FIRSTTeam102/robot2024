@@ -34,7 +34,8 @@ public class Intake extends SubsystemBase {
 		motor.enableVoltageCompensation(12);
 		motor.burnFlash();
 
-		Shuffleboard.getTab("drive").addBoolean("Holding Note?", () -> holdingNote).withWidget(BuiltInWidgets.kBooleanBox);
+		Shuffleboard.getTab("drive").addBoolean("Holding Note?", this::isHoldingNote)
+			.withWidget(BuiltInWidgets.kBooleanBox);
 
 	}
 
@@ -74,8 +75,9 @@ public class Intake extends SubsystemBase {
 	@AutoLog
 	public static class IntakeIOInputs {
 		public double current_A = 0.0;
-		public double voltage_V = 0.0;
-		public double tempature_C = 0.0;
+		public double busVoltage_V = 0.0;
+		public double appliedVoltage_V = 0.0;
+		public double temperature_C = 0.0;
 		public double percentOutput = 0.0;
 		public boolean noteSensor = false;
 	}
@@ -84,8 +86,9 @@ public class Intake extends SubsystemBase {
 
 	public void updateInputs(IntakeIOInputs inputs) {
 		inputs.current_A = motor.getOutputCurrent();
-		inputs.voltage_V = motor.getBusVoltage();
-		inputs.tempature_C = motor.getMotorTemperature();
+		inputs.busVoltage_V = motor.getBusVoltage();
+		inputs.appliedVoltage_V = motor.getBusVoltage() * motor.getAppliedOutput();
+		inputs.temperature_C = motor.getMotorTemperature();
 		inputs.percentOutput = motor.getAppliedOutput();
 		inputs.noteSensor = !noteSensor.get();
 	}

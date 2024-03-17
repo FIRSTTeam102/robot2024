@@ -53,8 +53,8 @@ public class Arm extends SubsystemBase {
 
 		leadMotor.setSoftLimit(SoftLimitDirection.kForward, (float) (110 + shaftEncoderOffset_deg));
 		leadMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) (-1.5 + shaftEncoderOffset_deg));
-		leadMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
-		leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+		leadMotor.enableSoftLimit(SoftLimitDirection.kForward, false);
+		leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
 
 		followerMotor.restoreFactoryDefaults();
 		followerMotor.setIdleMode(IdleMode.kBrake);
@@ -68,7 +68,7 @@ public class Arm extends SubsystemBase {
 		// rev / sec * sec / min = RPM
 		shaftEncoder.setVelocityConversionFactor(60);
 		shaftEncoder.setInverted(true);
-		shaftEncoder.setZeroOffset(0);
+		shaftEncoder.setZeroOffset(348.9);
 
 		pidController.setFeedbackDevice(shaftEncoder);
 		// Smart motion applies a velocity and acceleration limiter as it travels to the target position. More info can be

@@ -6,7 +6,9 @@ import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Lights;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class IntakeWithArm extends Command {
 	private Intake intake;
@@ -35,8 +37,11 @@ public class IntakeWithArm extends Command {
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
-		arm.setPosition(40);
-		intake.stopMotor();
+		if (DriverStation.isAutonomous())
+			arm.setPosition(4);
+		else
+			arm.setPosition(40);
+		Commands.waitSeconds(.02).andThen(intake::stopMotor, intake).schedule();
 		Lights.setDefaultStatus();
 	}
 
