@@ -196,7 +196,6 @@ public class RobotContainer {
 		// left bumper -> rotate to note
 		// driverController.leftBumper().whileTrue(new GamePieceVision(vision, swerve));
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
-		driverController.b().onTrue(new SetShooterVelocity(shooter, 2250));
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 

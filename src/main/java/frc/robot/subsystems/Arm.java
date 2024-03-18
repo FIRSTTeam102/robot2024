@@ -53,8 +53,8 @@ public class Arm extends SubsystemBase {
 
 		leadMotor.setSoftLimit(SoftLimitDirection.kForward, (float) (110 + shaftEncoderOffset_deg));
 		leadMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) (-1.5 + shaftEncoderOffset_deg));
-		leadMotor.enableSoftLimit(SoftLimitDirection.kForward, false);
-		leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, false);
+		leadMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+		leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
 		followerMotor.restoreFactoryDefaults();
 		followerMotor.setIdleMode(IdleMode.kBrake);
