@@ -3,6 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 package frc.robot.subsystems;
 
+import frc.robot.constants.Constants;
 import frc.robot.constants.LightsConstants.Mode;
 
 import edu.wpi.first.wpilibj.DigitalOutput;
@@ -14,10 +15,10 @@ import java.util.BitSet;
 
 public class Lights {
 	private static DigitalOutput[] pins = {
-		new DigitalOutput(4),
-		new DigitalOutput(3),
+		new DigitalOutput(1),
 		new DigitalOutput(2),
-		new DigitalOutput(1)
+		new DigitalOutput(3),
+		new DigitalOutput(4)
 	};
 
 	public Lights() {}
@@ -26,6 +27,8 @@ public class Lights {
 		int code = mode.getCode();
 		BitSet bits = BitSet.valueOf(new byte[] {(byte) code});
 		for (int i = 0; i <= 3; i++) {
+			if (Constants.tuningMode)
+				Logger.recordOutput("Lights/bits_" + i, bits.get(i) ? 1 : 0);
 			pins[i].set(bits.get(i));
 		}
 
