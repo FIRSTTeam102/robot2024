@@ -15,10 +15,10 @@ import java.util.BitSet;
 
 public class Lights {
 	private static DigitalOutput[] pins = {
-		new DigitalOutput(1),
-		new DigitalOutput(2),
-		new DigitalOutput(3),
-		new DigitalOutput(4)
+		new DigitalOutput(1), // 13
+		new DigitalOutput(2), // 12
+		new DigitalOutput(3), // 11
+		new DigitalOutput(4) // 10
 	};
 
 	public Lights() {}
