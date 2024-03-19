@@ -35,6 +35,7 @@ import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
@@ -45,6 +46,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -296,5 +298,17 @@ public class RobotContainer {
 	public void updateOIAlert() {
 		driverControllerAlert.set(!driverController.getHID().isConnected()
 			|| driverController.getHID().getName().indexOf("Xbox") < 0);
+	}
+
+	private boolean cachedShooterAtTarget = false;
+
+	public void checkRumble() {
+		if (shooter.isAtTargetVelocity() && (shooter.isAtTargetVelocity() != cachedShooterAtTarget)) {
+			if (shooter.getTargetVelocity_rpm() > 400) {
+				Commands.startEnd(() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, .7),
+					() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, 0), new Subsystem[] {}).withTimeout(.5)
+					.schedule();
+			}
+		}
 	}
 }

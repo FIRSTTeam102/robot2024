@@ -37,6 +37,10 @@ public class Shooter extends SubsystemBase {
 	@AutoLogOutput
 	private double targetVelocity_rpm = 0.0;
 
+	@Getter
+	@AutoLogOutput
+	private boolean atTargetVelocity = false;
+
 	public Shooter() {
 		leadMotor.restoreFactoryDefaults();
 		followerMotor.restoreFactoryDefaults();
@@ -48,7 +52,7 @@ public class Shooter extends SubsystemBase {
 		}
 
 		Shuffleboard.getTab("drive")
-			.addBoolean("Shooter at Target Speed?", () -> MathUtil.isNear(targetVelocity_rpm, inputs.leadVelocity_rpm, 50))
+			.addBoolean("Shooter at Target Speed?", this::isAtTargetVelocity)
 			.withWidget(BuiltInWidgets.kBooleanBox);
 
 		pidController.setP(kP);
@@ -86,6 +90,8 @@ public class Shooter extends SubsystemBase {
 	public void periodic() {
 		updateInputs(inputs);
 		Logger.processInputs(getName(), inputs);
+
+		atTargetVelocity = MathUtil.isNear(targetVelocity_rpm, inputs.leadVelocity_rpm, 50);
 	}
 
 	@AutoLog
