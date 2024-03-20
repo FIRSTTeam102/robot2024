@@ -56,8 +56,8 @@ public class FieldVisionIO {
 	private NetworkTableEntry botpose_wpiblueEntry = table.getEntry("botpose_wpiblue");
 	private double[] botpose_wpiblueCache = new double[7];
 
-	private LinearFilter targetSpaceXFilter = LinearFilter.movingAverage(40);
-	private LinearFilter targetSpaceZFilter = LinearFilter.movingAverage(40);
+	private LinearFilter targetSpaceXFilter = LinearFilter.singlePoleIIR(.1, .02);
+	private LinearFilter targetSpaceZFilter = LinearFilter.singlePoleIIR(.1, .02);
 
 	public void updateInputs(FieldVisionIOInputs inputs) {
 		inputs.pipeline = pipelineEntry.getNumber(inputs.pipeline).intValue();

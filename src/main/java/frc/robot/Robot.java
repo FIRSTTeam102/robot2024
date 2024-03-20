@@ -3,14 +3,18 @@ package frc.robot;
 import static frc.robot.constants.Constants.*;
 
 import frc.robot.constants.BuildConstants;
+import frc.robot.constants.LightsConstants;
+import frc.robot.subsystems.Lights;
 import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
 import frc.robot.util.VirtualSubsystem;
 
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -38,6 +42,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 public class Robot extends LoggedRobot {
 	private Command autonomousCommand;
 	private RobotContainer robotContainer;
+
+	Alliance alliance;
 
 	/**
 	 * This function is run when the robot is first started up and should be used for any
@@ -95,6 +101,8 @@ public class Robot extends LoggedRobot {
 
 		if (!tuningMode)
 			PPLibTelemetry.enableCompetitionMode();
+
+		// robotContainer.swerve.zeroYaw();
 	}
 
 	/**
@@ -124,11 +132,13 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void disabledInit() {
 		robotContainer.swerve.stop();
+		Lights.setStatus(LightsConstants.Mode.Disabled);
 	}
 
 	@Override
 	public void disabledPeriodic() {
 		robotContainer.updateOIAlert();
+
 	}
 
 	/** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -140,11 +150,23 @@ public class Robot extends LoggedRobot {
 		if (autonomousCommand != null) {
 			autonomousCommand.schedule();
 		}
+
+		alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue;
+
+		// for limelight shooting targeting
+		switch (alliance) {
+			case Red -> robotContainer.vision.setPriorityId(4);
+			case Blue -> robotContainer.vision.setPriorityId(7);
+		}
+
+		Lights.setStatus(LightsConstants.Mode.Auto);
 	}
 
 	/** This function is called periodically during autonomous. */
 	@Override
-	public void autonomousPeriodic() {}
+	public void autonomousPeriodic() {
+
+	}
 
 	@Override
 	public void teleopInit() {
@@ -158,11 +180,27 @@ public class Robot extends LoggedRobot {
 		}
 
 		robotContainer.arm.setPosition(5);
+		robotContainer.arm.setClimberRelay(Value.kReverse);
+		alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue;
+
+		// for limelight shooting targeting
+		switch (alliance) {
+			case Red -> {
+				robotContainer.vision.setPriorityId(4);
+				Lights.setStatus(LightsConstants.Mode.TeleopRED);
+			}
+			case Blue -> {
+				robotContainer.vision.setPriorityId(7);
+				Lights.setStatus(LightsConstants.Mode.TeleopBLUE);
+			}
+		}
 	}
 
 	/** This function is called periodically during operator control. */
 	@Override
-	public void teleopPeriodic() {}
+	public void teleopPeriodic() {
+		robotContainer.checkRumble();
+	}
 
 	@Override
 	public void testInit() {

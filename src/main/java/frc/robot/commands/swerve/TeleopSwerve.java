@@ -71,12 +71,14 @@ public class TeleopSwerve extends Command {
 	private DoubleSupplier turnSupplier;
 	private BooleanSupplier overrideSpeedSupplier;
 	private BooleanSupplier preciseModeSupplier;
+	private BooleanSupplier superPreciseModeSupplier;
 
 	/**
 	 * @param overrideSpeedSupplier forces swerve to run at normal speed when held, instead of slow if scoring mechanism is out
 	 */
 	public TeleopSwerve(DoubleSupplier driveSupplier, DoubleSupplier strafeSupplier, DoubleSupplier turnSupplier,
 		BooleanSupplier overrideSpeedSupplier, BooleanSupplier preciseModeSupplier,
+		BooleanSupplier superPreciseModeSupplier,
 		Swerve swerve) {
 		addRequirements(swerve);
 		this.driveSupplier = driveSupplier;
@@ -84,6 +86,7 @@ public class TeleopSwerve extends Command {
 		this.turnSupplier = turnSupplier;
 		this.overrideSpeedSupplier = overrideSpeedSupplier;
 		this.preciseModeSupplier = preciseModeSupplier;
+		this.superPreciseModeSupplier = superPreciseModeSupplier;
 		this.swerve = swerve;
 	}
 
@@ -112,7 +115,10 @@ public class TeleopSwerve extends Command {
 			turnMaxPercent = driveMax * 0.9;
 		}
 
-		if (preciseModeSupplier.getAsBoolean()) {
+		if (superPreciseModeSupplier.getAsBoolean()) {
+			driveMax *= 0.1;
+			turnMaxPercent *= 0.15;
+		} else if (preciseModeSupplier.getAsBoolean()) {
 			driveMax *= 0.3;
 			turnMaxPercent *= 0.2;
 		}

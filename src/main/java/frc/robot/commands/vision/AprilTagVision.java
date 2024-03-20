@@ -8,6 +8,8 @@ import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.Swerve;
 import frc.robot.subsystems.Vision;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -23,11 +25,14 @@ public class AprilTagVision extends Command {
 	private Swerve swerve;
 	private boolean isAligned;
 	private double robotRotate_radps;
-	Optional<Alliance> alliance = DriverStation.getAlliance();
-	public double rotationalOffset = Math.atan2(VisionConstants.limelightXOffset, vision.findDistance()); // inverse
-																																																				// tangent
-																																																				// of
-																																																				// X/y
+	Optional<Alliance> alliance;
+	private PIDController pidController = new PIDController(VisionConstants.visionRotateKp, 0,
+		VisionConstants.visionRotateKd);
+
+	// public double rotationalOffset; // inverse
+	// tangent
+	// of
+	// X/y
 
 	public AprilTagVision(Vision vision, Swerve swerve) {
 		addRequirements(swerve);
@@ -38,11 +43,13 @@ public class AprilTagVision extends Command {
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		if (alliance.get() == Alliance.Blue) {
-			vision.setPriorityId(VisionConstants.blueSpeakerTag);
-		}
-		if (alliance.get() == Alliance.Red) {
-			vision.setPriorityId(VisionConstants.redSpeakerTag);
+		alliance = DriverStation.getAlliance();
+		// rotationalOffset = Math.atan2(VisionConstants.limelightXOffset, vision.findDistance());
+		if (alliance.isPresent()) {
+			switch (alliance.get()) {
+				case Red -> vision.setPriorityId(VisionConstants.redSpeakerTag);
+				case Blue -> vision.setPriorityId(VisionConstants.blueSpeakerTag);
+			}
 		}
 		robotRotate_radps = 0;
 		isAligned = false;
@@ -59,19 +66,26 @@ public class AprilTagVision extends Command {
 		}
 		Logger.recordOutput("Fieldvision/isAligned", isAligned);
 
-		if (vision.fieldInputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairGamePieceBoundRotateX_rad) {
-			robotRotate_radps = VisionConstants.AprilTagRotateKp
-				* vision.fieldInputs.crosshairToTargetErrorX_rad // why do we use Proportional limit * error - derivative
-				- VisionConstants.AprilTagRotateKd;
-		} else if (VisionConstants.crosshairGamePieceBoundRotateX_rad < vision.fieldInputs.crosshairToTargetErrorX_rad) {
-			robotRotate_radps = VisionConstants.AprilTagRotateKp
-				* vision.fieldInputs.crosshairToTargetErrorX_rad
-				+ VisionConstants.AprilTagRotateKd;
-		}
-		robotRotate_radps *= -1; // Rotate opposite of error
+		// if (vision.fieldInputs.crosshairToTargetErrorX_rad < -VisionConstants.crosshairGamePieceBoundRotateX_rad) {
+		// robotRotate_radps = VisionConstants.AprilTagRotateKp
+		// * vision.fieldInputs.crosshairToTargetErrorX_rad // why do we use Proportional limit * error - derivative
+		// - VisionConstants.AprilTagRotateKd;
+		// } else if (VisionConstants.crosshairGamePieceBoundRotateX_rad < vision.fieldInputs.crosshairToTargetErrorX_rad) {
+		// robotRotate_radps = VisionConstants.AprilTagRotateKp
+		// * vision.fieldInputs.crosshairToTargetErrorX_rad
+		// + VisionConstants.AprilTagRotateKd;
+		// }
+		// robotRotate_radps *= -1; // Rotate opposite of error
+
+		if (!MathUtil.isNear(0, vision.fieldInputs.crosshairToTargetErrorX_rad,
+			VisionConstants.crosshairGamePieceBoundRotateX_rad)) {
+			robotRotate_radps = pidController.calculate(vision.fieldInputs.crosshairToTargetErrorX_rad, 0);
+		} else
+			robotRotate_radps = 0;
 
 		System.out.println("Swerve --> Shooting Speaker");
-		swerve.drive(new Translation2d(0, 0), robotRotate_radps - rotationalOffset, false);
+		Logger.recordOutput("Vision/targetRotation", robotRotate_radps);
+		swerve.drive(new Translation2d(0, 0), robotRotate_radps, false);
 	}
 
 	// Called once the command ends or is interrupted.

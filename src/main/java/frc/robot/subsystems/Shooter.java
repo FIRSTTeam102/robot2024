@@ -1,14 +1,16 @@
 package frc.robot.subsystems;
 
-import static frc.robot.constants.Constants.tuningMode;
 import static frc.robot.constants.ShooterConstants.*;
 
+import frc.robot.constants.Constants;
 import frc.robot.util.AutoSetterTunableNumber;
 import frc.robot.util.SparkUtil;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
@@ -35,15 +37,23 @@ public class Shooter extends SubsystemBase {
 	@AutoLogOutput
 	private double targetVelocity_rpm = 0.0;
 
+	@Getter
+	@AutoLogOutput
+	private boolean atTargetVelocity = false;
+
 	public Shooter() {
 		leadMotor.restoreFactoryDefaults();
 		followerMotor.restoreFactoryDefaults();
-		if (tuningMode) {
+		if (Constants.tuningMode) {
 			new AutoSetterTunableNumber("Shooter/kP", kP, (double value) -> pidController.setP(value));
 			new AutoSetterTunableNumber("Shooter/kD", kD, (double value) -> pidController.setD(value));
 
 			new AutoSetterTunableNumber("Shooter/setpoint", 0, (double value) -> setVelocity(value));
 		}
+
+		Shuffleboard.getTab("drive")
+			.addBoolean("Shooter at Target Speed?", this::isAtTargetVelocity)
+			.withWidget(BuiltInWidgets.kBooleanBox);
 
 		pidController.setP(kP);
 		pidController.setI(0);
@@ -57,7 +67,7 @@ public class Shooter extends SubsystemBase {
 		followerMotor.follow(leadMotor);
 
 		// only fetch position when tuning
-		SparkUtil.setPeriodicFrames(leadMotor, true, true, tuningMode, false, false, false, false);
+		SparkUtil.setPeriodicFrames(leadMotor, true, true, Constants.tuningMode, false, false, false, false);
 		SparkUtil.setPeriodicFrames(followerMotor, false, false, false, false, false, false, false);
 		leadMotor.burnFlash();
 		followerMotor.burnFlash();
@@ -69,17 +79,19 @@ public class Shooter extends SubsystemBase {
 	}
 
 	public void setPercentOutput(double speed) {
-		pidController.setReference(speed, ControlType.kDutyCycle, 0, 0);
+		pidController.setReference(speed * 12, ControlType.kVoltage, 0, 0);
 	}
 
 	public void stop() {
-		pidController.setReference(0, ControlType.kDutyCycle);
+		pidController.setReference(0, ControlType.kVoltage);
 	}
 
 	@Override
 	public void periodic() {
 		updateInputs(inputs);
 		Logger.processInputs(getName(), inputs);
+
+		atTargetVelocity = MathUtil.isNear(targetVelocity_rpm, inputs.leadVelocity_rpm, 50);
 	}
 
 	@AutoLog

@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.29,
-      "y": 5.57
+      "x": 1.3126474618911743,
+      "y": 5.567087650299072
     },
-    "rotation": 0.0
+    "rotation": -8.345126428911687e-30
   },
   "command": {
     "type": "sequential",
@@ -14,42 +14,36 @@
         {
           "type": "named",
           "data": {
-            "name": "AimAndShoot"
+            "name": "Options"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Intake"
+            "name": "SpeakerSetting"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Index"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetScoring"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "2piece.1"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "WaitIntake"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "2piece.2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "AimAndShoot"
+            "pathName": "exit center.1"
           }
         }
       ]
     }
   },
   "folder": null,
-  "choreoAuto": false
+  "choreoAuto": true
 }

@@ -10,7 +10,7 @@ public final class Constants {
 	}
 
 	/** publishes many constants to NT for hot editing & other non-competition functionality */
-	public static final boolean tuningMode = true;
+	public static final boolean tuningMode = false;
 
 	public static class OperatorConstants {
 		public static final int driverControllerPort = 0;
