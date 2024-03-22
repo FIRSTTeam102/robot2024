@@ -43,7 +43,7 @@ public class SetIntakeSpeed extends Command {
 		// Run motor only if we are either indexing or don't detect a note. Or, if we are intaking (not indexing) and we
 		// detect a note, don't run
 		if (isIndexing || !intake.isHoldingNote())
-		  intake.setMotorSpeed(speed);
+			intake.setMotorSpeed(speed);
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
@@ -54,7 +54,7 @@ public class SetIntakeSpeed extends Command {
 	@Override
 	public void end(boolean interrupted) {
 		intake.stopMotor();
-
+		Lights.setDefaultStatus(); // we no longer have a note...
 	}
 
 	// Returns true when the command should end.
