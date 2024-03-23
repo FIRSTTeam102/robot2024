@@ -24,7 +24,7 @@ public class IntakeWithArm extends Command {
 	@Override
 	public void initialize() {
 		if (!intake.isHoldingNote()) {
-			arm.setPosition(-1.5);
+			arm.setPosition(-2);
 			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
 			Lights.setStatus(LightsConstants.Mode.Intaking);
 		}

@@ -4,7 +4,7 @@ public final class ArmConstants {
 	public static final int leadMotorId = 29;
 	public static final int followerMotorId = 30;
 
-	public static final double shaftEncoderOffset_deg = 125.58; // needs to be tuned
+	public static final double shaftEncoderOffset_deg = 125.28; // needs to be tuned
 
 	// pid
 	public static final double kP = .000095;

@@ -48,6 +48,12 @@
               {
                 "type": "named",
                 "data": {
+                  "name": "RaceTimeout"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
                   "name": "WaitIntake"
                 }
               },
@@ -69,14 +75,14 @@
                     }
                   ]
                 }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 2.0
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {

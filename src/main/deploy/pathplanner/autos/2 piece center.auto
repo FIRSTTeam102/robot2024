@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3126474618911743,
+      "x": 1.3126474618911796,
       "y": 5.567087650299072
     },
-    "rotation": 4.78577780999322e-30
+    "rotation": -1.8767023109484276e-27
   },
   "command": {
     "type": "sequential",
@@ -48,7 +48,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "WaitIntake"
+                  "name": "RaceTimeout"
                 }
               },
               {
@@ -69,14 +69,26 @@
                     }
                   ]
                 }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 4.0
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Print"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ArmCarry"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Print"
           }
         },
         {

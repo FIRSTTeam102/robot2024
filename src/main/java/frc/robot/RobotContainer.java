@@ -20,6 +20,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.arm.AutoClimb;
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.intake.IntakeWithArm;
@@ -133,11 +134,13 @@ public class RobotContainer {
 			new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		NamedCommands.registerCommand("LimelightSetting",
 			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
-		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
+		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 5));
+		NamedCommands.registerCommand("WaitUntilVeryEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
 		NamedCommands.registerCommand("WaitIntake",
-			new IntakeWithArm(intake, arm).beforeStarting(() -> intake.resetNoteDetection(), intake));
+			new IntakeWithArm(intake, arm).beforeStarting(() -> intake.resetNoteDetection()));
 		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
 		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
+		NamedCommands.registerCommand("ArmCarry", new SetArmPosition(arm, 40).beforeStarting(Commands.print("arm up")));
 		NamedCommands.registerCommand("AmpSetting", new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));
 		NamedCommands.registerCommand("SlowForward",
 			Commands.startEnd(() -> swerve.drive(new Translation2d(.3, 0), 0, false), () -> swerve.stop(), swerve)
@@ -145,6 +148,8 @@ public class RobotContainer {
 		NamedCommands.registerCommand("ResetScoring",
 			new SetScoringPosition(arm, shooter, ScoringConstants.lowCarryPosition));
 		NamedCommands.registerCommand("StopShooter", new StopShooter(shooter));
+		NamedCommands.registerCommand("RaceTimeout", Commands.idle().withTimeout(4));
+		NamedCommands.registerCommand("Print", Commands.print("hello!"));
 		// create paths
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();
 		for (final String autoName : autoNames) {
@@ -213,10 +218,12 @@ public class RobotContainer {
 			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		operatorController.x().onTrue(
 			new SetScoringPosition(arm, shooter, ScoringConstants.carryPosition).andThen(() -> intake.resetNoteDetection()));
-		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
+		operatorController.y()
+			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
-		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
+		operatorController.leftTrigger(boolTriggerThreshold)
+			.whileTrue(new IntakeWithArm(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
 		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kForward), arm)
 			.unless(() -> DriverStation.getMatchTime() > 32));
@@ -225,10 +232,11 @@ public class RobotContainer {
 		// operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kOff), arm));
 		operatorController.povRight().onTrue(Commands.runOnce(() -> intake.resetNoteDetection()));
 
-		operatorController.start().toggleOnTrue(Commands.startEnd(() -> arm.setMotorVoltage(-3.7), () -> arm.stop(), arm));
+		operatorController.start().toggleOnTrue(new AutoClimb(arm));
 
 		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
-		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));
+		operatorController.rightStick().whileTrue(
+			new ManualArmControl(arm, operatorController::getLeftY));
 
 		// *TESTING CONTROLS*
 		//
@@ -303,15 +311,29 @@ public class RobotContainer {
 			|| driverController.getHID().getName().indexOf("Xbox") < 0);
 	}
 
+	public Command pulseRumble(CommandXboxController controller) {
+		return Commands.startEnd(() -> controller.getHID().setRumble(RumbleType.kBothRumble, .65),
+			() -> controller.getHID().setRumble(RumbleType.kBothRumble, 0), new Subsystem[] {}).withTimeout(.55);
+	}
+
 	private boolean cachedShooterAtTarget = false;
+	private boolean cachedHoldingNote = false;
 
 	public void checkRumble() {
-		if (shooter.isAtTargetVelocity() && (shooter.isAtTargetVelocity() != cachedShooterAtTarget)) {
+		// operator rumble on shooter reaching speed
+		boolean currShooterAtTarget = shooter.isAtTargetVelocity();
+		if (currShooterAtTarget && (currShooterAtTarget != cachedShooterAtTarget)) {
 			if (shooter.inputs.leadVelocity_rpm > 400) {
-				Commands.startEnd(() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, .5),
-					() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, 0), new Subsystem[] {}).withTimeout(.3)
-					.schedule();
+				pulseRumble(operatorController).schedule();
 			}
 		}
+		cachedShooterAtTarget = currShooterAtTarget;
+
+		// driver rumble on holding note
+		boolean currHoldingNote = intake.isHoldingNote();
+		if (currHoldingNote && (currHoldingNote != cachedHoldingNote)) {
+			pulseRumble(driverController).schedule();
+		}
+		cachedHoldingNote = currHoldingNote;
 	}
 }

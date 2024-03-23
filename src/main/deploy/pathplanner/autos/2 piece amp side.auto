@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.6235248446464539,
+      "x": 0.6235248446464541,
       "y": 6.866034507751465
     },
-    "rotation": 74.69650775120543
+    "rotation": 74.69650775120544
   },
   "command": {
     "type": "sequential",
@@ -48,6 +48,12 @@
               {
                 "type": "named",
                 "data": {
+                  "name": "RaceTimeout"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
                   "name": "WaitIntake"
                 }
               },
@@ -69,14 +75,14 @@
                     }
                   ]
                 }
-              },
-              {
-                "type": "wait",
-                "data": {
-                  "waitTime": 4.5
-                }
               }
             ]
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
@@ -107,12 +113,6 @@
           "type": "named",
           "data": {
             "name": "ResetScoring"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "2 piece left.3"
           }
         }
       ]
