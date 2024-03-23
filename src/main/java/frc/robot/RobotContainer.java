@@ -131,16 +131,22 @@ public class RobotContainer {
 		NamedCommands.registerCommand("SpeakerAlign", new AprilTagVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("NoteAlign", new GamePieceVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("SpeakerSetting",
-			new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
+			new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition).withTimeout(.5));
 		NamedCommands.registerCommand("LimelightSetting",
 			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
 		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 5));
 		NamedCommands.registerCommand("WaitUntilVeryEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
-		NamedCommands.registerCommand("WaitIntake",
-			new IntakeWithArm(intake, arm).beforeStarting(() -> intake.resetNoteDetection()));
+		NamedCommands.registerCommand("WaitIntake", Commands.startEnd(() -> {
+			arm.setPosition(-2);
+			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
+			intake.resetNoteDetection();
+		}, () -> {
+			arm.setPosition(4);
+			intake.stopMotor();
+		}, intake, arm).until(intake::isHoldingNote));
 		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
 		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
-		NamedCommands.registerCommand("ArmCarry", new SetArmPosition(arm, 40).beforeStarting(Commands.print("arm up")));
+		NamedCommands.registerCommand("ArmCarry", new SetArmPosition(arm, 40));
 		NamedCommands.registerCommand("AmpSetting", new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));
 		NamedCommands.registerCommand("SlowForward",
 			Commands.startEnd(() -> swerve.drive(new Translation2d(.3, 0), 0, false), () -> swerve.stop(), swerve)
@@ -149,7 +155,7 @@ public class RobotContainer {
 			new SetScoringPosition(arm, shooter, ScoringConstants.lowCarryPosition));
 		NamedCommands.registerCommand("StopShooter", new StopShooter(shooter));
 		NamedCommands.registerCommand("RaceTimeout", Commands.idle().withTimeout(4));
-		NamedCommands.registerCommand("Print", Commands.print("hello!"));
+		NamedCommands.registerCommand("Print", Commands.print("hello!").beforeStarting(Commands.print("another hi")));
 		// create paths
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();
 		for (final String autoName : autoNames) {

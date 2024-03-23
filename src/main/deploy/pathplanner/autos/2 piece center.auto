@@ -69,26 +69,14 @@
                     }
                   ]
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "WaitIntake"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Print"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "ArmCarry"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Print"
           }
         },
         {

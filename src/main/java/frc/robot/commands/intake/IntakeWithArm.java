@@ -41,7 +41,7 @@ public class IntakeWithArm extends Command {
 			arm.setPosition(4);
 		else
 			arm.setPosition(40);
-		Commands.waitSeconds(.015).andThen(intake::stopMotor, intake).schedule();
+		Commands.waitSeconds(.015).andThen(intake::stopMotor, intake).andThen(Commands.print("intook")).schedule();
 	}
 
 	// Returns true when the command should end.
