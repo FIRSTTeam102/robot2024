@@ -28,7 +28,7 @@ public class SetIntakeSpeed extends Command {
 	}
 
 	/**
-	 * Set an intake to a standard speed given by {@link IntakeConstants#intakeSpeed intakeSpeed} if intaking and {@link IntakeConstants#indexSpeed indexSpeed} if indexing
+	 * Set an intake to a standard speed given by {@link IntakeConstants#intakeSpeed  if intaking and {@link IntakeConstants#indexSpeed} if indexing
 	 * @param intake Intake Subsystem
 	 * @param isIndexing if set to true, the command will ignore the note sensor. Default speed will also be slower.
 	 */

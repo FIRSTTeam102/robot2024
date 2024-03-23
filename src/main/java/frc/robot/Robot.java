@@ -74,7 +74,7 @@ public class Robot extends LoggedRobot {
 				Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
 			}
 			case Active -> {
-				Logger.addDataReceiver(new WPILOGWriter("/media/sda1/logs/")); // log to a usb stick
+				Logger.addDataReceiver(new WPILOGWriter("/media/sda/logs/")); // log to a usb stick
 				Logger.addDataReceiver(new NT4Publisher()); // publish data to NetworkTables
 				if (isReal()) {
 					new PowerDistribution(pdhId, ModuleType.kRev); // enables power distribution logging

@@ -15,7 +15,7 @@ public class SetArmPosition extends Command {
 
 	/**
 	 * Command to set the arm position, cancels the command and moves on 
-	 * after being within the range given by {@link ArmConstants#accuracyTolerance_deg accuracyTolerance}
+	 * after being within the range given by {@link ArmConstants#accuracyTolerance_deg}
 	 * @param arm Arm subsystem
 	 * @param targetPosition_deg Position in degrees to set the arm to (0 is horizontal to robot base)
 	 */

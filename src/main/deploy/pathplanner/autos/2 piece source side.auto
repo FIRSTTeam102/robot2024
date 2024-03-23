@@ -46,6 +46,12 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "WaitIntake"
+                }
+              },
+              {
                 "type": "sequential",
                 "data": {
                   "commands": [
@@ -65,15 +71,9 @@
                 }
               },
               {
-                "type": "named",
-                "data": {
-                  "name": "WaitIntake"
-                }
-              },
-              {
                 "type": "wait",
                 "data": {
-                  "waitTime": 4.5
+                  "waitTime": 2.0
                 }
               }
             ]

@@ -30,7 +30,7 @@ public class SetScoringPosition extends Command {
 	/**
 	 * Create a set scoring position command that goes to a static {@link ScoringPosition}
 	 * @param arm Arm subsystem
-	 * @param shooter Shooter subsyste,
+	 * @param shooter Shooter subsystem
 	 * @param position ScoringPosition to go to
 	 */
 	public SetScoringPosition(Arm arm, Shooter shooter, ScoringPosition position) {

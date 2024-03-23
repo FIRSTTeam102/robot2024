@@ -2,7 +2,7 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.623524844646454,
+      "x": 0.6235248446464539,
       "y": 6.866034507751465
     },
     "rotation": 74.69650775120543
@@ -46,6 +46,12 @@
           "data": {
             "commands": [
               {
+                "type": "named",
+                "data": {
+                  "name": "WaitIntake"
+                }
+              },
+              {
                 "type": "sequential",
                 "data": {
                   "commands": [
@@ -62,12 +68,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WaitIntake"
                 }
               },
               {

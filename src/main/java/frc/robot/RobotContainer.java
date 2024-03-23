@@ -218,8 +218,10 @@ public class RobotContainer {
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
 		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
-		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kForward), arm));
-		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kReverse), arm));
+		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kForward), arm)
+			.unless(() -> DriverStation.getMatchTime() > 32));
+		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kReverse), arm)
+			.unless(() -> DriverStation.getMatchTime() > 32));
 		// operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kOff), arm));
 		operatorController.povRight().onTrue(Commands.runOnce(() -> intake.resetNoteDetection()));
 
