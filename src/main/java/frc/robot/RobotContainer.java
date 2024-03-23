@@ -6,8 +6,8 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.IntakeConstants;
+import frc.robot.constants.ScoringConstants;
 import frc.robot.constants.ScoringConstants.ScoringPosition;
-import frc.robot.constants.ShooterConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -130,7 +130,7 @@ public class RobotContainer {
 		NamedCommands.registerCommand("SpeakerAlign", new AprilTagVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("NoteAlign", new GamePieceVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("SpeakerSetting",
-			new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
+			new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		NamedCommands.registerCommand("LimelightSetting",
 			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
 		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
@@ -138,11 +138,12 @@ public class RobotContainer {
 			new IntakeWithArm(intake, arm).beforeStarting(() -> intake.resetNoteDetection(), intake));
 		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
 		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
-		NamedCommands.registerCommand("AmpSetting", new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
+		NamedCommands.registerCommand("AmpSetting", new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));
 		NamedCommands.registerCommand("SlowForward",
 			Commands.startEnd(() -> swerve.drive(new Translation2d(.3, 0), 0, false), () -> swerve.stop(), swerve)
 				.withTimeout(1.5));
-		NamedCommands.registerCommand("ResetScoring", new SetScoringPosition(arm, shooter, new ScoringPosition(4, 0)));
+		NamedCommands.registerCommand("ResetScoring",
+			new SetScoringPosition(arm, shooter, ScoringConstants.lowCarryPosition));
 		NamedCommands.registerCommand("StopShooter", new StopShooter(shooter));
 		// create paths
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();
@@ -209,10 +210,10 @@ public class RobotContainer {
 		operatorController.a()
 			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
 		operatorController.b()
-			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
+			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		operatorController.x().onTrue(
-			new SetScoringPosition(arm, shooter, new ScoringPosition(40, 0)).andThen(() -> intake.resetNoteDetection()));
-		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(1, 2950)));
+			new SetScoringPosition(arm, shooter, ScoringConstants.carryPosition).andThen(() -> intake.resetNoteDetection()));
+		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
 		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
@@ -304,9 +305,9 @@ public class RobotContainer {
 
 	public void checkRumble() {
 		if (shooter.isAtTargetVelocity() && (shooter.isAtTargetVelocity() != cachedShooterAtTarget)) {
-			if (shooter.getTargetVelocity_rpm() > 400) {
-				Commands.startEnd(() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, .7),
-					() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, 0), new Subsystem[] {}).withTimeout(.5)
+			if (shooter.inputs.leadVelocity_rpm > 400) {
+				Commands.startEnd(() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, .5),
+					() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, 0), new Subsystem[] {}).withTimeout(.3)
 					.schedule();
 			}
 		}

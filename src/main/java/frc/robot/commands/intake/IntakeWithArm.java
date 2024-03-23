@@ -42,11 +42,6 @@ public class IntakeWithArm extends Command {
 		else
 			arm.setPosition(40);
 		Commands.waitSeconds(.015).andThen(intake::stopMotor, intake).schedule();
-		if (intake.isHoldingNote()) {
-			Lights.setStatus(LightsConstants.Mode.We_have_a_note);
-		} else {
-			Lights.setDefaultStatus();
-		}
 	}
 
 	// Returns true when the command should end.

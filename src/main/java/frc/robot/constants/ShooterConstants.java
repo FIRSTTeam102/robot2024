@@ -12,5 +12,4 @@ public final class ShooterConstants {
 	public static final double kA = .008631;
 
 	public static final double maxVelocity_rpm = 5000;
-	public static final double subwooferVelocity_rpm = 3250;
 }

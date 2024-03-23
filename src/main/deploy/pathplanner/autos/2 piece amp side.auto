@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7669039964675903,
-      "y": 6.639083385467529
+      "x": 0.623524844646454,
+      "y": 6.866034507751465
     },
-    "rotation": 57.72434388873349
+    "rotation": 74.69650775120543
   },
   "command": {
     "type": "sequential",
@@ -24,6 +24,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Index"
@@ -36,32 +42,38 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "race",
           "data": {
             "commands": [
               {
-                "type": "path",
-                "data": {
-                  "pathName": "2 piece left.1"
-                }
-              },
-              {
-                "type": "deadline",
+                "type": "sequential",
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
+                      "type": "wait",
                       "data": {
-                        "name": "WaitIntake"
+                        "waitTime": 1.0
                       }
                     },
                     {
-                      "type": "wait",
+                      "type": "path",
                       "data": {
-                        "waitTime": 1.2
+                        "pathName": "2 piece left.1"
                       }
                     }
                   ]
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "WaitIntake"
+                }
+              },
+              {
+                "type": "wait",
+                "data": {
+                  "waitTime": 4.5
                 }
               }
             ]

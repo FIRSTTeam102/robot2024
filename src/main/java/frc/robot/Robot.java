@@ -200,6 +200,10 @@ public class Robot extends LoggedRobot {
 	@Override
 	public void teleopPeriodic() {
 		robotContainer.checkRumble();
+		if (robotContainer.intake.isHoldingNote())
+			Lights.setStatus(LightsConstants.Mode.HaveANote);
+		else
+			Lights.setDefaultStatus();
 	}
 
 	@Override
