@@ -131,19 +131,13 @@ public class RobotContainer {
 		NamedCommands.registerCommand("SpeakerAlign", new AprilTagVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("NoteAlign", new GamePieceVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("SpeakerSetting",
-			new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition).withTimeout(.5));
+			new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		NamedCommands.registerCommand("LimelightSetting",
 			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
 		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 5));
 		NamedCommands.registerCommand("WaitUntilVeryEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
-		NamedCommands.registerCommand("WaitIntake", Commands.startEnd(() -> {
-			arm.setPosition(-2);
-			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
-			intake.resetNoteDetection();
-		}, () -> {
-			arm.setPosition(4);
-			intake.stopMotor();
-		}, intake, arm).until(intake::isHoldingNote));
+		NamedCommands.registerCommand("WaitIntake",
+			IntakeWithArm.intakeWithDelay(intake, arm).beforeStarting(() -> intake.resetNoteDetection()));
 		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
 		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
 		NamedCommands.registerCommand("ArmCarry", new SetArmPosition(arm, 40));
@@ -155,10 +149,12 @@ public class RobotContainer {
 			new SetScoringPosition(arm, shooter, ScoringConstants.lowCarryPosition));
 		NamedCommands.registerCommand("StopShooter", new StopShooter(shooter));
 		NamedCommands.registerCommand("RaceTimeout", Commands.idle().withTimeout(4));
-		NamedCommands.registerCommand("Print", Commands.print("hello!").beforeStarting(Commands.print("another hi")));
+		NamedCommands.registerCommand("Print", Commands.print("hello!"));
 		// create paths
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();
 		for (final String autoName : autoNames) {
+			if (autoName == "pits test" && !Constants.tuningMode)
+				continue;
 			final Command auto = new PathPlannerAuto(autoName);
 			autoChooser.addOption(autoName, auto);
 		}
@@ -229,7 +225,7 @@ public class RobotContainer {
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
 		operatorController.leftTrigger(boolTriggerThreshold)
-			.whileTrue(new IntakeWithArm(intake, arm));
+			.whileTrue(IntakeWithArm.intakeWithDelay(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
 		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kForward), arm)
 			.unless(() -> DriverStation.getMatchTime() > 32));

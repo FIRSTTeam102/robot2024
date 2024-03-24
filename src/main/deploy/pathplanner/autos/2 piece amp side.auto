@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.6235248446464541,
+      "x": 0.6235248446464539,
       "y": 6.866034507751465
     },
-    "rotation": 74.69650775120544
+    "rotation": 74.69650775120543
   },
   "command": {
     "type": "sequential",
@@ -80,12 +80,6 @@
           }
         },
         {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "2 piece left.2"
@@ -100,7 +94,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.2
           }
         },
         {
