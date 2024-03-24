@@ -13,6 +13,7 @@ public class SetScoringPosition extends Command {
 	private Shooter shooter;
 
 	private Supplier<ScoringPosition> posSupplier;
+	private ScoringPosition targetPosition;
 
 	/**
 	 * Create a set scoring position command that adjusts dynamically according to a method that provides a {@link ScoringPosition} object 
@@ -40,14 +41,15 @@ public class SetScoringPosition extends Command {
 	// Called when the command is initially scheduled.
 	@Override
 	public void initialize() {
-		var targetPosition = posSupplier.get();
-		arm.setPosition(targetPosition.armAngle_deg());
+		targetPosition = posSupplier.get();
 		shooter.setVelocity(targetPosition.shooterSpeed_rpm());
 	}
 
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
-	public void execute() {}
+	public void execute() {
+		arm.setPosition(targetPosition.armAngle_deg(), arm.getBestPIDSlot(targetPosition.armAngle_deg()));
+	}
 
 	// Called once the command ends or is interrupted.
 	@Override

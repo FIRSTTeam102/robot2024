@@ -7,7 +7,6 @@ import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.ScoringConstants;
-import frc.robot.constants.ScoringConstants.ScoringPosition;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -148,7 +147,7 @@ public class RobotContainer {
 		NamedCommands.registerCommand("ResetScoring",
 			new SetScoringPosition(arm, shooter, ScoringConstants.lowCarryPosition));
 		NamedCommands.registerCommand("StopShooter", new StopShooter(shooter));
-		NamedCommands.registerCommand("RaceTimeout", Commands.idle().withTimeout(4));
+		NamedCommands.registerCommand("RaceTimeout", Commands.idle().withTimeout(5));
 		NamedCommands.registerCommand("Print", Commands.print("hello!"));
 		// create paths
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();
@@ -215,7 +214,7 @@ public class RobotContainer {
 		// *OPERATOR CONTROLS*
 		//
 		operatorController.a()
-			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
+			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));
 		operatorController.b()
 			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		operatorController.x().onTrue(

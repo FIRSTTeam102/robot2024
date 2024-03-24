@@ -72,6 +72,18 @@
                       "data": {
                         "pathName": "2 piece right.1"
                       }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 0.3
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "2 piece right.2"
+                      }
                     }
                   ]
                 }
@@ -82,7 +94,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2 piece right.2"
+            "pathName": "2 piece right.3"
           }
         },
         {
@@ -94,7 +106,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.2
+            "waitTime": 1.0
           }
         },
         {
@@ -112,7 +124,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2 piece right.3"
+            "pathName": "2 piece right.4"
           }
         }
       ]

@@ -80,12 +80,21 @@ public class Arm extends SubsystemBase {
 		pidController.setSmartMotionAllowedClosedLoopError(accuracyTolerance_deg, 0);
 		pidController.setOutputRange(minOutput, maxOutput);
 		// since we are using smartmotion, the PID numbers are for velocity control, not position.
-		pidController.setP(kP);
-		pidController.setD(kD);
+		pidController.setP(kP, 0);
+		pidController.setD(kD, 0);
 		// Treats 0 and 360 degrees as the same number, so going from one side of 0 to the other doesnt make it do a 360
 		pidController.setPositionPIDWrappingEnabled(true);
 		pidController.setPositionPIDWrappingMinInput(0);
 		pidController.setPositionPIDWrappingMaxInput(360);
+
+		// high angles PID loop
+		pidController.setSmartMotionAccelStrategy(AccelStrategy.kTrapezoidal, 1);
+		pidController.setSmartMotionMaxAccel(maxAccel_rpmps, 1);
+		pidController.setSmartMotionMaxVelocity(maxVelocityHigh_rpm, 1);
+		pidController.setSmartMotionAllowedClosedLoopError(accuracyToleranceHigh_deg, 1);
+
+		pidController.setP(kPHigh, 1);
+		pidController.setD(kDHigh, 1);
 
 		// if (tuningMode) {
 		// new AutoSetterTunableNumber("Arm/kP", kP, (value) -> pidController.setP(value));
@@ -141,10 +150,14 @@ public class Arm extends SubsystemBase {
 		inputs.motorVelocity_rpm = Math102.truncate(motorEncoder.getVelocity(), 2);
 	}
 
-	public void setPosition(double position_deg) {
+	public void setPosition(double position_deg, int pidSlot) {
 		targetPosition_deg = position_deg;
-		pidController.setReference(targetPosition_deg + shaftEncoderOffset_deg, ControlType.kSmartMotion, 0,
+		pidController.setReference(targetPosition_deg + shaftEncoderOffset_deg, ControlType.kSmartMotion, pidSlot,
 			feedforwardController.calculate(Units.degreesToRadians(targetPosition_deg), 0));
+	}
+
+	public void setPosition(double position_deg) {
+		setPosition(position_deg, 0);
 	}
 
 	public void setMotorVoltage(double voltage_V) {
@@ -166,5 +179,10 @@ public class Arm extends SubsystemBase {
 
 	public boolean closeEnough() {
 		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, 5);
+	}
+
+	public int getBestPIDSlot(double targetPosition_deg) {
+		boolean chooseTop = (inputs.shaftPosition_deg > 65) && (targetPosition_deg > 65);
+		return chooseTop ? 1 : 0;
 	}
 }

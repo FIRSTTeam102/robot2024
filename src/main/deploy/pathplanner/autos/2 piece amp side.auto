@@ -72,6 +72,18 @@
                       "data": {
                         "pathName": "2 piece left.1"
                       }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "2 piece left.2"
+                      }
                     }
                   ]
                 }
@@ -82,19 +94,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2 piece left.2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SpeakerSetting"
+            "pathName": "2 piece left.3"
           }
         },
         {
           "type": "wait",
           "data": {
             "waitTime": 0.2
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SpeakerSetting"
           }
         },
         {
@@ -107,6 +119,12 @@
           "type": "named",
           "data": {
             "name": "ResetScoring"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 piece left.4"
           }
         }
       ]
