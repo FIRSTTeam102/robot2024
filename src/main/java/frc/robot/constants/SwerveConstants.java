@@ -78,4 +78,7 @@ public final class SwerveConstants {
 	/* current limiting */
 	public static final int driveCurrentLimit_amp = 50;
 	public static final int angleCurrentLimit_amp = 30;
+
+	/* physical yaw reset switch id */
+	switchId=5; //DIO 5
 };

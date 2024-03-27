@@ -41,6 +41,9 @@ import lombok.Getter;
 public class Swerve extends SubsystemBase {
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
 
+	//@Getter  - I don't know how to properly implement this
+	private final DigitalInput yawSwitch = new DigitalInput(switchId);
+
 	public SwerveModule[] modules;
 	public SwerveModulePosition[] modulePositions = {new SwerveModulePosition(), new SwerveModulePosition(),
 		new SwerveModulePosition(), new SwerveModulePosition()};
@@ -229,6 +232,10 @@ public class Swerve extends SubsystemBase {
 	}
 
 	private double visionSeenCount = 0;
+
+	public boolean getYawSwitch() {
+    return yawSwitch;
+  }
 
 	@Override
 	public void periodic() {
