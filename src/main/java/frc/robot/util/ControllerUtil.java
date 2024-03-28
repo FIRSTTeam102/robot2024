@@ -8,11 +8,13 @@ import frc.robot.constants.Constants.OperatorConstants;
 
 import edu.wpi.first.math.MathUtil;
 
-/** Add your docs here. */
+/**
+ * Various utility functions that deal with controllers and human input
+ */
 public class ControllerUtil {
 	/**
-	 * Applies a deadband defined by {@link OperatorConstants#xboxStickDeadband xboxStickDeadband}, 
-	 * and scales the resulting value on the function x^2 * sgn(x) (squares it but preserves the curve)
+	 * Applies a deadband defined by {@link OperatorConstants#xboxStickDeadband}, 
+	 * and scales the resulting value on the function x^2 * sgn(x) (squares it but preserves the sign)
 	 * @param value Unfiltered controller axis value, should be on the interval [-1.0, 1.0]
 	 * @return Returns the squared and deadbanded controller axis
 	 */

@@ -1,5 +1,8 @@
 package frc.robot.util;
 
+/**
+ * Various math-related methods that were not defined in other math libraries
+ */
 public class Math102 {
 	public static final double falconCountsPerRotation = 2048.0;
 	public static final double cancoderCountsPerRotation = 4096.0;
