@@ -33,12 +33,13 @@ import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.PixelFormat;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -114,15 +115,22 @@ public class RobotContainer {
 			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
 			.withSize(5, 4).withPosition(4, 5).withWidget(Alert.widgetName);
-		driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.12:5800/stream.mjpg"))
-			.withProperties(Map.of("show crosshair", false, "show controls", false))
-			.withWidget(BuiltInWidgets.kCameraStream)
-			.withSize(11, 5)
-			.withPosition(0, 0);
+		// driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.12:5800/stream.mjpg"))
+		// .withProperties(Map.of("show crosshair", false, "show controls", false))
+		// .withWidget(BuiltInWidgets.kCameraStream)
+		// .withSize(11, 5)
+		// .withPosition(0, 0);
+		var camera = CameraServer.startAutomaticCapture();
+		camera.setResolution(160, 120);
+		camera.setFPS(15);
+		camera.setPixelFormat(PixelFormat.kMJPEG);
+		driveTab.add("camera", camera).withWidget(BuiltInWidgets.kCameraStream).withProperties(Map.of("comp", 50))
+			.withPosition(0, 0).withSize(11, 5);
 
 		Command shuffleboardAutoOptions = Commands.parallel(
 			Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0),
-			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))));
+			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))),
+			Commands.runOnce(() -> swerve.gyroIO.setYaw(swerve.getPose().getRotation().getDegrees())));
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);

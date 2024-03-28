@@ -16,7 +16,7 @@ public final class ScoringConstants {
 		scoringMap.put(3.227, new ScoringPosition(19, 3450));
 	}
 
-	public static final ScoringPosition ampPosition = new ScoringPosition(87, 1750);
+	public static final ScoringPosition ampPosition = new ScoringPosition(90, 1750);
 	public static final ScoringPosition subwooferPosition = new ScoringPosition(-1.5, 3250);
 	public static final ScoringPosition carryPosition = new ScoringPosition(40, 0);
 	public static final ScoringPosition lowCarryPosition = new ScoringPosition(4, 0);

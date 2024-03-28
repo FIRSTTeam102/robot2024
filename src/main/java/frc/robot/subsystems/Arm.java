@@ -151,6 +151,7 @@ public class Arm extends SubsystemBase {
 	}
 
 	public void setPosition(double position_deg, int pidSlot) {
+		Logger.recordOutput("Arm/pidSlot", pidSlot);
 		targetPosition_deg = position_deg;
 		pidController.setReference(targetPosition_deg + shaftEncoderOffset_deg, ControlType.kSmartMotion, pidSlot,
 			feedforwardController.calculate(Units.degreesToRadians(targetPosition_deg), 0));

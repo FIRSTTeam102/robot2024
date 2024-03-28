@@ -11,8 +11,8 @@ public final class ArmConstants {
 	public static final double kI = 0;
 	public static final double kD = .00000165;
 
-	public static final double kPHigh = 0.000067;
-	public static final double kDHigh = 0.00000225;
+	public static final double kPHigh = 0.000047;
+	public static final double kDHigh = 0.00000725;
 
 	public static final double maxOutput = .5;
 	public static final double minOutput = -maxOutput;

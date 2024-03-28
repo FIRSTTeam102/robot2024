@@ -54,10 +54,10 @@ public class SetScoringPosition extends Command {
 	// Called once the command ends or is interrupted.
 	@Override
 	public void end(boolean interrupted) {
-		if (interrupted) {
+		if (interrupted)
 			shooter.stop();
+		if (interrupted || targetPosition.armAngle_deg() >= 65)
 			arm.stop();
-		}
 	}
 
 	// Returns true when the command should end.
