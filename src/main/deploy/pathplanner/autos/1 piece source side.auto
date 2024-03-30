@@ -40,12 +40,6 @@
           "data": {
             "name": "WaitUntilEnd"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "2 piece right.4"
-          }
         }
       ]
     }
