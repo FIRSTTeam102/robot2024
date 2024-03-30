@@ -40,12 +40,6 @@
           "data": {
             "name": "WaitUntilEnd"
           }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "source exit.1"
-          }
         }
       ]
     }

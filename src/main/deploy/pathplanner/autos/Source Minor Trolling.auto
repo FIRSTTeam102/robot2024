@@ -1,0 +1,56 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6495805978775024,
+      "y": 4.286937236785889
+    },
+    "rotation": -72.18110552179574
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "sequential",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Options"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "SpeakerSetting"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Index"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "ResetScoring"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Source Minor trolling"
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}
