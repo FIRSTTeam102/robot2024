@@ -80,5 +80,5 @@ public final class SwerveConstants {
 	public static final int angleCurrentLimit_amp = 30;
 
 	/* physical yaw reset switch id */
-	switchId=5; //DIO 5
+	public static final int switchId = 5; // DIO 5
 };

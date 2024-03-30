@@ -239,11 +239,9 @@ public class RobotContainer {
 		operatorController.rightStick().whileTrue(
 			new ManualArmControl(arm, operatorController::getLeftY));
 
-
 		// *RESET YAW THROUGH PUSHBUTTON*
-		Trigger limitSwitch = new Trigger(() -> swerve.getyawSwitch());
-		limitSwitch.onTrue(teleopSwerve.zeroYaw());
-
+		Trigger yawTrigger = new Trigger(swerve::getYawSwitch);
+		yawTrigger.onTrue(teleopSwerve.zeroYaw());
 
 		// *TESTING CONTROLS*
 		//
