@@ -52,6 +52,12 @@
                 }
               },
               {
+                "type": "named",
+                "data": {
+                  "name": "WaitIntake"
+                }
+              },
+              {
                 "type": "sequential",
                 "data": {
                   "commands": [
@@ -68,12 +74,6 @@
                       }
                     }
                   ]
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "WaitIntake"
                 }
               }
             ]
@@ -94,7 +94,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 1.0
+            "waitTime": 0.2
           }
         },
         {
@@ -107,6 +107,12 @@
           "type": "named",
           "data": {
             "name": "ResetScoring"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "exit center.1"
           }
         }
       ]

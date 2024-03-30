@@ -7,7 +7,6 @@ import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.ScoringConstants;
-import frc.robot.constants.ScoringConstants.ScoringPosition;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -34,12 +33,13 @@ import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.util.PixelFormat;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -115,15 +115,22 @@ public class RobotContainer {
 			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
 			.withSize(5, 4).withPosition(4, 5).withWidget(Alert.widgetName);
-		driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.12:5800/stream.mjpg"))
-			.withProperties(Map.of("show crosshair", false, "show controls", false))
-			.withWidget(BuiltInWidgets.kCameraStream)
-			.withSize(11, 5)
-			.withPosition(0, 0);
+		// driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.12:5800/stream.mjpg"))
+		// .withProperties(Map.of("show crosshair", false, "show controls", false))
+		// .withWidget(BuiltInWidgets.kCameraStream)
+		// .withSize(11, 5)
+		// .withPosition(0, 0);
+		var camera = CameraServer.startAutomaticCapture();
+		camera.setResolution(160, 120);
+		camera.setFPS(15);
+		camera.setPixelFormat(PixelFormat.kMJPEG);
+		driveTab.add("camera", camera).withWidget(BuiltInWidgets.kCameraStream).withProperties(Map.of("comp", 50))
+			.withPosition(0, 0).withSize(11, 5);
 
 		Command shuffleboardAutoOptions = Commands.parallel(
 			Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0),
-			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))));
+			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))),
+			Commands.runOnce(() -> swerve.gyroIO.setYaw(swerve.getPose().getRotation().getDegrees())));
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);
@@ -131,19 +138,13 @@ public class RobotContainer {
 		NamedCommands.registerCommand("SpeakerAlign", new AprilTagVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("NoteAlign", new GamePieceVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("SpeakerSetting",
-			new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition).withTimeout(.5));
+			new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		NamedCommands.registerCommand("LimelightSetting",
 			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
 		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 5));
 		NamedCommands.registerCommand("WaitUntilVeryEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
-		NamedCommands.registerCommand("WaitIntake", Commands.startEnd(() -> {
-			arm.setPosition(-2);
-			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
-			intake.resetNoteDetection();
-		}, () -> {
-			arm.setPosition(4);
-			intake.stopMotor();
-		}, intake, arm).until(intake::isHoldingNote));
+		NamedCommands.registerCommand("WaitIntake",
+			IntakeWithArm.intakeWithDelay(intake, arm).beforeStarting(() -> intake.resetNoteDetection()));
 		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
 		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
 		NamedCommands.registerCommand("ArmCarry", new SetArmPosition(arm, 40));
@@ -154,11 +155,13 @@ public class RobotContainer {
 		NamedCommands.registerCommand("ResetScoring",
 			new SetScoringPosition(arm, shooter, ScoringConstants.lowCarryPosition));
 		NamedCommands.registerCommand("StopShooter", new StopShooter(shooter));
-		NamedCommands.registerCommand("RaceTimeout", Commands.idle().withTimeout(4));
-		NamedCommands.registerCommand("Print", Commands.print("hello!").beforeStarting(Commands.print("another hi")));
+		NamedCommands.registerCommand("RaceTimeout", Commands.idle().withTimeout(5));
+		NamedCommands.registerCommand("Print", Commands.print("hello!"));
 		// create paths
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();
 		for (final String autoName : autoNames) {
+			if (autoName == "pits test" && !Constants.tuningMode)
+				continue;
 			final Command auto = new PathPlannerAuto(autoName);
 			autoChooser.addOption(autoName, auto);
 		}
@@ -219,7 +222,7 @@ public class RobotContainer {
 		// *OPERATOR CONTROLS*
 		//
 		operatorController.a()
-			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
+			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));
 		operatorController.b()
 			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		operatorController.x().onTrue(
@@ -229,7 +232,7 @@ public class RobotContainer {
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
 		operatorController.leftTrigger(boolTriggerThreshold)
-			.whileTrue(new IntakeWithArm(intake, arm));
+			.whileTrue(IntakeWithArm.intakeWithDelay(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
 		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kForward), arm)
 			.unless(() -> DriverStation.getMatchTime() > 32));

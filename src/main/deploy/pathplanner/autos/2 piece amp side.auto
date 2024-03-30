@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.6235248446464541,
+      "x": 0.6235248446464539,
       "y": 6.866034507751465
     },
-    "rotation": 74.69650775120544
+    "rotation": 74.69650775120543
   },
   "command": {
     "type": "sequential",
@@ -72,6 +72,18 @@
                       "data": {
                         "pathName": "2 piece left.1"
                       }
+                    },
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "2 piece left.2"
+                      }
                     }
                   ]
                 }
@@ -80,27 +92,21 @@
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 0.5
+            "pathName": "2 piece left.3"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "2 piece left.2"
+            "waitTime": 0.2
           }
         },
         {
           "type": "named",
           "data": {
             "name": "SpeakerSetting"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
           }
         },
         {
@@ -113,6 +119,12 @@
           "type": "named",
           "data": {
             "name": "ResetScoring"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 piece left.4"
           }
         }
       ]
