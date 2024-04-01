@@ -198,6 +198,8 @@ public class RobotContainer {
 		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
 		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));
 
+		Trigger yawTrigger = new Trigger(swerve::getYawSwitch);
+		yawTrigger.onTrue((teleopSwerve.zeroYaw()));
 		// *TESTING CONTROLS*
 		//
 		// When in tuning mode, create multiple testing options on shuffleboard as well as bind commands to a unique

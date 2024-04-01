@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -39,6 +40,8 @@ import org.littletonrobotics.junction.Logger;
 import lombok.Getter;
 
 public class Swerve extends SubsystemBase {
+
+	public final DigitalInput yawSwitch = new DigitalInput(switchId);
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
 
 	public SwerveModule[] modules;
@@ -223,6 +226,10 @@ public class Swerve extends SubsystemBase {
 		states[2].angle = new Rotation2d(Math.PI / 2 + Math.atan(trackWidth_m / wheelBase_m));
 		states[3].angle = new Rotation2d(Math.PI / 2 - Math.atan(trackWidth_m / wheelBase_m));
 		return states;
+	}
+
+	public boolean getYawSwitch() {
+		return yawSwitch.get();
 	}
 
 	private double visionSeenCount = 0;
