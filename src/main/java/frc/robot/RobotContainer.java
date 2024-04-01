@@ -31,7 +31,6 @@ import frc.robot.commands.shooter.StopShooter;
 import frc.robot.commands.swerve.SwerveAngleOffsetCalibration;
 import frc.robot.commands.swerve.TeleopSwerve;
 import frc.robot.commands.swerve.XStance;
-import frc.robot.commands.vision.AprilTagVision;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -170,7 +169,7 @@ public class RobotContainer {
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
 		driverController.rightBumper().whileTrue(new AutoAimArm(arm, shooter, vision));// test
-		driverController.leftBumper().whileTrue(new AprilTagVision(vision, swerve)); // test
+		// driverController.leftBumper().whileTrue(new AprilTagVision(vision, swerve)); // test
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		// b -> trap/climb align maybe?
 		driverController.x().whileTrue(new XStance(swerve));
