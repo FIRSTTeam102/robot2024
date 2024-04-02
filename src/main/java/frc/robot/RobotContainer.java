@@ -246,6 +246,10 @@ public class RobotContainer {
 		operatorController.rightStick().whileTrue(
 			new ManualArmControl(arm, operatorController::getLeftY));
 
+		// *RESET YAW THROUGH PUSHBUTTON*
+		Trigger yawTrigger = new Trigger(swerve::getYawSwitch);
+		yawTrigger.onTrue(teleopSwerve.zeroYaw());
+
 		// *TESTING CONTROLS*
 		//
 		// When in tuning mode, create multiple testing options on shuffleboard as well as bind commands to a unique

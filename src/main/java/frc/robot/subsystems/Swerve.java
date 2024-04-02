@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -40,6 +41,8 @@ import lombok.Getter;
 
 public class Swerve extends SubsystemBase {
 	public SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
+
+	private final DigitalInput yawSwitch = new DigitalInput(switchId);
 
 	public SwerveModule[] modules;
 	public SwerveModulePosition[] modulePositions = {new SwerveModulePosition(), new SwerveModulePosition(),
@@ -229,6 +232,10 @@ public class Swerve extends SubsystemBase {
 	}
 
 	private double visionSeenCount = 0;
+
+	public boolean getYawSwitch() {
+		return yawSwitch.get();
+	}
 
 	@Override
 	public void periodic() {
