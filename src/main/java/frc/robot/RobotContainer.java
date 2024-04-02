@@ -35,7 +35,6 @@ import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.PixelFormat;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Relay;
@@ -122,8 +121,8 @@ public class RobotContainer {
 		// .withPosition(0, 0);
 		var camera = CameraServer.startAutomaticCapture();
 		camera.setResolution(160, 120);
-		camera.setFPS(15);
-		camera.setPixelFormat(PixelFormat.kMJPEG);
+		camera.setFPS(10);
+		// camera.setPixelFormat(PixelFormat.kMJPEG);
 		driveTab.add("camera", camera).withWidget(BuiltInWidgets.kCameraStream).withProperties(Map.of("comp", 50))
 			.withPosition(0, 0).withSize(11, 5);
 
@@ -145,7 +144,7 @@ public class RobotContainer {
 		NamedCommands.registerCommand("WaitUntilVeryEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
 		NamedCommands.registerCommand("WaitIntake",
 			IntakeWithArm.intakeWithDelay(intake, arm).beforeStarting(() -> intake.resetNoteDetection()));
-		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
+		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(.2));
 		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
 		NamedCommands.registerCommand("ArmCarry", new SetArmPosition(arm, 40));
 		NamedCommands.registerCommand("AmpSetting", new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));

@@ -76,7 +76,7 @@
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.0
+                        "waitTime": 0.3
                       }
                     },
                     {
@@ -107,6 +107,12 @@
           "type": "named",
           "data": {
             "name": "SpeakerSetting"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.7
           }
         },
         {

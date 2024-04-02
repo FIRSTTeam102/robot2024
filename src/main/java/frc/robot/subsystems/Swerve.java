@@ -257,29 +257,28 @@ public class Swerve extends SubsystemBase {
 		// todo: estimate without using gyro?
 
 		// Every 0.02s, updating pose2d
-		if (!DriverStation.isAutonomous()) {
-			if (vision.fieldInputs.hasTarget == true) {
-				visionSeenCount++;
-				if (visionSeenCount > 2) { // The if statement is used to eliminate "hallucinations". Schizophrenic robot smh
-					var visionPose = new Pose2d(vision.fieldInputs.fieldspaceTranslationX_m,
-						vision.fieldInputs.fieldspaceTranslationY_m,
-						new Rotation2d(vision.fieldInputs.fieldspaceRotationX_rad)
-							.plus(Rotation2d.fromDegrees(Robot.isBlue() ? 0 : 180))); // continuation of lines 259-261. Create a new
-					// pose2d
-					// using X,Y and rotation
-					Logger.recordOutput("Odometry/VisionPose", visionPose); // log the odometry to advantage kit
-					var distance = Math.hypot( // use pythagorean theorem to find the distance from the last position
-						Math.abs(translationX - vision.fieldInputs.fieldspaceTranslationX_m),
-						Math.abs(translationY - vision.fieldInputs.fieldspaceTranslationY_m));
-					poseEstimator.addVisionMeasurement(visionPose,
-						timer.get() - vision.fieldInputs.fieldspaceTotalLatency_s); // remove lag from the time in the calculation
-																																				// of
-																																				// estimated pose
-					VecBuilder.fill(distance / 2, distance / 2, 100);
-				}
-			} else
-				visionSeenCount = 0;
-		}
+		// if (!DriverStation.isAutonomous()) {
+		if (vision.fieldInputs.targetAprilTag != -1) {
+			visionSeenCount++;
+			if (visionSeenCount > 2) { // The if statement is used to eliminate "hallucinations". Schizophrenic robot smh
+				var visionPose = new Pose2d(vision.fieldInputs.fieldspaceTranslationX_m,
+					vision.fieldInputs.fieldspaceTranslationY_m,
+					new Rotation2d(vision.fieldInputs.fieldspaceRotationZ_rad)); // continuation of lines 259-261. Create a new
+				// pose2d
+				// using X,Y and rotation
+				Logger.recordOutput("Odometry/VisionPose", visionPose); // log the odometry to advantage kit
+				var distance = Math.hypot( // use pythagorean theorem to find the distance from the last position
+					Math.abs(translationX - vision.fieldInputs.fieldspaceTranslationX_m),
+					Math.abs(translationY - vision.fieldInputs.fieldspaceTranslationY_m));
+				poseEstimator.addVisionMeasurement(visionPose,
+					timer.get() - vision.fieldInputs.fieldspaceTotalLatency_s); // remove lag from the time in the calculation
+																																			// of
+																																			// estimated pose
+				VecBuilder.fill(distance / 2, distance / 2, 100);
+			}
+		} else
+			visionSeenCount = 0;
+		// }
 		Logger.recordOutput("Odometry/Robot", pose);
 		// update field pose
 		for (int i = 0; i < modules.length; i++) {
