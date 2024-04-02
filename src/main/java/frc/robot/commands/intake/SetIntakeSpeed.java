@@ -6,7 +6,6 @@ package frc.robot.commands.intake;
 
 import frc.robot.constants.IntakeConstants;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Lights;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -29,7 +28,7 @@ public class SetIntakeSpeed extends Command {
 	}
 
 	/**
-	 * Set an intake to a standard speed given by {@link IntakeConstants#intakeSpeed intakeSpeed} if intaking and {@link IntakeConstants#indexSpeed indexSpeed} if indexing
+	 * Set an intake to a standard speed given by {@link IntakeConstants#intakeSpeed  if intaking and {@link IntakeConstants#indexSpeed} if indexing
 	 * @param intake Intake Subsystem
 	 * @param isIndexing if set to true, the command will ignore the note sensor. Default speed will also be slower.
 	 */
@@ -54,7 +53,6 @@ public class SetIntakeSpeed extends Command {
 	@Override
 	public void end(boolean interrupted) {
 		intake.stopMotor();
-		Lights.setDefaultStatus(); // we no longer have a note...
 	}
 
 	// Returns true when the command should end.

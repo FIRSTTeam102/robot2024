@@ -6,8 +6,7 @@ import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.IntakeConstants;
-import frc.robot.constants.ScoringConstants.ScoringPosition;
-import frc.robot.constants.ShooterConstants;
+import frc.robot.constants.ScoringConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -20,6 +19,7 @@ import frc.robot.subsystems.Vision;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 
+import frc.robot.commands.arm.AutoClimb;
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
 import frc.robot.commands.intake.IntakeWithArm;
@@ -33,12 +33,12 @@ import frc.robot.commands.swerve.XStance;
 import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.SendableCameraWrapper;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -114,15 +114,22 @@ public class RobotContainer {
 			.withSize(4, 1).withPosition(0, 5);
 		driveTab.add("alerts", Alert.getAlertsSendable())
 			.withSize(5, 4).withPosition(4, 5).withWidget(Alert.widgetName);
-		driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.12:5800/stream.mjpg"))
-			.withProperties(Map.of("show crosshair", false, "show controls", false))
-			.withWidget(BuiltInWidgets.kCameraStream)
-			.withSize(11, 5)
-			.withPosition(0, 0);
+		// driveTab.add("camera", SendableCameraWrapper.wrap("limelight-stream", "http://10.1.2.12:5800/stream.mjpg"))
+		// .withProperties(Map.of("show crosshair", false, "show controls", false))
+		// .withWidget(BuiltInWidgets.kCameraStream)
+		// .withSize(11, 5)
+		// .withPosition(0, 0);
+		var camera = CameraServer.startAutomaticCapture();
+		camera.setResolution(160, 120);
+		camera.setFPS(10);
+		// camera.setPixelFormat(PixelFormat.kMJPEG);
+		driveTab.add("camera", camera).withWidget(BuiltInWidgets.kCameraStream).withProperties(Map.of("comp", 50))
+			.withPosition(0, 0).withSize(11, 5);
 
 		Command shuffleboardAutoOptions = Commands.parallel(
 			Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0),
-			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))));
+			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))),
+			Commands.runOnce(() -> swerve.gyroIO.setYaw(swerve.getPose().getRotation().getDegrees())));
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);
@@ -130,23 +137,30 @@ public class RobotContainer {
 		NamedCommands.registerCommand("SpeakerAlign", new AprilTagVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("NoteAlign", new GamePieceVision(vision, swerve).withTimeout(1));
 		NamedCommands.registerCommand("SpeakerSetting",
-			new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
+			new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		NamedCommands.registerCommand("LimelightSetting",
 			new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
-		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
+		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 5));
+		NamedCommands.registerCommand("WaitUntilVeryEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
 		NamedCommands.registerCommand("WaitIntake",
-			new IntakeWithArm(intake, arm).beforeStarting(() -> intake.resetNoteDetection(), intake));
-		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(1));
+			IntakeWithArm.intakeWithDelay(intake, arm).beforeStarting(() -> intake.resetNoteDetection()));
+		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(.2));
 		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
-		NamedCommands.registerCommand("AmpSetting", new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
+		NamedCommands.registerCommand("ArmCarry", new SetArmPosition(arm, 40));
+		NamedCommands.registerCommand("AmpSetting", new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));
 		NamedCommands.registerCommand("SlowForward",
 			Commands.startEnd(() -> swerve.drive(new Translation2d(.3, 0), 0, false), () -> swerve.stop(), swerve)
 				.withTimeout(1.5));
-		NamedCommands.registerCommand("ResetScoring", new SetScoringPosition(arm, shooter, new ScoringPosition(4, 0)));
+		NamedCommands.registerCommand("ResetScoring",
+			new SetScoringPosition(arm, shooter, ScoringConstants.lowCarryPosition));
 		NamedCommands.registerCommand("StopShooter", new StopShooter(shooter));
+		NamedCommands.registerCommand("RaceTimeout", Commands.idle().withTimeout(5));
+		NamedCommands.registerCommand("Print", Commands.print("hello!"));
 		// create paths
 		final List<String> autoNames = AutoBuilder.getAllAutoNames();
 		for (final String autoName : autoNames) {
+			if (autoName == "pits test" && !Constants.tuningMode)
+				continue;
 			final Command auto = new PathPlannerAuto(autoName);
 			autoChooser.addOption(autoName, auto);
 		}
@@ -207,25 +221,34 @@ public class RobotContainer {
 		// *OPERATOR CONTROLS*
 		//
 		operatorController.a()
-			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(84, 1750)));
+			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));
 		operatorController.b()
-			.onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(-1.5, ShooterConstants.subwooferVelocity_rpm)));
+			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		operatorController.x().onTrue(
-			new SetScoringPosition(arm, shooter, new ScoringPosition(40, 0)).andThen(() -> intake.resetNoteDetection()));
-		operatorController.y().onTrue(new SetScoringPosition(arm, shooter, new ScoringPosition(1, 2950)));
+			new SetScoringPosition(arm, shooter, ScoringConstants.carryPosition).andThen(() -> intake.resetNoteDetection()));
+		operatorController.y()
+			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
-		operatorController.leftTrigger(boolTriggerThreshold).whileTrue(new IntakeWithArm(intake, arm));
+		operatorController.leftTrigger(boolTriggerThreshold)
+			.whileTrue(IntakeWithArm.intakeWithDelay(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
-		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kForward), arm));
-		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kReverse), arm));
+		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kForward), arm)
+			.unless(() -> DriverStation.getMatchTime() > 32));
+		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kReverse), arm)
+			.unless(() -> DriverStation.getMatchTime() > 32));
 		// operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kOff), arm));
 		operatorController.povRight().onTrue(Commands.runOnce(() -> intake.resetNoteDetection()));
 
-		operatorController.start().toggleOnTrue(Commands.startEnd(() -> arm.setMotorVoltage(-3.7), () -> arm.stop(), arm));
+		operatorController.start().toggleOnTrue(new AutoClimb(arm));
 
 		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
-		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));
+		operatorController.rightStick().whileTrue(
+			new ManualArmControl(arm, operatorController::getLeftY));
+
+		// *RESET YAW THROUGH PUSHBUTTON*
+		Trigger yawTrigger = new Trigger(swerve::getYawSwitch);
+		yawTrigger.onTrue(teleopSwerve.zeroYaw());
 
 		// *TESTING CONTROLS*
 		//
@@ -300,15 +323,29 @@ public class RobotContainer {
 			|| driverController.getHID().getName().indexOf("Xbox") < 0);
 	}
 
+	public Command pulseRumble(CommandXboxController controller) {
+		return Commands.startEnd(() -> controller.getHID().setRumble(RumbleType.kBothRumble, .65),
+			() -> controller.getHID().setRumble(RumbleType.kBothRumble, 0), new Subsystem[] {}).withTimeout(.55);
+	}
+
 	private boolean cachedShooterAtTarget = false;
+	private boolean cachedHoldingNote = false;
 
 	public void checkRumble() {
-		if (shooter.isAtTargetVelocity() && (shooter.isAtTargetVelocity() != cachedShooterAtTarget)) {
-			if (shooter.getTargetVelocity_rpm() > 400) {
-				Commands.startEnd(() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, .7),
-					() -> operatorController.getHID().setRumble(RumbleType.kBothRumble, 0), new Subsystem[] {}).withTimeout(.5)
-					.schedule();
+		// operator rumble on shooter reaching speed
+		boolean currShooterAtTarget = shooter.isAtTargetVelocity();
+		if (currShooterAtTarget && (currShooterAtTarget != cachedShooterAtTarget)) {
+			if (shooter.inputs.leadVelocity_rpm > 400) {
+				pulseRumble(operatorController).schedule();
 			}
 		}
+		cachedShooterAtTarget = currShooterAtTarget;
+
+		// driver rumble on holding note
+		boolean currHoldingNote = intake.isHoldingNote();
+		if (currHoldingNote && (currHoldingNote != cachedHoldingNote)) {
+			pulseRumble(driverController).schedule();
+		}
+		cachedHoldingNote = currHoldingNote;
 	}
 }

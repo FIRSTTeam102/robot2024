@@ -5,7 +5,7 @@
       "x": 1.3126474618911743,
       "y": 5.567087650299072
     },
-    "rotation": -8.345126428911687e-30
+    "rotation": 0.0
   },
   "command": {
     "type": "sequential",
@@ -33,6 +33,12 @@
           "type": "named",
           "data": {
             "name": "ResetScoring"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitUntilEnd"
           }
         },
         {

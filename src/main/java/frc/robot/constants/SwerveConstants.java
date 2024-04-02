@@ -7,10 +7,10 @@ import edu.wpi.first.math.geometry.Translation2d;
 public final class SwerveConstants {
 	// FL, FR, BL, BR (matches AdvantageScope convention)
 	public static final SwerveModuleConstants moduleConstants[] = {
-		new SwerveModuleConstants(21, 22, .723),
-		new SwerveModuleConstants(23, 24, 1.914),
-		new SwerveModuleConstants(25, 26, 3.073),
-		new SwerveModuleConstants(27, 28, 2.859)
+		new SwerveModuleConstants(21, 22, .676),
+		new SwerveModuleConstants(23, 24, 1.919),
+		new SwerveModuleConstants(25, 26, 2.168),
+		new SwerveModuleConstants(27, 28, 2.814)
 	};
 
 	// the left-to-right distance between the drivetrain wheels, should be measured from center to center
@@ -78,4 +78,7 @@ public final class SwerveConstants {
 	/* current limiting */
 	public static final int driveCurrentLimit_amp = 50;
 	public static final int angleCurrentLimit_amp = 30;
+
+	/* physical yaw reset switch id */
+	public static final int switchId = 5; // DIO 5
 };

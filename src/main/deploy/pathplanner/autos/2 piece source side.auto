@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.78237783908844,
-      "y": 4.488044738769531
+      "x": 0.6313003897666931,
+      "y": 4.255156517028809
     },
-    "rotation": -56.888709413415555
+    "rotation": -73.89436683802228
   },
   "command": {
     "type": "sequential",
@@ -24,6 +24,12 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Index"
@@ -36,29 +42,47 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "race",
           "data": {
             "commands": [
               {
-                "type": "path",
+                "type": "named",
                 "data": {
-                  "pathName": "2 piece right.1"
+                  "name": "RaceTimeout"
                 }
               },
               {
-                "type": "deadline",
+                "type": "named",
+                "data": {
+                  "name": "WaitIntake"
+                }
+              },
+              {
+                "type": "sequential",
                 "data": {
                   "commands": [
                     {
-                      "type": "named",
+                      "type": "wait",
                       "data": {
-                        "name": "WaitIntake"
+                        "waitTime": 1.0
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "2 piece right.1"
                       }
                     },
                     {
                       "type": "wait",
                       "data": {
-                        "waitTime": 1.3
+                        "waitTime": 0.3
+                      }
+                    },
+                    {
+                      "type": "path",
+                      "data": {
+                        "pathName": "2 piece right.2"
                       }
                     }
                   ]
@@ -70,7 +94,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2 piece right.2"
+            "pathName": "2 piece right.3"
           }
         },
         {
@@ -100,7 +124,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "2 piece right.3"
+            "pathName": "2 piece right.4"
           }
         }
       ]

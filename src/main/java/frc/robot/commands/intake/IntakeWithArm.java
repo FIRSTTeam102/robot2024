@@ -14,7 +14,7 @@ public class IntakeWithArm extends Command {
 	private Intake intake;
 	private Arm arm;
 
-	public IntakeWithArm(Intake intake, Arm arm) {
+	private IntakeWithArm(Intake intake, Arm arm) {
 		this.intake = intake;
 		this.arm = arm;
 		addRequirements(intake, arm);
@@ -24,7 +24,7 @@ public class IntakeWithArm extends Command {
 	@Override
 	public void initialize() {
 		if (!intake.isHoldingNote()) {
-			arm.setPosition(-1.5);
+			arm.setPosition(-2);
 			intake.setMotorSpeed(IntakeConstants.intakeSpeed);
 			Lights.setStatus(LightsConstants.Mode.Intaking);
 		}
@@ -41,13 +41,19 @@ public class IntakeWithArm extends Command {
 			arm.setPosition(4);
 		else
 			arm.setPosition(40);
-		Commands.waitSeconds(.015).andThen(intake::stopMotor, intake).schedule();
-		Lights.setDefaultStatus();
+		// Commands.waitSeconds(.015).andThen(intake::stopMotor, intake).schedule();
+		if (interrupted) {
+			intake.stopMotor();
+		}
 	}
 
 	// Returns true when the command should end.
 	@Override
 	public boolean isFinished() {
 		return intake.isHoldingNote();
+	}
+
+	public static Command intakeWithDelay(Intake intake, Arm arm) {
+		return new IntakeWithArm(intake, arm).andThen(Commands.waitSeconds(.015)).andThen(intake::stopMotor, intake);
 	}
 }

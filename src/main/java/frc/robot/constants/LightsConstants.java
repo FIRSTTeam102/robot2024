@@ -8,8 +8,8 @@ import lombok.Getter;
 
 public final class LightsConstants {
 	public enum Mode {
-		Shooting(0), Intaking(1), Disabled(2), Auto(3), We_can_shoot(4), TeleopRED(5), TeleopBLUE(6), Climb(
-			7), We_have_a_note(8);
+		Shooting(0), Intaking(1), Disabled(2), Auto(3), CanShoot(4), TeleopRED(5), TeleopBLUE(6), Climb(
+			7), HaveANote(8);
 
 		@Getter
 		private final int code;
