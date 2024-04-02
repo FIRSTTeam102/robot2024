@@ -8,9 +8,9 @@ public final class SwerveConstants {
 	// FL, FR, BL, BR (matches AdvantageScope convention)
 	public static final SwerveModuleConstants moduleConstants[] = {
 		new SwerveModuleConstants(21, 22, .676),
-		new SwerveModuleConstants(23, 24, 1.919),
-		new SwerveModuleConstants(25, 26, 2.168),
-		new SwerveModuleConstants(27, 28, 2.814)
+		new SwerveModuleConstants(23, 24, 1.925),
+		new SwerveModuleConstants(25, 26, 2.602),
+		new SwerveModuleConstants(27, 28, 2.864)
 	};
 
 	// the left-to-right distance between the drivetrain wheels, should be measured from center to center

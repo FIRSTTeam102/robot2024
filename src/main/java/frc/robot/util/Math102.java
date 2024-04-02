@@ -1,5 +1,7 @@
 package frc.robot.util;
 
+import frc.robot.Robot;
+
 /**
  * Various math-related methods that were not defined in other math libraries
  */
@@ -20,5 +22,13 @@ public class Math102 {
 	 */
 	public static double truncate(double num, int precision) {
 		return Math.floor(num * Math.pow(10, precision)) / Math.pow(10, precision);
+	}
+
+	public static double mirrorAngle_deg(double angle_deg) {
+		return 180 - angle_deg;
+	}
+
+	public static double mirrorAngleByAlliance_deg(double angle_deg) {
+		return Robot.isBlue() ? angle_deg : mirrorAngle_deg(angle_deg);
 	}
 }

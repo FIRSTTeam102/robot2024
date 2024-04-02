@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.7669039964675903,
-      "y": 6.639083385467529
+      "x": 0.6235248446464539,
+      "y": 6.866034507751465
     },
-    "rotation": 57.72434388873349
+    "rotation": 74.69650775120543
   },
   "command": {
     "type": "sequential",
@@ -20,7 +20,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ResetScoring"
+            "name": "ResetScoringHigh"
           }
         },
         {
@@ -44,7 +44,7 @@
         {
           "type": "named",
           "data": {
-            "name": "ResetScoring"
+            "name": "ResetScoringHigh"
           }
         }
       ]

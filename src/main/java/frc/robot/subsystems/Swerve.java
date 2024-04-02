@@ -96,7 +96,7 @@ public class Swerve extends SubsystemBase {
 			this::getPose,
 			this::resetOdometry,
 			() -> kinematics.toChassisSpeeds(getStates()),
-			this::setChasisSpeeds,
+			this::setChassisSpeeds,
 			new HolonomicPathFollowerConfig(
 				new PIDConstants(autoDriveKp, autoDriveKi, autoDriveKd),
 				new PIDConstants(autoAngleKp, autoAngleKi, autoAngleKd),
@@ -134,7 +134,7 @@ public class Swerve extends SubsystemBase {
 			mod.setDesiredState(desiredStates[mod.moduleNumber], isOpenLoop, forceAngle);
 	}
 
-	public void setChasisSpeeds(ChassisSpeeds chassisSpeeds) {
+	public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
 		SwerveModuleState[] states = kinematics.toSwerveModuleStates(chassisSpeeds, centerRotation);
 		setModuleStates(states);
 	}

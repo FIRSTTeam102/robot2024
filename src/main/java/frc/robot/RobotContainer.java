@@ -18,6 +18,7 @@ import frc.robot.subsystems.SystemAlerter;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
+import frc.robot.util.Math102;
 
 import frc.robot.commands.arm.AutoClimb;
 import frc.robot.commands.arm.ManualArmControl;
@@ -129,7 +130,8 @@ public class RobotContainer {
 		Command shuffleboardAutoOptions = Commands.parallel(
 			Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0),
 			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))),
-			Commands.runOnce(() -> swerve.gyroIO.setYaw(swerve.getPose().getRotation().getDegrees())));
+			Commands.runOnce(
+				() -> swerve.gyroIO.setYaw(Math102.mirrorAngleByAlliance_deg(swerve.getPose().getRotation().getDegrees()))));
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);
@@ -153,6 +155,8 @@ public class RobotContainer {
 				.withTimeout(1.5));
 		NamedCommands.registerCommand("ResetScoring",
 			new SetScoringPosition(arm, shooter, ScoringConstants.lowCarryPosition));
+		NamedCommands.registerCommand("ResetScoringHigh",
+			new SetScoringPosition(arm, shooter, ScoringConstants.carryPosition));
 		NamedCommands.registerCommand("StopShooter", new StopShooter(shooter));
 		NamedCommands.registerCommand("RaceTimeout", Commands.idle().withTimeout(5));
 		NamedCommands.registerCommand("Print", Commands.print("hello!"));
@@ -207,8 +211,11 @@ public class RobotContainer {
 
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
-		// right bumper -> rotate to speaker apriltag
-		driverController.rightBumper().whileTrue(new AprilTagVision(vision, swerve));
+		// right bumper -> limelight arm + shooter setting
+		driverController.rightBumper()
+			.onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
+		// the double colon calls fora method but doesn'treturn its value immediately
+
 		// left bumper -> rotate to note
 		// driverController.leftBumper().whileTrue(new GamePieceVision(vision, swerve));
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());

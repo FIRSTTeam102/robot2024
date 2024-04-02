@@ -4,14 +4,14 @@ public final class ArmConstants {
 	public static final int leadMotorId = 29;
 	public static final int followerMotorId = 30;
 
-	public static final double shaftEncoderOffset_deg = 124.52; // needs to be tuned
+	public static final double shaftEncoderOffset_deg = 4.54; // needs to be tuned
 
 	// pid
 	public static final double kP = .000095;
 	public static final double kI = 0;
 	public static final double kD = .00000165;
 
-	public static final double kPHigh = 0.000047;
+	public static final double kPHigh = 0.000054;
 	public static final double kDHigh = 0.00000725;
 
 	public static final double maxOutput = .5;
@@ -31,7 +31,7 @@ public final class ArmConstants {
 	public static double maxAccel_rpmps = 7200;
 	public static double maxVelocity_rpm = 3800;
 
-	public static double maxVelocityHigh_rpm = 1900;
+	public static double maxVelocityHigh_rpm = 2500;
 
 	// Conversion (not needed)
 	// public static final int gearRatio = 1; // 1 IS PLACEHOLDER
