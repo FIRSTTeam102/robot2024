@@ -1,0 +1,80 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.6235248446464539,
+      "y": 6.866034507751465
+    },
+    "rotation": 74.69650775120543
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "Options"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetScoringHigh"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "amp (blue).1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AmpSetting"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Index"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "WaitIntake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "amp (blue).2"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AmpSetting"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Index"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": true
+}

@@ -61,7 +61,7 @@ public class AprilTagVision extends Command {
 	public void execute() {
 		if ((vision.fieldInputs.targetAprilTag == VisionConstants.blueSpeakerTag) && (alliance.get() == Alliance.Blue)
 			|| (vision.fieldInputs.targetAprilTag == VisionConstants.redSpeakerTag) && (alliance.get() == Alliance.Red)) {
-			isAligned = (vision.pieceInputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairGamePieceBoundRotateX_rad)
+			isAligned = (vision.fieldInputs.crosshairToTargetErrorX_rad < VisionConstants.crosshairGamePieceBoundRotateX_rad)
 				&& (vision.fieldInputs.crosshairToTargetErrorX_rad > -VisionConstants.crosshairGamePieceBoundRotateX_rad);
 		}
 		Logger.recordOutput("Fieldvision/isAligned", isAligned);

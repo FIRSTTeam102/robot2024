@@ -214,10 +214,9 @@ public class RobotContainer {
 		// right bumper -> limelight arm + shooter setting
 		driverController.rightBumper()
 			.onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
-		// the double colon calls fora method but doesn'treturn its value immediately
+		// the double colon calls fora method but doesn't return its value immediately
 
-		// left bumper -> rotate to note
-		// driverController.leftBumper().whileTrue(new GamePieceVision(vision, swerve));
+		driverController.leftBumper().whileTrue(new AprilTagVision(vision, swerve));
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
 		driverController.x().whileTrue(new XStance(swerve));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
