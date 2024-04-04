@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.6313003897666931,
-      "y": 4.255156517028809
+      "x": 0.6103193163871765,
+      "y": 4.308632850646973
     },
-    "rotation": -73.89436683802228
+    "rotation": -67.33790579008051
   },
   "command": {
     "type": "sequential",
@@ -39,6 +39,12 @@
           "type": "named",
           "data": {
             "name": "WaitUntilEnd"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "2 piece right.4"
           }
         }
       ]
