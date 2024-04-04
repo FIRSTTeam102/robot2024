@@ -265,6 +265,7 @@ public class Swerve extends SubsystemBase {
 
 		// Every 0.02s, updating pose2d
 		// if (!DriverStation.isAutonomous()) {
+		vision.setOrientation(pose.getRotation().getDegrees());
 		if (vision.fieldInputs.targetAprilTag != -1) {
 			visionSeenCount++;
 			if (visionSeenCount > 2) { // The if statement is used to eliminate "hallucinations". Schizophrenic robot smh
@@ -277,11 +278,11 @@ public class Swerve extends SubsystemBase {
 				var distance = Math.hypot( // use pythagorean theorem to find the distance from the last position
 					Math.abs(translationX - vision.fieldInputs.fieldspaceTranslationX_m),
 					Math.abs(translationY - vision.fieldInputs.fieldspaceTranslationY_m));
+				poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.2, .2, 1));
 				poseEstimator.addVisionMeasurement(visionPose,
 					timer.get() - vision.fieldInputs.fieldspaceTotalLatency_s); // remove lag from the time in the calculation
 																																			// of
 																																			// estimated pose
-				VecBuilder.fill(distance / 2, distance / 2, 100);
 			}
 		} else
 			visionSeenCount = 0;

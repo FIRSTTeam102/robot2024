@@ -18,7 +18,6 @@ import frc.robot.subsystems.SystemAlerter;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
-import frc.robot.util.Math102;
 
 import frc.robot.commands.arm.AutoClimb;
 import frc.robot.commands.arm.ManualArmControl;
@@ -121,7 +120,7 @@ public class RobotContainer {
 		// .withSize(11, 5)
 		// .withPosition(0, 0);
 		var camera = CameraServer.startAutomaticCapture();
-		camera.setResolution(160, 120);
+		camera.setResolution(240, 60);
 		camera.setFPS(10);
 		// camera.setPixelFormat(PixelFormat.kMJPEG);
 		driveTab.add("camera", camera).withWidget(BuiltInWidgets.kCameraStream).withProperties(Map.of("comp", 50))
@@ -130,8 +129,7 @@ public class RobotContainer {
 		Command shuffleboardAutoOptions = Commands.parallel(
 			Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0),
 			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))),
-			Commands.runOnce(
-				() -> swerve.gyroIO.setYaw(Math102.mirrorAngleByAlliance_deg(swerve.getPose().getRotation().getDegrees()))));
+			Commands.runOnce(() -> swerve.gyroIO.setYaw(swerve.getPose().getRotation().getDegrees())));
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);

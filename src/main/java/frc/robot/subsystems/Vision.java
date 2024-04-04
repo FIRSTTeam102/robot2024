@@ -7,6 +7,7 @@ import frc.robot.io.FieldVisionIO;
 import frc.robot.io.FieldVisionIOInputsAutoLogged;
 import frc.robot.io.PieceVisionIO;
 import frc.robot.io.PieceVisionIOInputsAutoLogged;
+import frc.robot.util.LimelightHelpers;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -99,6 +100,14 @@ public class Vision extends SubsystemBase {
 		Logger.recordOutput("Vision/targetPosition", new double[] {angle, speed});
 
 		return new ScoringPosition(angle, speed);
+	}
+
+	/**
+	 * Give limelight the robot rotation information via network tables. REQUIRED for MegaTag2. All angles other than yaw are set to 0.
+	 * @param yaw_deg
+	 */
+	public void setOrientation(double yaw_deg) {
+		LimelightHelpers.SetRobotOrientation("limelight-fv", yaw_deg, 0, 0, 0, 0, 0);
 	}
 }
 

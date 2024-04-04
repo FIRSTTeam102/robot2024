@@ -68,7 +68,7 @@ public class Arm extends SubsystemBase {
 		// rev / sec * sec / min = RPM
 		shaftEncoder.setVelocityConversionFactor(60);
 		shaftEncoder.setInverted(true);
-		shaftEncoder.setZeroOffset(300);
+		shaftEncoder.setZeroOffset(180);
 
 		pidController.setFeedbackDevice(shaftEncoder);
 		// Smart motion applies a velocity and acceleration limiter as it travels to the target position. More info can be
