@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.6235248446464539,
-      "y": 6.866034507751465
+      "x": 1.431949496269226,
+      "y": 7.3236985206604
     },
-    "rotation": 74.69650775120543
+    "rotation": -89.95437383553926
   },
   "command": {
     "type": "sequential",
@@ -45,6 +45,18 @@
           "type": "named",
           "data": {
             "name": "ResetScoringHigh"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "WaitUntilVeryEnd"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "amp.5"
           }
         }
       ]

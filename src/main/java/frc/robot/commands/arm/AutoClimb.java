@@ -18,11 +18,11 @@ public class AutoClimb extends Command {
 
 	@Override
 	public void execute() {
-		boolean nearZero = MathUtil.isNear(0, arm.inputs.shaftPosition_deg, 1);
+		boolean nearZero = MathUtil.isNear(33, arm.inputs.shaftPosition_deg, .7);
 		if (!nearZero)
-			arm.setPosition(0);
+			arm.setPosition(33);
 		else
-			arm.setMotorVoltage(-.75);
+			arm.setMotorVoltage(-.15);
 	}
 
 	@Override

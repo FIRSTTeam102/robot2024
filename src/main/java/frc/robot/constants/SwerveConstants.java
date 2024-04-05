@@ -7,9 +7,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 public final class SwerveConstants {
 	// FL, FR, BL, BR (matches AdvantageScope convention)
 	public static final SwerveModuleConstants moduleConstants[] = {
-		new SwerveModuleConstants(21, 22, .692),
-		new SwerveModuleConstants(23, 24, 1.926),
-		new SwerveModuleConstants(25, 26, 3.046),
+		new SwerveModuleConstants(21, 22, .686),
+		new SwerveModuleConstants(23, 24, 1.945),
+		new SwerveModuleConstants(25, 26, 3.012),
 		new SwerveModuleConstants(27, 28, 2.875)
 	};
 

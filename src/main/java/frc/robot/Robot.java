@@ -4,6 +4,7 @@ import static frc.robot.constants.Constants.*;
 
 import frc.robot.constants.BuildConstants;
 import frc.robot.constants.LightsConstants;
+import frc.robot.constants.ScoringConstants;
 import frc.robot.subsystems.Lights;
 import frc.robot.util.AutoSetterTunableNumber.AutoSetterTunableNumberManager;
 import frc.robot.util.VirtualSubsystem;
@@ -14,7 +15,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.Relay.Value;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -179,8 +179,8 @@ public class Robot extends LoggedRobot {
 			autonomousCommand.cancel();
 		}
 
-		robotContainer.arm.setPosition(5);
-		robotContainer.arm.setClimberRelay(Value.kReverse);
+		robotContainer.arm.setPosition(ScoringConstants.carryPosition.armAngle_deg());
+		robotContainer.arm.climbStartup().schedule();
 		alliance = DriverStation.getAlliance().isPresent() ? DriverStation.getAlliance().get() : Alliance.Blue;
 
 		// for limelight shooting targeting

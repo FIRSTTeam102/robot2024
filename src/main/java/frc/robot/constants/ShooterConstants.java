@@ -8,7 +8,7 @@ public final class ShooterConstants {
 	public static final double kD = .0000025;
 
 	public static final double kS = 0.026257;
-	public static final double kV = .002097;
+	public static final double kV = .002102;
 	public static final double kA = .008631;
 
 	public static final double maxVelocity_rpm = 5000;

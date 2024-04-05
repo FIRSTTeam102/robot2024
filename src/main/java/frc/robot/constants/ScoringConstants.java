@@ -20,5 +20,6 @@ public final class ScoringConstants {
 	public static final ScoringPosition subwooferPosition = new ScoringPosition(-1.5, 3250);
 	public static final ScoringPosition carryPosition = new ScoringPosition(40, 0);
 	public static final ScoringPosition lowCarryPosition = new ScoringPosition(4, 0);
-	public static final ScoringPosition passPosition = new ScoringPosition(1, 2950);
+	public static final ScoringPosition passPosition = new ScoringPosition(1, 3000);
+	public static final ScoringPosition lowPassPosition = new ScoringPosition(50, 2650);
 }

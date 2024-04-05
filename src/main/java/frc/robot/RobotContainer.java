@@ -18,6 +18,7 @@ import frc.robot.subsystems.SystemAlerter;
 import frc.robot.subsystems.Vision;
 import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
+import frc.robot.util.ControllerUtil;
 
 import frc.robot.commands.arm.AutoClimb;
 import frc.robot.commands.arm.ManualArmControl;
@@ -34,9 +35,10 @@ import frc.robot.commands.vision.AprilTagVision;
 import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.VideoException;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -46,7 +48,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -60,6 +61,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -119,17 +121,21 @@ public class RobotContainer {
 		// .withWidget(BuiltInWidgets.kCameraStream)
 		// .withSize(11, 5)
 		// .withPosition(0, 0);
-		var camera = CameraServer.startAutomaticCapture();
-		camera.setResolution(240, 60);
-		camera.setFPS(10);
-		// camera.setPixelFormat(PixelFormat.kMJPEG);
-		driveTab.add("camera", camera).withWidget(BuiltInWidgets.kCameraStream).withProperties(Map.of("comp", 50))
-			.withPosition(0, 0).withSize(11, 5);
-
+		try {
+			var camera = CameraServer.startAutomaticCapture();
+			camera.setResolution(240, 60);
+			camera.setFPS(10);
+			// camera.setPixelFormat(PixelFormat.kMJPEG);
+			driveTab.add("camera", camera).withWidget(BuiltInWidgets.kCameraStream).withProperties(Map.of("comp", 50))
+				.withPosition(0, 0).withSize(11, 5);
+		} catch (VideoException e) {
+			new Alert("Could not connect to USB Camera", AlertType.Error).set(true);
+		}
 		Command shuffleboardAutoOptions = Commands.parallel(
 			Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0),
 			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))),
-			Commands.runOnce(() -> swerve.gyroIO.setYaw(swerve.getPose().getRotation().getDegrees())));
+			Commands.runOnce(() -> swerve.gyroIO
+				.setYaw(swerve.getPose().getRotation().plus(Rotation2d.fromDegrees(Robot.isBlue() ? 0 : 180)).getDegrees())));
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);
@@ -143,7 +149,7 @@ public class RobotContainer {
 		NamedCommands.registerCommand("WaitUntilEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 5));
 		NamedCommands.registerCommand("WaitUntilVeryEnd", Commands.idle().until(() -> DriverStation.getMatchTime() <= 2));
 		NamedCommands.registerCommand("WaitIntake",
-			IntakeWithArm.intakeWithDelay(intake, arm).beforeStarting(() -> intake.resetNoteDetection()));
+			IntakeWithArm.withDelay(intake, arm).beforeStarting(() -> intake.resetNoteDetection()));
 		NamedCommands.registerCommand("Index", new SetIntakeSpeed(intake, true).withTimeout(.2));
 		NamedCommands.registerCommand("ArmDown", new SetArmPosition(arm, 4));
 		NamedCommands.registerCommand("ArmCarry", new SetArmPosition(arm, 40));
@@ -182,6 +188,9 @@ public class RobotContainer {
 		// needs to run when disabled so motors don't run
 		SmartDashboard.putData("swerve angle calibration", new SwerveAngleOffsetCalibration(swerve));
 		SmartDashboard.putData("Clean Motor", new SetShooterVelocity(shooter, 1500));
+
+		SmartDashboard.updateValues();
+		Shuffleboard.update();
 	}
 
 	/**
@@ -214,9 +223,11 @@ public class RobotContainer {
 			.onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
 		// the double colon calls fora method but doesn't return its value immediately
 
-		driverController.leftBumper().whileTrue(new AprilTagVision(vision, swerve));
+		// driverController.leftBumper().whileTrue(new AprilTagVision(vision, swerve));
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
-		driverController.x().whileTrue(new XStance(swerve));
+		// driverController.x().whileTrue(new XStance(swerve));
+		driverController.x().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
+		driverController.b().whileTrue(new SetIntakeSpeed(intake, true));
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 
 		// dpad left -> call for coopertition (lights)
@@ -232,15 +243,19 @@ public class RobotContainer {
 			new SetScoringPosition(arm, shooter, ScoringConstants.carryPosition).andThen(() -> intake.resetNoteDetection()));
 		operatorController.y()
 			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
+		operatorController.povLeft().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.lowPassPosition));
+
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
 		operatorController.leftTrigger(boolTriggerThreshold)
-			.whileTrue(IntakeWithArm.intakeWithDelay(intake, arm));
+			.whileTrue(IntakeWithArm.withDelay(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
+		// only let climb be run if end of match or we aren't on the field
+		BooleanSupplier climbAllowed = () -> (DriverStation.getMatchTime() < 32) || (!DriverStation.isFMSAttached());
 		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kForward), arm)
-			.unless(() -> DriverStation.getMatchTime() > 32));
+			.onlyIf(climbAllowed));
 		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kReverse), arm)
-			.unless(() -> DriverStation.getMatchTime() > 32));
+			.onlyIf(climbAllowed));
 		// operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kOff), arm));
 		operatorController.povRight().onTrue(Commands.runOnce(() -> intake.resetNoteDetection()));
 
@@ -327,20 +342,18 @@ public class RobotContainer {
 			|| driverController.getHID().getName().indexOf("Xbox") < 0);
 	}
 
-	public Command pulseRumble(CommandXboxController controller) {
-		return Commands.startEnd(() -> controller.getHID().setRumble(RumbleType.kBothRumble, .65),
-			() -> controller.getHID().setRumble(RumbleType.kBothRumble, 0), new Subsystem[] {}).withTimeout(.55);
-	}
-
 	private boolean cachedShooterAtTarget = false;
 	private boolean cachedHoldingNote = false;
 
+	/**
+	 * Runs checks on the shooter and intake to send rumble to operator/driver controllers.
+	 */
 	public void checkRumble() {
 		// operator rumble on shooter reaching speed
 		boolean currShooterAtTarget = shooter.isAtTargetVelocity();
 		if (currShooterAtTarget && (currShooterAtTarget != cachedShooterAtTarget)) {
 			if (shooter.inputs.leadVelocity_rpm > 400) {
-				pulseRumble(operatorController).schedule();
+				ControllerUtil.pulseRumble(operatorController).schedule();
 			}
 		}
 		cachedShooterAtTarget = currShooterAtTarget;
@@ -348,7 +361,7 @@ public class RobotContainer {
 		// driver rumble on holding note
 		boolean currHoldingNote = intake.isHoldingNote();
 		if (currHoldingNote && (currHoldingNote != cachedHoldingNote)) {
-			pulseRumble(driverController).schedule();
+			ControllerUtil.pulseRumble(driverController).schedule();
 		}
 		cachedHoldingNote = currHoldingNote;
 	}

@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 
+/**
+ * Commands to run the intake in tandem with the arm. Main method of intaking notes as opposed to setting them individually.
+ */
 public class IntakeWithArm extends Command {
 	private Intake intake;
 	private Arm arm;
@@ -53,7 +56,23 @@ public class IntakeWithArm extends Command {
 		return intake.isHoldingNote();
 	}
 
-	public static Command intakeWithDelay(Intake intake, Arm arm) {
+	/**
+	 * Creates a new IntakeWithArm command with a delay between sensing the note and stopping the motor.
+	 * @param intake
+	 * @param arm
+	 * @return Command to be scheduled or bound
+	 */
+	public static Command withDelay(Intake intake, Arm arm) {
 		return new IntakeWithArm(intake, arm).andThen(Commands.waitSeconds(.015)).andThen(intake::stopMotor, intake);
+	}
+
+	/**
+	 * Creates a new IntakeWithArm command with no delay between sensing the note and stopping the motor
+	 * @param intake
+	 * @param arm
+	 * @return Command to be scheduled or bound
+	 */
+	public static Command noDelay(Intake intake, Arm arm) {
+		return new IntakeWithArm(intake, arm).andThen(intake::stopMotor, intake);
 	}
 }

@@ -8,6 +8,8 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.AbsoluteEncoder;
@@ -52,7 +54,8 @@ public class Arm extends SubsystemBase {
 		leadMotor.enableVoltageCompensation(12);
 
 		leadMotor.setSoftLimit(SoftLimitDirection.kForward, (float) (110 + shaftEncoderOffset_deg));
-		leadMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) (-1.5 + shaftEncoderOffset_deg));
+		leadMotor.setSoftLimit(SoftLimitDirection.kReverse, (float) (-1.5 + shaftEncoderOffset_deg)); // change to allow us
+																																																	// to flipover
 		leadMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
 		leadMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
 
@@ -141,7 +144,7 @@ public class Arm extends SubsystemBase {
 
 		inputs.followerCurrent_A = followerMotor.getOutputCurrent();
 		inputs.followerBusVoltage_V = followerMotor.getBusVoltage();
-		inputs.leadAppliedVoltage_V = 12 * followerMotor.getAppliedOutput();
+		inputs.followerAppliedVoltage_V = 12 * followerMotor.getAppliedOutput();
 		inputs.followerTemperature_C = followerMotor.getMotorTemperature();
 		inputs.followerPercentOutput = followerMotor.getAppliedOutput();
 
@@ -185,5 +188,15 @@ public class Arm extends SubsystemBase {
 	public int getBestPIDSlot(double targetPosition_deg) {
 		boolean chooseTop = (inputs.shaftPosition_deg > 65) && (targetPosition_deg > 65);
 		return chooseTop ? 1 : 0;
+	}
+
+	/**
+	 * ~30s climb startup routine to get it in the right position (no position control :(  )
+	 * @return
+	 */
+	public Command climbStartup() {
+		return Commands.runOnce(() -> setClimberRelay(Relay.Value.kReverse)).andThen(Commands.waitSeconds(15))
+			.andThen(() -> setClimberRelay(Relay.Value.kForward)).andThen(Commands.waitSeconds(5))
+			.andThen(() -> setClimberRelay(Relay.Value.kOn));
 	}
 }

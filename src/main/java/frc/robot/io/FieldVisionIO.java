@@ -34,6 +34,13 @@ public class FieldVisionIO {
 		public double fieldspaceRotationY_rad = 0.0;
 		public double fieldspaceRotationZ_rad = 0.0;
 
+		public double megatag2TranslationX_m = 0.0;
+		public double megatag2TranslationY_m = 0.0;
+		public double megatag2TranslationZ_m = 0.0;
+		public double megatag2RotationX_rad = 0.0;
+		public double megatag2RotationY_rad = 0.0;
+		public double megatag2RotationZ_rad = 0.0;
+
 		public double fieldspaceTotalLatency_s = 0.0;
 	}
 
@@ -55,6 +62,9 @@ public class FieldVisionIO {
 
 	private NetworkTableEntry botpose_wpiblueEntry = table.getEntry("botpose_wpiblue");
 	private double[] botpose_wpiblueCache = new double[7];
+
+	private NetworkTableEntry botpose_megatag2entry = table.getEntry("botpose_orb_wpiblue");
+	private double[] botpose_megatag2Cache = new double[7];
 
 	private LinearFilter targetSpaceXFilter = LinearFilter.singlePoleIIR(.1, .02);
 	private LinearFilter targetSpaceZFilter = LinearFilter.singlePoleIIR(.1, .02);
@@ -91,6 +101,23 @@ public class FieldVisionIO {
 		} else {
 			DriverStation.reportWarning("(Field Vision) invalid wpiblue array from limelight", true);
 			inputs.fieldspaceTotalLatency_s = (tlEntry.getDouble(0) - clEntry.getDouble(0)) / 1000;
+		}
+
+		// megatag2 is MUCH more stable but it requires heading information with 0 degrees facing red wall. We reset our
+		// gyro constantly so we can not rely on it for accurate heading info. Megatag1 rotation is instead used for vision
+		// pose
+		if (botpose_megatag2Cache.length > 0) {
+			botpose_megatag2Cache = botpose_megatag2entry.getDoubleArray(botpose_megatag2Cache);
+			inputs.megatag2TranslationX_m = botpose_megatag2Cache[0];
+			inputs.megatag2TranslationY_m = botpose_megatag2Cache[1];
+			inputs.megatag2TranslationZ_m = botpose_megatag2Cache[2];
+			inputs.megatag2RotationX_rad = Math.toRadians(botpose_megatag2Cache[3]);
+			inputs.megatag2RotationY_rad = Math.toRadians(botpose_megatag2Cache[4]);
+			inputs.megatag2RotationZ_rad = Math.toRadians(botpose_megatag2Cache[5]);
+			// Log megatag2 pose to compare to megatag1
+			// var megatag2Pose = new Pose2d(inputs.megatag2TranslationX_m, inputs.megatag2TranslationY_m,
+			// Rotation2d.fromRadians(inputs.megatag2RotationZ_rad));
+			// Logger.recordOutput("Odometry/MegaTag2Pose", megatag2Pose);
 		}
 	}
 
