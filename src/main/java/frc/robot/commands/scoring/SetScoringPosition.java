@@ -4,7 +4,6 @@ import frc.robot.constants.ScoringConstants.ScoringPosition;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Shooter;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import java.util.function.Supplier;
@@ -15,8 +14,6 @@ public class SetScoringPosition extends Command {
 
 	private Supplier<ScoringPosition> posSupplier;
 	private ScoringPosition targetPosition;
-
-	private int armPIDSlot;
 
 	/**
 	 * Create a set scoring position command that adjusts dynamically according to a method that provides a {@link ScoringPosition} object 
@@ -51,9 +48,7 @@ public class SetScoringPosition extends Command {
 	// Called every time the scheduler runs while the command is scheduled.
 	@Override
 	public void execute() {
-		// only use the slow PID loop if we're in auto. Let it shake so teleop is quicker
-		armPIDSlot = DriverStation.isAutonomous() ? arm.getBestPIDSlot(targetPosition.armAngle_deg()) : 0;
-		arm.setPosition(targetPosition.armAngle_deg(), armPIDSlot);
+		arm.setPosition(targetPosition.armAngle_deg(), arm.getBestPIDSlot(targetPosition.armAngle_deg()));
 	}
 
 	// Called once the command ends or is interrupted.

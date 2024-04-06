@@ -7,6 +7,7 @@ import frc.robot.util.Math102;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Relay;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -185,14 +186,24 @@ public class Arm extends SubsystemBase {
 		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, 5);
 	}
 
+	/**
+	 * Gets the best PID configuration to use based on target position, actual position, and current driverstation mode
+	 * @param targetPosition_deg
+	 * @return recommended PID slot, either 0 (normal) or 1 (high angle). Can be fed directly into {@link Arm#setPosition(double, int) setPosition}
+	 */
 	public int getBestPIDSlot(double targetPosition_deg) {
+		// if in autonomous, let it shake
+		if (!DriverStation.isAutonomous())
+			return 0;
+
+		// in auto, use the dual PID loop
 		boolean chooseTop = (inputs.shaftPosition_deg > 65) && (targetPosition_deg > 65);
 		return chooseTop ? 1 : 0;
 	}
 
 	/**
 	 * ~30s climb startup routine to get it in the right position (no position control :(  )
-	 * @return
+	 * @return Command to be scheduled
 	 */
 	public Command climbStartup() {
 		return Commands.runOnce(() -> setClimberRelay(Relay.Value.kReverse)).andThen(Commands.waitSeconds(15))
