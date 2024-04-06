@@ -4,11 +4,14 @@ import static frc.robot.constants.AutoConstants.*;
 import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.Robot;
+import frc.robot.constants.LightsConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.subsystems.swerve.SwerveModuleIOReal;
 import frc.robot.subsystems.swerve.SwerveModuleIOSim;
+import frc.robot.util.Alert;
+import frc.robot.util.Alert.AlertType;
 import frc.robot.util.LocalADStarAK;
 
 import edu.wpi.first.math.VecBuilder;
@@ -66,6 +69,7 @@ public class Swerve extends SubsystemBase {
 
 	public GyroIO gyroIO;
 	public GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
+	private static Alert zeroYawAlert = new Alert("didn't zero yaw", AlertType.Warning);
 
 	private Vision vision;
 	private double translationY;
@@ -84,6 +88,7 @@ public class Swerve extends SubsystemBase {
 		this.vision = vision;
 
 		this.gyroIO = gyroIO;
+		zeroYawAlert.set(true);
 		zeroYaw();
 
 		timer.reset();
@@ -173,6 +178,9 @@ public class Swerve extends SubsystemBase {
 
 	public void zeroYaw() {
 		gyroIO.setYaw(0);
+		zeroYawAlert.set(false);
+		// flash lights
+		Lights.setStatus(LightsConstants.Mode.Climb);
 	}
 
 	public double getTilt_rad() {

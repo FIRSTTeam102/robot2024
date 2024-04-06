@@ -36,7 +36,6 @@ import frc.robot.commands.vision.GamePieceVision;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.VideoException;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Relay;
@@ -133,9 +132,7 @@ public class RobotContainer {
 		}
 		Command shuffleboardAutoOptions = Commands.parallel(
 			Commands.waitSeconds(delayEntry.getBoolean(false) ? 2 : 0),
-			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))),
-			Commands.runOnce(() -> swerve.gyroIO
-				.setYaw(swerve.getPose().getRotation().plus(Rotation2d.fromDegrees(Robot.isBlue() ? 0 : 180)).getDegrees())));
+			Commands.runOnce(() -> intake.resetNoteDetection(noteStartEntry.getBoolean(false))));
 
 		// named commands must be registered before any paths are created
 		NamedCommands.registerCommand("Options", shuffleboardAutoOptions);
@@ -205,6 +202,7 @@ public class RobotContainer {
 	private void configureBindings() {
 		// *DRIVER CONTROLS*
 		//
+		// swerve controls
 		var teleopSwerve = new TeleopSwerve(
 			() -> -driverController.getLeftY(),
 			() -> -driverController.getLeftX(),
@@ -212,29 +210,33 @@ public class RobotContainer {
 			() -> false, // no overdrive functionality
 			// driverController.getHID()::getLeftBumper, // override speed
 			() -> driverController.getLeftTriggerAxis() > OperatorConstants.boolTriggerThreshold, // precise mode
-			driverController.getHID()::getLeftBumper, // super precise mode
+			driverController.getHID()::getLeftStickButton, // super precise mode
 			swerve);
-		swerve.setDefaultCommand(teleopSwerve);
 
+		swerve.setDefaultCommand(teleopSwerve);
 		driverController.rightTrigger(OperatorConstants.boolTriggerThreshold)
 			.whileTrue(teleopSwerve.holdToggleFieldRelative());
+		driverController.y().onTrue(teleopSwerve.zeroYaw());
 		// right bumper -> limelight arm + shooter setting
-		driverController.rightBumper()
-			.onTrue(new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math));
-		// the double colon calls fora method but doesn't return its value immediately
-
-		// driverController.leftBumper().whileTrue(new AprilTagVision(vision, swerve));
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
+
+		// limelight shooting
+		driverController.rightBumper()
+			.onTrue(SetScoringPosition.withVision(arm, shooter, vision));
+		// the double colon calls fora method but doesn't return its value immediately
+		driverController.leftBumper().whileTrue(new AprilTagVision(vision, swerve));
+
+		// passing just in case
 		// driverController.x().whileTrue(new XStance(swerve));
 		driverController.x().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
 		driverController.b().whileTrue(new SetIntakeSpeed(intake, true));
-		driverController.y().onTrue(teleopSwerve.zeroYaw());
 
 		// dpad left -> call for coopertition (lights)
 		// dpad right -> call for amplify (lights)
 
 		// *OPERATOR CONTROLS*
 		//
+		// Scoring presets
 		operatorController.a()
 			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));
 		operatorController.b()
@@ -245,25 +247,26 @@ public class RobotContainer {
 			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
 		operatorController.povLeft().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.lowPassPosition));
 
+		// arm control
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
+		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));
+
+		// intaking/indexing
 		operatorController.leftTrigger(boolTriggerThreshold)
 			.whileTrue(IntakeWithArm.withDelay(intake, arm));
 		operatorController.rightTrigger(boolTriggerThreshold).whileTrue(new SetIntakeSpeed(intake, true));
+		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
+		operatorController.povRight().onTrue(Commands.runOnce(() -> intake.resetNoteDetection()));
+
 		// only let climb be run if end of match or we aren't on the field
 		BooleanSupplier climbAllowed = () -> (DriverStation.getMatchTime() < 32) || (!DriverStation.isFMSAttached());
 		operatorController.povDown().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kForward), arm)
 			.onlyIf(climbAllowed));
 		operatorController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kReverse), arm)
 			.onlyIf(climbAllowed));
-		// operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kOff), arm));
-		operatorController.povRight().onTrue(Commands.runOnce(() -> intake.resetNoteDetection()));
-
 		operatorController.start().toggleOnTrue(new AutoClimb(arm));
-
-		operatorController.leftStick().whileTrue(new SetIntakeSpeed(intake, -IntakeConstants.intakeSpeed, true));
-		operatorController.rightStick().whileTrue(
-			new ManualArmControl(arm, operatorController::getLeftY));
+		// operatorController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kOff), arm));
 
 		// *RESET YAW THROUGH PUSHBUTTON*
 		Trigger yawTrigger = new Trigger(swerve::getYawSwitch);
@@ -296,11 +299,12 @@ public class RobotContainer {
 			testController.a()
 				.onTrue(new InstantCommand(() -> shooter.setPercentOutput(shooterSpeedEntry.getDouble(0)), shooter));
 
-			testController.leftTrigger(boolTriggerThreshold)
+			testController.leftTrigger(boolTriggerThreshold).whileTrue(IntakeWithArm.withDelay(intake, arm));
+			testController.leftBumper()
 				.whileTrue(Commands
 					.runEnd(() -> intake.setMotorSpeed(intakeSpeedEntry.getDouble(0)), () -> intake.stopMotor(), intake)
 					.until(() -> intake.inputs.noteSensor).unless(() -> intake.inputs.noteSensor));
-			testController.leftBumper().whileTrue(
+			testController.rightTrigger(boolTriggerThreshold).whileTrue(
 				new StartEndCommand(() -> intake.setMotorSpeed(indexSpeedEntry.getDouble(0)), () -> intake.stopMotor(),
 					intake));
 

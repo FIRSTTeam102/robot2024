@@ -44,6 +44,8 @@ public class Intake extends SubsystemBase {
 		updateInputs(inputs);
 		Logger.processInputs(getName(), inputs);
 
+		// if we sense a note and this is the first time we're seeing it, toggle
+		// this is done because the note is hollow and we will see one edge on enter and the other on exit
 		if ((inputs.noteSensor != cachedNoteSensor) && inputs.noteSensor) {
 			holdingNote = !holdingNote;
 		}

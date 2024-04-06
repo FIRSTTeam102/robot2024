@@ -2,8 +2,6 @@ package frc.robot.commands.swerve;
 
 import frc.robot.constants.SwerveConstants;
 import frc.robot.subsystems.Swerve;
-import frc.robot.util.Alert;
-import frc.robot.util.Alert.AlertType;
 import frc.robot.util.ControllerUtil;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -42,17 +40,15 @@ public class TeleopSwerve extends Command {
 			});
 	}
 
-	private static Alert zeroYawAlert = new Alert("didn't zero yaw", AlertType.Warning);
-
 	private class ZeroYaw extends InstantCommand {
 		public ZeroYaw() {
-			zeroYawAlert.set(true);
+
 		}
 
 		@Override
 		public void initialize() {
 			swerve.zeroYaw();
-			zeroYawAlert.set(false);
+
 		}
 
 		@Override

@@ -22,7 +22,7 @@ public class AutoClimb extends Command {
 		if (!nearZero)
 			arm.setPosition(33);
 		else
-			arm.setMotorVoltage(-.15);
+			arm.setMotorVoltage(-.25);
 	}
 
 	@Override

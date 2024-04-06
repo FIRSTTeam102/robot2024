@@ -38,7 +38,8 @@ public class Arm extends SubsystemBase {
 	// throughbore encoder on hex shaft
 	private AbsoluteEncoder shaftEncoder = leadMotor.getAbsoluteEncoder(SparkAbsoluteEncoder.Type.kDutyCycle);
 
-	private ArmFeedforward feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
+	// feedforward control to keep the arm up
+	private ArmFeedforward feedforwardController = new ArmFeedforward(0, kG, 0, 0);
 
 	private Relay climberRelay = new Relay(0);
 
@@ -155,7 +156,6 @@ public class Arm extends SubsystemBase {
 	}
 
 	public void setPosition(double position_deg, int pidSlot) {
-		Logger.recordOutput("Arm/pidSlot", pidSlot);
 		targetPosition_deg = position_deg;
 		pidController.setReference(targetPosition_deg + shaftEncoderOffset_deg, ControlType.kSmartMotion, pidSlot,
 			feedforwardController.calculate(Units.degreesToRadians(targetPosition_deg), 0));
@@ -183,7 +183,7 @@ public class Arm extends SubsystemBase {
 	}
 
 	public boolean closeEnough() {
-		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, 5);
+		return MathUtil.isNear(targetPosition_deg, inputs.shaftPosition_deg, .8);
 	}
 
 	/**
@@ -207,7 +207,7 @@ public class Arm extends SubsystemBase {
 	 */
 	public Command climbStartup() {
 		return Commands.runOnce(() -> setClimberRelay(Relay.Value.kReverse)).andThen(Commands.waitSeconds(15))
-			.andThen(() -> setClimberRelay(Relay.Value.kForward)).andThen(Commands.waitSeconds(5))
+			.andThen(() -> setClimberRelay(Relay.Value.kForward)).andThen(Commands.waitSeconds(0))
 			.andThen(() -> setClimberRelay(Relay.Value.kOn));
 	}
 }

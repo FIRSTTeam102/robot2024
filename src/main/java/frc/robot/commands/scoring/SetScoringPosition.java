@@ -3,6 +3,7 @@ package frc.robot.commands.scoring;
 import frc.robot.constants.ScoringConstants.ScoringPosition;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Vision;
 
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -64,5 +65,16 @@ public class SetScoringPosition extends Command {
 	@Override
 	public boolean isFinished() {
 		return arm.closeEnough();
+	}
+
+	/**
+	 * Generate a command that sets the scoring position based on distance from the target apriltag
+	 * @param arm
+	 * @param shooter
+	 * @param vision
+	 * @return Command to be scheduled or bound
+	 */
+	public static Command withVision(Arm arm, Shooter shooter, Vision vision) {
+		return new SetScoringPosition(arm, shooter, vision::estimateScoringPosition_math);
 	}
 }

@@ -51,6 +51,7 @@ public class Shooter extends SubsystemBase {
 			new AutoSetterTunableNumber("Shooter/setpoint", 0, (double value) -> setVelocity(value));
 		}
 
+		// so drivers don't shoot too early
 		Shuffleboard.getTab("drive")
 			.addBoolean("Shooter at Target Speed?", this::isAtTargetVelocity)
 			.withWidget(BuiltInWidgets.kBooleanBox);

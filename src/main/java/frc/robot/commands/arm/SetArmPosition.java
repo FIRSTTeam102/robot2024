@@ -37,8 +37,8 @@ public class SetArmPosition extends Command {
 
 	@Override
 	public void end(boolean interrupted) {
-		// only stop if interrupted. Otherwise, continue adjusting arm position just move on to another command
-		if (interrupted || targetPosition_deg >= 65) {
+		// only stop if interrupted or high up. Otherwise, continue adjusting arm position just move on to another command
+		if (interrupted || (targetPosition_deg >= 65)) {
 			arm.stop();
 		}
 	}

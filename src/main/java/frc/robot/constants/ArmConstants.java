@@ -20,10 +20,7 @@ public final class ArmConstants {
 	public static final double manualMaxOutput = .4;
 
 	// feedforward
-	public static final double kS = 0;
 	public static final double kG = .5;
-	public static final double kV = 0;
-	public static final double kA = 0;
 
 	public static final double verticalArmPos_deg = 90;
 

@@ -52,6 +52,10 @@ public class Vision extends SubsystemBase {
 		return distance;
 	}
 
+	/**
+	 * Get a scoring position for a distance speaker shot using math functions generated from experimental data
+	 * @return ScoringPosition object
+	 */
 	public ScoringPosition estimateScoringPosition_math() {
 		double distance = Math.hypot(fieldInputs.targetspaceTranslationX_m, fieldInputs.targetspaceTranslationZ_m);
 
@@ -64,11 +68,16 @@ public class Vision extends SubsystemBase {
 		return new ScoringPosition(angle, speed);
 	}
 
+	/**
+	 * Get an estimated scoring position for a distance speaker shot using linear interpolation from experimental data
+	 * @return estimated ScoringPosition object
+	 * @deprecated Use {@link Vision#estimateScoringPosition_math() estimateScoringPosition_math} instead
+	 */
 	public ScoringPosition estimateScoringPosition_map() {
 		double distance = Math.hypot(fieldInputs.targetspaceTranslationX_m, fieldInputs.targetspaceTranslationZ_m);
 
 		// sort the keys with stream methods then collect into a set
-		ArrayList<Double> keys = ScoringConstants.scoringMap.keySet().stream().sorted()
+		ArrayList<Double> keys = ScoringConstants.scoringData.keySet().stream().sorted()
 			.collect(Collectors.toCollection(ArrayList::new));
 		// get closest value
 		double closestKey_m = keys.stream().min(Comparator.comparing(i -> Math.abs(i - distance))).orElseThrow()
@@ -88,8 +97,8 @@ public class Vision extends SubsystemBase {
 		}
 		double interpolationDistance = (distance - lowerKey_m) / (upperKey_m - lowerKey_m);
 
-		var lowerPosition = ScoringConstants.scoringMap.get(lowerKey_m);
-		var upperPosition = ScoringConstants.scoringMap.get(upperKey_m);
+		var lowerPosition = ScoringConstants.scoringData.get(lowerKey_m);
+		var upperPosition = ScoringConstants.scoringData.get(upperKey_m);
 
 		// interpolate between the two positions to get the estimated angle and speed
 		double angle = MathUtil.interpolate(lowerPosition.armAngle_deg(), upperPosition.armAngle_deg(),
