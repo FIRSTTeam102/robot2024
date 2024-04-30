@@ -73,6 +73,7 @@ public class Vision extends SubsystemBase {
 	 * @return estimated ScoringPosition object
 	 * @deprecated Use {@link Vision#estimateScoringPosition_math() estimateScoringPosition_math} instead
 	 */
+	@Deprecated
 	public ScoringPosition estimateScoringPosition_map() {
 		double distance = Math.hypot(fieldInputs.targetspaceTranslationX_m, fieldInputs.targetspaceTranslationZ_m);
 

@@ -81,6 +81,7 @@ public class RobotContainer {
 	private final CommandXboxController driverController = new CommandXboxController(driverControllerPort);
 	private final CommandXboxController operatorController = new CommandXboxController(operaterControllerPort);
 	private final CommandXboxController testController = new CommandXboxController(testControllerPort);
+	private final CommandXboxController demoController = new CommandXboxController(demoControllerPort);
 
 	private LoggedDashboardChooser<Command> autoChooser = new LoggedDashboardChooser<>("auto routine");
 
@@ -315,6 +316,30 @@ public class RobotContainer {
 			testController.povUp().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kReverse), arm));
 			testController.povLeft().onTrue(Commands.runOnce(() -> arm.setClimberRelay(Relay.Value.kOff), arm));
 		}
+
+		// DEMO CONTROLS
+		var demoTab = Shuffleboard.getTab("Demo");
+
+		var demoEnabled = demoTab.add("Demo Mode Enabled?", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+		var demoDriveEnabled = demoTab.add("Demo Drive Enabled?", false).withWidget(BuiltInWidgets.kToggleSwitch)
+			.getEntry();
+
+		var demoDriveScale = demoTab.add("Drive Scaling", .8).withWidget(BuiltInWidgets.kNumberSlider)
+			.withProperties(Map.of("min", 0, "max", 1)).getEntry();
+		var demoTurnScale = demoTab.add("Turn Scaling", .8).withWidget(BuiltInWidgets.kNumberSlider)
+			.withProperties(Map.of("min", 0, "max", 1)).getEntry();
+
+		var demoSwerve = new TeleopSwerve(
+			() -> (-demoController.getLeftY() * demoDriveScale.getDouble(.8)),
+			() -> (-driverController.getLeftX() * demoDriveScale.getDouble(.8)),
+			() -> (-driverController.getRightX() * demoTurnScale.getDouble(.8)),
+			() -> false,
+			() -> false, // no alt modes, just one speed scale
+			() -> false,
+			swerve);
+
+		Trigger demoDriving = new Trigger(() -> demoDriveEnabled.getBoolean(false));
+		demoDriving.whileTrue(demoSwerve);
 	}
 
 	/**

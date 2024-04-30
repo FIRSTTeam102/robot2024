@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 /**
  * @deprecated All autonomous stuff done with Choreo, PathPlanner, and inlines
  */
+@Deprecated
 public final class Autos {
 
 	public static Command deadlineSeconds(double time_s, Command... commands) {

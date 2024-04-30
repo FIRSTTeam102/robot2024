@@ -16,6 +16,7 @@ public final class Constants {
 		public static final int driverControllerPort = 0;
 		public static final int operaterControllerPort = 1;
 		public static final int testControllerPort = 2;
+		public static final int demoControllerPort = 3;
 
 		public static final double xboxStickDeadband = 0.1;
 		public static final double boolTriggerThreshold = 0.3;
