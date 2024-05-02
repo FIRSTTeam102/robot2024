@@ -7,6 +7,7 @@ import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
 import frc.robot.constants.IntakeConstants;
 import frc.robot.constants.ScoringConstants;
+import frc.robot.constants.ScoringConstants.ScoringPosition;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOPigeon2;
 import frc.robot.io.GyroIOSim;
@@ -320,26 +321,42 @@ public class RobotContainer {
 		// DEMO CONTROLS
 		var demoTab = Shuffleboard.getTab("Demo");
 
-		var demoEnabled = demoTab.add("Demo Mode Enabled?", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-		var demoDriveEnabled = demoTab.add("Demo Drive Enabled?", false).withWidget(BuiltInWidgets.kToggleSwitch)
+		var demoEnabledEntry = demoTab.add("Demo Mode Enabled?", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+		var demoDriveEnabledEntry = demoTab.add("Demo Drive Enabled?", false).withWidget(BuiltInWidgets.kToggleSwitch)
 			.getEntry();
 
-		var demoDriveScale = demoTab.add("Drive Scaling", .8).withWidget(BuiltInWidgets.kNumberSlider)
+		BooleanSupplier isDemoEnabled = () -> demoEnabledEntry.getBoolean(false);
+
+		var demoDriveScaleEntry = demoTab.add("Drive Scaling", .8).withWidget(BuiltInWidgets.kNumberSlider)
 			.withProperties(Map.of("min", 0, "max", 1)).getEntry();
-		var demoTurnScale = demoTab.add("Turn Scaling", .8).withWidget(BuiltInWidgets.kNumberSlider)
+		var demoTurnScaleEntry = demoTab.add("Turn Scaling", .8).withWidget(BuiltInWidgets.kNumberSlider)
 			.withProperties(Map.of("min", 0, "max", 1)).getEntry();
 
+		var demoAngleEntry = demoTab.add("Arm Angle (deg)", -1.5).getEntry();
+		var demoSpeedEntry = demoTab.add("Shooter speed (rpm)", 2700).getEntry();
+
 		var demoSwerve = new TeleopSwerve(
-			() -> (-demoController.getLeftY() * demoDriveScale.getDouble(.8)),
-			() -> (-driverController.getLeftX() * demoDriveScale.getDouble(.8)),
-			() -> (-driverController.getRightX() * demoTurnScale.getDouble(.8)),
+			() -> (-demoController.getLeftY() * demoDriveScaleEntry.getDouble(.8)),
+			() -> (-demoController.getLeftX() * demoDriveScaleEntry.getDouble(.8)),
+			() -> (-demoController.getRightX() * demoTurnScaleEntry.getDouble(.8)),
 			() -> false,
 			() -> false, // no alt modes, just one speed scale
 			() -> false,
 			swerve);
 
-		Trigger demoDriving = new Trigger(() -> demoDriveEnabled.getBoolean(false));
+		Trigger demoDriving = new Trigger(
+			() -> (demoDriveEnabledEntry.getBoolean(false) && demoEnabledEntry.getBoolean(false)));
 		demoDriving.whileTrue(demoSwerve);
+
+		demoController.leftTrigger(boolTriggerThreshold)
+			.whileTrue(IntakeWithArm.withDelay(intake, arm).onlyWhile(isDemoEnabled));
+		demoController.rightTrigger(boolTriggerThreshold)
+			.whileTrue(new SetIntakeSpeed(intake, true).onlyWhile(isDemoEnabled));
+
+		demoController.b().onTrue(new SetScoringPosition(arm, shooter,
+			() -> new ScoringPosition(demoAngleEntry.getDouble(-1.5), demoSpeedEntry.getDouble(2700))));
+		demoController.x().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.carryPosition));
+
 	}
 
 	/**
