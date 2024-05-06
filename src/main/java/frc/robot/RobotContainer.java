@@ -321,19 +321,21 @@ public class RobotContainer {
 		// DEMO CONTROLS
 		var demoTab = Shuffleboard.getTab("Demo");
 
-		var demoEnabledEntry = demoTab.add("Demo Mode Enabled?", false).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+		var demoEnabledEntry = demoTab.add("Demo Mode Enabled?", false).withWidget(BuiltInWidgets.kToggleSwitch)
+			.withSize(4, 2).withPosition(0, 0).getEntry();
 		var demoDriveEnabledEntry = demoTab.add("Demo Drive Enabled?", false).withWidget(BuiltInWidgets.kToggleSwitch)
+			.withSize(4, 2).withPosition(0, 2)
 			.getEntry();
 
 		BooleanSupplier isDemoEnabled = () -> demoEnabledEntry.getBoolean(false);
 
 		var demoDriveScaleEntry = demoTab.add("Drive Scaling", .8).withWidget(BuiltInWidgets.kNumberSlider)
-			.withProperties(Map.of("min", 0, "max", 1)).getEntry();
+			.withProperties(Map.of("min", 0, "max", 1)).withPosition(4, 0).getEntry();
 		var demoTurnScaleEntry = demoTab.add("Turn Scaling", .8).withWidget(BuiltInWidgets.kNumberSlider)
-			.withProperties(Map.of("min", 0, "max", 1)).getEntry();
+			.withProperties(Map.of("min", 0, "max", 1)).withPosition(9, 0).getEntry();
 
-		var demoAngleEntry = demoTab.add("Arm Angle (deg)", -1.5).getEntry();
-		var demoSpeedEntry = demoTab.add("Shooter speed (rpm)", 2700).getEntry();
+		var demoAngleEntry = demoTab.add("Arm Angle (deg)", -1.5).withPosition(4, 3).withSize(5, 2).getEntry();
+		var demoSpeedEntry = demoTab.add("Shooter speed (rpm)", 2700).withPosition(9, 3).withSize(5, 2).getEntry();
 
 		var demoSwerve = new TeleopSwerve(
 			() -> (-demoController.getLeftY() * demoDriveScaleEntry.getDouble(.8)),
@@ -354,8 +356,10 @@ public class RobotContainer {
 			.whileTrue(new SetIntakeSpeed(intake, true).onlyWhile(isDemoEnabled));
 
 		demoController.b().onTrue(new SetScoringPosition(arm, shooter,
-			() -> new ScoringPosition(demoAngleEntry.getDouble(-1.5), demoSpeedEntry.getDouble(2700))));
-		demoController.x().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.carryPosition));
+			() -> new ScoringPosition(demoAngleEntry.getDouble(-1.5), demoSpeedEntry.getDouble(2700)))
+				.onlyWhile(isDemoEnabled));
+		demoController.x()
+			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.carryPosition).onlyWhile(isDemoEnabled));
 
 	}
 
