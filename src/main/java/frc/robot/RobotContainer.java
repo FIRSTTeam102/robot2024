@@ -221,6 +221,7 @@ public class RobotContainer {
 		driverController.y().onTrue(teleopSwerve.zeroYaw());
 		// right bumper -> limelight arm + shooter setting
 		driverController.a().onTrue(teleopSwerve.toggleFieldRelative());
+		driverController.b().whileTrue(new GamePieceVision(vision, swerve));
 
 		// limelight shooting
 		driverController.rightBumper()
@@ -230,8 +231,8 @@ public class RobotContainer {
 
 		// passing just in case
 		// driverController.x().whileTrue(new XStance(swerve));
-		driverController.x().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
-		driverController.b().whileTrue(new SetIntakeSpeed(intake, true));
+		// driverController.x().onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.passPosition));
+		// driverController.b().whileTrue(new SetIntakeSpeed(intake, true));
 
 		// dpad left -> call for coopertition (lights)
 		// dpad right -> call for amplify (lights)
