@@ -81,4 +81,8 @@ public final class SwerveConstants {
 
 	/* physical yaw reset switch id */
 	public static final int switchId = 5; // DIO 5
+
+	/* Speed Scale Factor for demos */
+
+	public static final double speedScaleFactor = 0.2;
 };

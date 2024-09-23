@@ -5,6 +5,7 @@ import static frc.robot.constants.SwerveConstants.*;
 
 import frc.robot.Robot;
 import frc.robot.constants.LightsConstants;
+import frc.robot.constants.SwerveConstants;
 import frc.robot.io.GyroIO;
 import frc.robot.io.GyroIOInputsAutoLogged;
 import frc.robot.subsystems.swerve.SwerveModule;
@@ -208,14 +209,14 @@ public class Swerve extends SubsystemBase {
 		SwerveModuleState[] swerveModuleStates = kinematics.toSwerveModuleStates(
 			fieldRelative
 				? ChassisSpeeds.fromFieldRelativeSpeeds(
-					translation_mps.getX(),
-					translation_mps.getY(),
-					rotation_radps,
+					translation_mps.getX() * SwerveConstants.speedScaleFactor,
+					translation_mps.getY() * SwerveConstants.speedScaleFactor,
+					rotation_radps * SwerveConstants.speedScaleFactor,
 					getYaw())
 				: new ChassisSpeeds(
-					translation_mps.getX(),
-					translation_mps.getY(),
-					rotation_radps),
+					translation_mps.getX() * SwerveConstants.speedScaleFactor,
+					translation_mps.getY() * SwerveConstants.speedScaleFactor,
+					rotation_radps * SwerveConstants.speedScaleFactor),
 			centerRotation);
 		SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, maxVelocity_mps);
 
