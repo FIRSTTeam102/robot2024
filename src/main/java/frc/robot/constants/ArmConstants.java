@@ -23,6 +23,7 @@ public final class ArmConstants {
 	public static final double kG = .5;
 
 	public static final double verticalArmPos_deg = 90;
+	public static final double verticalArmPosDemo_deg = 105;
 
 	// smartmotion
 	public static double maxAccel_rpmps = 7200;

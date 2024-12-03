@@ -2,6 +2,7 @@ package frc.robot;
 
 import static frc.robot.constants.Constants.OperatorConstants.*;
 
+import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
@@ -20,6 +21,7 @@ import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 import frc.robot.util.ControllerUtil;
 
+import frc.robot.commands.arm.ArmWave;
 import frc.robot.commands.arm.AutoClimb;
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
@@ -238,7 +240,7 @@ public class RobotContainer {
 		//
 		// Scoring presets
 		operatorController.a()
-			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.ampPosition));
+			.onTrue(new ArmWave(arm, ArmConstants.verticalArmPosDemo_deg));
 		operatorController.b()
 			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		operatorController.x().onTrue(
