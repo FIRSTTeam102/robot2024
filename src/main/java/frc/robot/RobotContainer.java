@@ -2,7 +2,6 @@ package frc.robot;
 
 import static frc.robot.constants.Constants.OperatorConstants.*;
 
-import frc.robot.constants.ArmConstants;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.OperatorConstants;
 import frc.robot.constants.Constants.ShuffleboardConstants;
@@ -21,7 +20,6 @@ import frc.robot.util.Alert;
 import frc.robot.util.Alert.AlertType;
 import frc.robot.util.ControllerUtil;
 
-import frc.robot.commands.arm.ArmWave;
 import frc.robot.commands.arm.AutoClimb;
 import frc.robot.commands.arm.ManualArmControl;
 import frc.robot.commands.arm.SetArmPosition;
@@ -239,8 +237,7 @@ public class RobotContainer {
 		// *OPERATOR CONTROLS*
 		//
 		// Scoring presets
-		operatorController.a()
-			.onTrue(new ArmWave(arm, ArmConstants.verticalArmPosDemo_deg));
+
 		operatorController.b()
 			.onTrue(new SetScoringPosition(arm, shooter, ScoringConstants.subwooferPosition));
 		operatorController.x().onTrue(
@@ -253,6 +250,11 @@ public class RobotContainer {
 		operatorController.leftBumper().onTrue(new SetArmPosition(arm, 4));
 		operatorController.rightBumper().onTrue(new SetArmPosition(arm, 40));
 		operatorController.rightStick().whileTrue(new ManualArmControl(arm, operatorController::getLeftY));
+
+		// FOR LIGHT PARADE - WAVE the arm while right trigger is pressed
+		operatorController.a().whileTrue(
+			new SetArmPosition(arm, 40)
+				.andThen(new SetArmPosition(arm, 70)).repeatedly());
 
 		// intaking/indexing
 		operatorController.leftTrigger(boolTriggerThreshold)
